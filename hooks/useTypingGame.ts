@@ -16,6 +16,8 @@ const initialGameState: GameState = {
   keysPressed: 0,
   gameOver: false,
   level: 1,
+  lastKeyPressed: null, // Track last key pressed
+  lastKeyCorrect: true, // Track if it was correct
 };
 
 export const useTypingGame = () => {
@@ -46,7 +48,7 @@ export const useTypingGame = () => {
         return { ...newState, gameOver: true };
       }
 
-      // Spawn new letters if needed
+      // Spawn new letters
       if (
         newState.letters.length === 0 ||
         (newState.time % 60 === 0 &&
@@ -72,7 +74,12 @@ export const useTypingGame = () => {
     setGameState((prevState) => {
       if (prevState.gameOver) return prevState;
 
-      const newState = { ...prevState, keysPressed: prevState.keysPressed + 1 };
+      const newState = {
+        ...prevState,
+        keysPressed: prevState.keysPressed + 1,
+        lastKeyPressed: upperKey,
+        lastKeyCorrect: false, // default to false
+      };
 
       const index = newState.letters.findIndex((l) => l.letter === upperKey);
       if (index !== -1) {
@@ -83,9 +90,7 @@ export const useTypingGame = () => {
         newState.lettersCorrect += 1;
         newState.score += getLetterScore(upperKey);
         newState.speed = Math.min(GAME_CONFIG.MAX_SPEED, newState.speed * 1.01);
-      } else {
-        // Wrong key
-        newState.speed *= 0.95;
+        newState.lastKeyCorrect = true;
       }
 
       return newState;
@@ -97,7 +102,6 @@ export const useTypingGame = () => {
     letterIdCounter.current = 0;
   }, []);
 
-  // Game loop effect
   useEffect(() => {
     if (!gameState.gameOver) {
       gameLoopRef.current = window.setInterval(
@@ -111,7 +115,6 @@ export const useTypingGame = () => {
     };
   }, [gameLoop, gameState.gameOver]);
 
-  // Keyboard listener
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => handleKeyPress(event.key);
     window.addEventListener("keydown", handleKeyDown);

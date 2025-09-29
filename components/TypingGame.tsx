@@ -8,6 +8,7 @@ import { LEVEL_THRESHOLDS } from "../constants/gameConfig";
 import { GameArea } from "./game/GameArea";
 import { GameOver } from "./ui/GameOver";
 import { Instructions } from "./ui/Instructions";
+import { GameStats } from "./ui/GameStats";
 
 const pulse = keyframes`
   0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -21,10 +22,10 @@ const gridMove = keyframes`
 
 const GameWrapper = styled.div<{ level: number }>`
   position: relative;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   overflow: hidden;
-  transition: all 2s ease;
+  transition: all 0.5s ease;
 
   ${({ level }) => {
     const gradients: Record<number, string> = {
@@ -39,11 +40,7 @@ const GameWrapper = styled.div<{ level: number }>`
   }}
 `;
 
-const ParticleDot = styled.div<{
-  left: number;
-  top: number;
-  delay: number;
-}>`
+const ParticleDot = styled.div<{ left: number; top: number; delay: number }>`
   position: absolute;
   width: 4px;
   height: 4px;
@@ -111,15 +108,16 @@ const GameContainer = styled.div`
 
 const LevelIndicator = styled.div`
   position: absolute;
-  top: 24px;
+  top: 0.5vh;
   left: 50%;
   transform: translateX(-50%);
   padding: 8px 24px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
-  border-radius: 9999px;
+  border-radius: 50px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 
   span {
     color: white;
@@ -162,6 +160,63 @@ const ProgressText = styled.div`
   z-index: 1000;
 `;
 
+const StartScreen = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  z-index: 1000;
+  text-align: center;
+  padding: 16px;
+
+  h1 {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 20px;
+  }
+
+  button {
+    padding: 12px 32px;
+    font-size: 20px;
+    font-weight: bold;
+    background: linear-gradient(to right, #22d3ee, #a855f7);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    color: white;
+    transition: transform 0.2s ease;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+  }
+`;
+
+const InstructionsPanel = styled.div`
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 16px 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  max-width: 600px;
+  margin-bottom: 32px;
+
+  p {
+    color: white;
+    font-size: 16px;
+    margin: 0;
+  }
+`;
+
 function seededRandom(seed: number) {
   const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
@@ -180,13 +235,11 @@ const Particle: React.FC<ParticleProps> = React.memo(
 
     return <ParticleDot left={left} top={top} delay={delay} />;
   },
-  (prevProps: ParticleProps, nextProps: ParticleProps) =>
+  (prevProps, nextProps) =>
     prevProps.lettersCorrect === nextProps.lettersCorrect &&
     prevProps.index === nextProps.index &&
     prevProps.delay === nextProps.delay
 );
-
-Particle.displayName = "Particle";
 
 Particle.displayName = "Particle";
 
@@ -201,15 +254,6 @@ export const TypingGame: React.FC = () => {
     gameState.keysPressed
   );
 
-  const showInstructions = !hasStarted;
-
-  useEffect(() => {
-    if (!hasStarted && gameState.keysPressed > 0) {
-      setHasStarted(true);
-    }
-  }, [gameState.keysPressed, hasStarted]);
-
-  // Progress relative to current level thresholds
   const getProgress = () => {
     const currentLevel = gameState.level;
     let minThreshold = 0;
@@ -228,57 +272,79 @@ export const TypingGame: React.FC = () => {
 
   return (
     <GameWrapper level={gameState.level}>
-      <ParticleLayer>
-        {particles.map((i) => (
-          <Particle
-            key={i}
-            index={i}
-            delay={i * 0.1}
-            lettersCorrect={gameState.lettersCorrect}
-          />
-        ))}
-      </ParticleLayer>
+      {!hasStarted && (
+        <StartScreen>
+          <h1>Typing Challenge</h1>
 
-      <GridBackground />
+          <Instructions show={!hasStarted} />
 
-      <GlowingOrb size={128} color="#06b6d4" top="40px" left="40px" />
-      <GlowingOrb
-        size={96}
-        color="#9333ea"
-        bottom="40px"
-        right="40px"
-        delay="1s"
-      />
-      <GlowingOrb size={64} color="#ec4899" top="50%" left="25%" delay="2s" />
-
-      <GameContainer>
-        <GameArea gameState={gameState} />
-      </GameContainer>
-
-      {gameState.gameOver && (
-        <GameOver
-          gameStats={gameStats}
-          score={gameState.score}
-          lettersCorrect={gameState.lettersCorrect}
-          keysPressed={gameState.keysPressed}
-          onRestart={resetGame}
-        />
+          <button onClick={() => setHasStarted(true)}>PLAY!</button>
+        </StartScreen>
       )}
 
-      <Instructions show={showInstructions} />
-
-      {!gameState.gameOver && (
+      {hasStarted && (
         <>
-          <LevelIndicator>
-            <span>Level {gameState.level}</span>
-          </LevelIndicator>
+          <ParticleLayer>
+            {particles.map((i) => (
+              <Particle
+                key={i}
+                index={i}
+                delay={i * 0.1}
+                lettersCorrect={gameState.lettersCorrect}
+              />
+            ))}
+          </ParticleLayer>
+          <GridBackground />
+          <GlowingOrb size={128} color="#06b6d4" top="40px" left="40px" />
+          <GlowingOrb
+            size={96}
+            color="#9333ea"
+            bottom="40px"
+            right="40px"
+            delay="1s"
+          />
+          <GlowingOrb
+            size={64}
+            color="#ec4899"
+            top="50%"
+            left="25%"
+            delay="2s"
+          />
+          <GameContainer>
+            <GameStats
+              time={gameState.time}
+              lettersCorrect={gameState.lettersCorrect}
+              score={gameState.score}
+            />
+            <GameArea gameState={gameState} />
+          </GameContainer>
 
-          <ProgressWrapper>
-            <ProgressBar progress={getProgress()}>
-              <div />
-            </ProgressBar>
-            <ProgressText>Progress to next level</ProgressText>
-          </ProgressWrapper>
+          {gameState.gameOver && (
+            <GameOver
+              gameStats={gameStats}
+              score={gameState.score}
+              lettersCorrect={gameState.lettersCorrect}
+              keysPressed={gameState.keysPressed}
+              onRestart={resetGame}
+            />
+          )}
+
+          <Instructions show={gameState.gameOver} />
+
+          {!gameState.gameOver && (
+            <>
+              <LevelIndicator>
+                <span>Level {gameState.level}</span>
+              </LevelIndicator>
+
+              <ProgressWrapper>
+                <ProgressBar progress={getProgress()}>
+                  <div />
+                </ProgressBar>
+                <ProgressText>Progress to next level</ProgressText>
+              </ProgressWrapper>
+            </>
+          )}
         </>
       )}
     </GameWrapper>

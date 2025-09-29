@@ -15,21 +15,14 @@ const StatsContainer = styled.div`
 `;
 
 const StatPanel = styled.div`
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(12px);
+  margin-top: 32px;
+  background: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
-  padding: 20px 28px;
+  padding: 10px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
-  min-width: 140px;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.5);
-    border-color: rgba(255, 255, 255, 0.25);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-  }
+  min-width: 120px;
 `;
 
 const StatLabel = styled.div`
