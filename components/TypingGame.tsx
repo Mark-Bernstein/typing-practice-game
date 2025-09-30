@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import { useTypingGame } from "../hooks/useTypingGame";
 import { calculateGameStats, getLevelMessage } from "../utils/gameUtils";
@@ -190,10 +190,29 @@ const LevelMessage = styled.div`
   left: 50%;
   transform: translateX(-50%);
   color: #22d3ee;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: bold;
   text-shadow: 0 0 8px rgba(34, 211, 238, 0.7);
   z-index: 1000;
+  opacity: 0;
+  animation: fadeInOut 3s ease-in-out forwards;
+
+  @keyframes fadeInOut {
+    0% {
+      opacity: 0;
+      transform: translateX(-50%) scale(0.9);
+    }
+    10% {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
 `;
 
 const StartButton = styled.button`
@@ -208,18 +227,17 @@ const StartButton = styled.button`
   cursor: pointer;
   background: limegreen;
   background-size: 600% 600%;
-  animation: cosmicShift 8s ease infinite, pulse 4s ease-in-out infinite;
   z-index: 1;
   overflow: visible;
   box-shadow: 0 0 30px rgba(147, 51, 234, 0.9), 0 0 60px rgba(34, 211, 238, 0.8);
+  transition: all 0.4s ease;
 
   &:hover {
-    color: cyan;
+    color: white;
     letter-spacing: 10px;
-    background: black;
-    opacity: 1;
-    /* box-shadow: none; */
-    transition: all 0.8s ease-in-out;
+    transform: scale(1.1) rotateX(5deg) rotateY(5deg);
+    text-shadow: 5px 5px 10px #22d3ee, 0 0 20px #a855f7, 0 0 30px #ec4899;
+    background: linear-gradient(135deg, #1900ff, #8400ff, #000000);
   }
 
   /* Cosmic glowing orbs */
@@ -371,6 +389,7 @@ const GamePlay: React.FC<{
 }> = ({ onExit, onLevelChange }) => {
   const { gameState, resetGame } = useTypingGame();
   const [particles] = useState(() => Array.from({ length: 50 }, (_, i) => i));
+  const [levelMessage, setLevelMessage] = useState(getLevelMessage(0));
 
   const gameStats = calculateGameStats(
     gameState.time,
@@ -402,10 +421,12 @@ const GamePlay: React.FC<{
     return Math.min(100, Math.max(0, progress));
   };
 
-  // Notify parent about level change
-  React.useEffect(() => {
+  useEffect(() => {
+    const newMessage = getLevelMessage(gameState.lettersCorrect);
+    setLevelMessage(newMessage);
+
     onLevelChange?.(gameState.level);
-  }, [gameState.level, onLevelChange]);
+  }, [gameState.lettersCorrect, gameState.level, onLevelChange]);
 
   return (
     <>
@@ -460,12 +481,10 @@ const GamePlay: React.FC<{
           <LevelIndicator>
             <span>Level {gameState.level}</span>
           </LevelIndicator>
-          {gameState.level > 1 && (
-            <LevelMessage>
-              {getLevelMessage(gameState.lettersCorrect)}
-            </LevelMessage>
-          )}
 
+          {levelMessage && (
+            <LevelMessage key={levelMessage}>{levelMessage}</LevelMessage>
+          )}
           <ProgressWrapper>
             <ProgressBar progress={getProgress()}>
               <div />

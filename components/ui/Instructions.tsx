@@ -84,8 +84,7 @@ export const CreatedBy = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "show",
 })<{ show: boolean }>`
   position: relative;
-  backdrop-filter: blur(14px);
-  padding: 16px 24px;
+  padding: 20px 36px;
   text-align: center;
   max-width: 800px;
   margin-top: 20px;
@@ -139,27 +138,35 @@ export const CreatedBy = styled.div.withConfig({
     background: linear-gradient(90deg, #22d3ee, #9333ea, #ec4899);
     background-size: 300% 300%;
     animation: ${textShimmer} 6s ease infinite;
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 `;
 
-const MainText = styled.p<{ reflected?: boolean }>`
+const MainText = styled.p<{ $reflected?: boolean }>`
   color: white;
-  /* font-size: 32px; */
   font-weight: 600;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   white-space: nowrap;
 
-  ${({ reflected }) =>
-    reflected &&
+  ${({ $reflected }) =>
+    $reflected &&
     `
       transform: scaleY(-1);
-      opacity: 0.3;
+      opacity: 0;
       margin-top: -4px;
       mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0,0,0,0));
       -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0,0,0,0));
+      animation: fadeIn 1s ease forwards;
+      animation-delay: 1.2s;
   `}
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
 `;
 
 const SubText = styled.p`
@@ -183,6 +190,7 @@ const CreatedByText = styled.span`
   text-transform: uppercase;
   background: linear-gradient(90deg, #22d3ee, #9333ea, #ec4899);
   background-size: 300% 300%;
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: ${textShimmer} 6s ease infinite;
@@ -223,6 +231,17 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
     <InstructionsContainer>
       <InstructionsPanel show={show} delay={0.5}>
         <SubText>
+          Type the letters as they fall and reach the highest score!
+        </SubText>
+      </InstructionsPanel>
+      <InstructionsPanel show={show} delay={0.9}>
+        <SubText>Incorrect letters effects your score negatively!</SubText>
+      </InstructionsPanel>
+      <InstructionsPanel show={show} delay={1.2}>
+        <SubText>Progress through levels to increase difficulty.</SubText>
+      </InstructionsPanel>
+      <InstructionsPanel show={show} delay={1.5}>
+        <SubText>
           <HighlightText>Home row letters</HighlightText> (A, S, D, F, J, K, L)
           = 1 point
         </SubText>
@@ -230,20 +249,9 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
           <HighlightText>All others</HighlightText> = 3 points
         </SubText>
       </InstructionsPanel>
-      <InstructionsPanel show={show} delay={0.8}>
-        <SubText>
-          Type the letters as they fall and reach the highest score!
-        </SubText>
-      </InstructionsPanel>
-      <InstructionsPanel show={show} delay={1.3}>
-        <SubText>Correct letters help you reach the next level.</SubText>
-      </InstructionsPanel>
-      <InstructionsPanel show={show} delay={1.8}>
-        <SubText>Progress through levels to increase difficulty.</SubText>
-      </InstructionsPanel>
       <CreatedBy show={show}>
         <MainText>Created by: Mark Bernstein</MainText>
-        <MainText reflected={true}>Created by: Mark Bernstein</MainText>
+        <MainText $reflected={true}>Created by: Mark Bernstein</MainText>
       </CreatedBy>
     </InstructionsContainer>
   );
