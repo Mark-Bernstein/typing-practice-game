@@ -243,7 +243,7 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
       </InstructionsPanel>
       <CreatedBy show={show}>
         <MainText>Created by: Mark Bernstein</MainText>
-        <MainText reflected="true">Created by: Mark Bernstein</MainText>
+        <MainText reflected={true}>Created by: Mark Bernstein</MainText>
       </CreatedBy>
     </InstructionsContainer>
   );
