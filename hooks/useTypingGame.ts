@@ -29,7 +29,8 @@ export const useTypingGame = () => {
     setGameState((prevState) => {
       if (prevState.gameOver) return prevState;
 
-      const newState = { ...prevState };
+      // eslint-disable-next-line prefer-const
+      let newState = { ...prevState };
       newState.time += 1;
 
       // Move letters down
