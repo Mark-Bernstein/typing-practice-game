@@ -7,8 +7,16 @@ const fadeIn = keyframes`
 `;
 
 const fadeOut = keyframes`
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateX(1000px); }
+  from { 
+    opacity: 1; 
+    transform: translateY(0); 
+    filter: blur(5px);
+  }
+  to { 
+    opacity: 0; 
+    transform: translateX(1000px);
+    filter: blur(50px); /* Adjust the blur intensity as desired */
+  }
 `;
 
 const InstructionsContainer = styled.div`

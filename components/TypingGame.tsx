@@ -172,11 +172,11 @@ const StartScreen = styled.div`
   z-index: 1000;
   text-align: center;
   padding: 16px;
-  padding-top: 15%; /* adjust this value to fine-tune vertical positioning */
+  padding-top: 10%;
 
   h1 {
     font-size: 48px;
-    margin-bottom: 200px;
+    margin-bottom: 100px;
   }
 
   p {

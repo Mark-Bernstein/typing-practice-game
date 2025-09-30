@@ -51,7 +51,7 @@ export const getLevelMessage = (lettersCorrect: number): string => {
     return "Level 3: Expert Mode!";
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_2)
     return "Level 2: Getting Better!";
-  if (lettersCorrect >= 0) return "Level 1: Let's do this! Goodluck!";
+  if (lettersCorrect >= 0) return "Level 1";
   return "";
 };
 
