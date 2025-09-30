@@ -3,8 +3,6 @@ import styled, { keyframes } from "styled-components";
 import { GameState } from "../../types/game";
 import { GAME_CONFIG } from "../../constants/gameConfig";
 import { FallingLetter } from "./FallingLetter";
-import { LevelMessage } from "./LevelMessage";
-import { GameStats } from "../ui/GameStats";
 
 // Wrapper to center and scale game proportionally
 const GameContainer = styled.div`

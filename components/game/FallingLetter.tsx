@@ -18,10 +18,6 @@ const StyledLetter = styled.div<{ $color: string }>`
   transition: none;
 `;
 
-interface FallingLetterProps {
-  letter: LetterPosition;
-}
-
 export const FallingLetter: React.FC<{ letter: LetterPosition }> = memo(
   ({ letter }) => {
     return (

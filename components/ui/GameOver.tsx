@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import { GameStats } from "../../types/game";
-import { GAME_CONFIG } from "../../constants/gameConfig";
 
 interface GameOverProps {
   gameStats: GameStats;
@@ -80,6 +79,7 @@ const Title = styled.h1`
   font-weight: 900;
   margin-bottom: 16px;
   background: linear-gradient(90deg, #ff004c, #ff00ff, #ff004c);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: ${glow} 3s infinite;
