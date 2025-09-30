@@ -6,7 +6,7 @@ export const GAME_CONFIG = {
   START_LETTER_SPEED: 2,
   FRAME_RATE: 60,
   MAX_LETTERS: 10,
-  MAX_SPEED: 10,
+  MAX_SPEED: 50,
 } as const;
 
 export const LETTER_COLORS: readonly string[] = [
