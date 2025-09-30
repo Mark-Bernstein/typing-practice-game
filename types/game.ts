@@ -15,6 +15,8 @@ export interface GameState {
   keysPressed: number;
   gameOver: boolean;
   level: number;
+  lastKeyPressed: string | null;
+  lastKeyCorrect: boolean;
 }
 
 export interface GameStats {

@@ -16,13 +16,13 @@ const initialGameState: GameState = {
   keysPressed: 0,
   gameOver: false,
   level: 1,
-  lastKeyPressed: null, // Track last key pressed
-  lastKeyCorrect: true, // Track if it was correct
+  lastKeyPressed: null,
+  lastKeyCorrect: true,
 };
 
 export const useTypingGame = () => {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
-  const gameLoopRef = useRef<number>();
+  const gameLoopRef = useRef<number | undefined>(undefined);
   const letterIdCounter = useRef(0);
 
   const gameLoop = useCallback(() => {

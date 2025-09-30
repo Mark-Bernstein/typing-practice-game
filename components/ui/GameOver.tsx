@@ -23,8 +23,8 @@ const bounce = keyframes`
 `;
 
 const glow = keyframes`
-  0%, 100% { text-shadow: 0 0 10px #00f7ff, 0 0 20px #00f7ff, 0 0 40px #0ff; }
-  50% { text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff, 0 0 60px #f0f; }
+  0%, 100% { text-shadow: 0 0 50px #ff0000, 0 0 50px #000000, 0 0 50px #ff0000; }
+  20% { text-shadow: 0 0 50px #800080, 0 0 10px #000000, 0 0 10px #740074; }
 `;
 
 /* --- Styled Components --- */
@@ -223,12 +223,20 @@ export const GameOver: React.FC<GameOverProps> = ({
   }, [score]);
 
   const getPerformanceMessage = (percentage: number) => {
-    if (percentage >= 95) return { msg: "LEGENDARY!", color: "#FFD700" };
-    if (percentage >= 90) return { msg: "EXCELLENT!", color: "#00FF7F" };
-    if (percentage >= 80) return { msg: "GREAT JOB!", color: "#00BFFF" };
-    if (percentage >= 70) return { msg: "GOOD WORK!", color: "#BA55D3" };
-    if (percentage >= 60) return { msg: "NOT BAD!", color: "#40E0D0" };
-    return { msg: "KEEP PRACTICING!", color: "#FF4500" };
+    if (percentage >= 95)
+      return { msg: `${percentage}% Correct! LEGENDARY!`, color: "#FFD700" };
+    if (percentage >= 90)
+      return { msg: `${percentage}% Correct! EXCELLENT!`, color: "#00FF7F" };
+    if (percentage >= 80)
+      return { msg: `${percentage}% Correct! GREAT JOB!`, color: "#00BFFF" };
+    if (percentage >= 70)
+      return { msg: `${percentage}% Correct! GOOD WORK!`, color: "#BA55D3" };
+    if (percentage >= 60)
+      return { msg: `${percentage}% Correct! NOT BAD!`, color: "#40E0D0" };
+    return {
+      msg: `${percentage}% Correct... KEEP PRACTICING!`,
+      color: "red",
+    };
   };
 
   const performance = getPerformanceMessage(gameStats.successPercentage);
