@@ -10,3 +10,4 @@ export { LevelMessage } from "./game/LevelMessage";
 export { GameOver } from "./ui/GameOver";
 export { GameStats } from "./ui/GameStats";
 export { Instructions } from "./ui/Instructions";
+export { Lives } from "./ui/Lives";

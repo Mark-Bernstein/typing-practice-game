@@ -8,7 +8,7 @@ const fadeIn = keyframes`
 
 const fadeOut = keyframes`
   from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-500px); }
+  to { opacity: 0; transform: translateX(1000px); }
 `;
 
 const InstructionsContainer = styled.div`
@@ -21,7 +21,7 @@ const InstructionsContainer = styled.div`
 
 const InstructionsPanel = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "show" && prop !== "delay",
-})<{ show: boolean; delay?: number }>`
+})<{ show: boolean; delay: number }>`
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -39,7 +39,7 @@ const InstructionsPanel = styled.div.withConfig({
           animation: ${fadeIn} 1s ${delay || 0}s ease-in-out forwards;
         `
       : css`
-          animation: ${fadeOut} 0.5s ease-in-out forwards;
+          animation: ${fadeOut} 0.5s ${delay / 2 || 0}s ease-in-out forwards;
         `}
 `;
 
@@ -103,7 +103,7 @@ export const CreatedBy = styled.div.withConfig({
             ${float} 5s ease-in-out 2s infinite;
         `
       : css`
-          animation: ${fadeOut} 2s ease-in-out forwards;
+          animation: ${fadeOut} 1s ease-in-out forwards;
         `}
 
   &::after {

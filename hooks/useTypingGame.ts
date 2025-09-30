@@ -18,6 +18,7 @@ const initialGameState: GameState = {
   level: 1,
   lastKeyPressed: null,
   lastKeyCorrect: true,
+  lives: 3,
 };
 
 export const useTypingGame = () => {
@@ -39,15 +40,34 @@ export const useTypingGame = () => {
         y: letter.y + newState.speed,
       }));
 
-      // Check for game over
-      if (
-        newState.letters.some(
-          (letter) =>
-            letter.y + GAME_CONFIG.LETTER_SIZE >= GAME_CONFIG.SCREEN_HEIGHT
-        )
-      ) {
-        return { ...newState, gameOver: true };
+      // Check for letters that reached the bottom
+      const lettersReachedBottom = newState.letters.filter(
+        (letter) =>
+          letter.y + GAME_CONFIG.LETTER_SIZE >= GAME_CONFIG.SCREEN_HEIGHT
+      );
+
+      // Remove letters that reached the bottom
+      const remainingLetters = newState.letters.filter(
+        (letter) =>
+          letter.y + GAME_CONFIG.LETTER_SIZE < GAME_CONFIG.SCREEN_HEIGHT
+      );
+
+      // Decrease lives for each letter that reached the bottom
+      const newLives = newState.lives - lettersReachedBottom.length;
+
+      // Check for game over (no lives left)
+      if (newLives <= 0) {
+        return {
+          ...newState,
+          gameOver: true,
+          lives: 0,
+          letters: remainingLetters,
+        };
       }
+
+      // Update letters and lives
+      newState.letters = remainingLetters;
+      newState.lives = newLives;
 
       // Spawn new letters
       if (

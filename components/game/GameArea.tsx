@@ -3,6 +3,7 @@ import styled, { keyframes } from "styled-components";
 import { GameState } from "../../types/game";
 import { GAME_CONFIG } from "../../constants/gameConfig";
 import { FallingLetter } from "./FallingLetter";
+import { Lives } from "../ui/Lives";
 
 // Wrapper to center and scale game proportionally
 const GameContainer = styled.div`
@@ -63,6 +64,10 @@ interface GameAreaProps {
 export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
   return (
     <GameContainer>
+      {/* Lives Display - Left Side */}
+      <Lives lives={gameState.lives} />
+
+      {/* Main Game Area */}
       <GameCanvas>
         {gameState.letters.map((letter) => (
           <FallingLetter key={letter.id} letter={letter} />
