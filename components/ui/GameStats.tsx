@@ -9,8 +9,9 @@ const StatsContainer = styled.div`
   right: 0;
   padding: 24px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
+  gap: 20px;
   z-index: 20;
 `;
 
