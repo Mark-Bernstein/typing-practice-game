@@ -2,10 +2,14 @@ import React from "react";
 import styled from "styled-components";
 
 const LivesContainer = styled.div`
+  position: absolute; /* remove from flow */
+  top: 50%; /* center vertically */
+  left: 0; /* stick to left */
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 24px;
+  padding: 16px;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -15,7 +19,7 @@ const LivesContainer = styled.div`
 
 const LivesLabel = styled.div`
   color: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -25,15 +29,15 @@ const LivesLabel = styled.div`
 const HeartsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 `;
 
 const Heart = styled.div<{ $filled: boolean }>`
-  font-size: 32px;
-  transition: all 0.3s ease;
+  font-size: 60px;
+  transition: all 0.4s ease;
   filter: ${(props) =>
     props.$filled ? "none" : "grayscale(100%) brightness(0.5)"};
-  opacity: ${(props) => (props.$filled ? "1" : "0.4")};
+  opacity: ${(props) => (props.$filled ? "1" : "0.5")};
 
   ${(props) =>
     props.$filled &&
@@ -62,7 +66,7 @@ interface LivesProps {
   maxLives?: number;
 }
 
-export const Lives: React.FC<LivesProps> = ({ lives, maxLives = 3 }) => {
+export const Lives: React.FC<LivesProps> = ({ lives, maxLives = 10 }) => {
   return (
     <LivesContainer>
       <LivesLabel>Lives</LivesLabel>

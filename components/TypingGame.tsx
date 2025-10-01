@@ -98,11 +98,15 @@ const GlowingOrb = styled.div<{
   animation-delay: ${({ delay }) => delay || "0s"};
 `;
 
+// GameContainer: keeps layout flow but centers the canvas
 const GameContainer = styled.div`
   position: relative;
   z-index: 10;
   width: 100%;
-  height: 100%;
+  min-height: 100vh; /* IMPORTANT: fill viewport if parent has no fixed height */
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center; /* center vertically */
   backdrop-filter: blur(4px);
 `;
 
@@ -128,7 +132,7 @@ const LevelIndicator = styled.div`
 
 const ProgressWrapper = styled.div`
   position: absolute;
-  bottom: 13%;
+  bottom: 3%;
   left: 50%;
   transform: translateX(-50%);
   width: 500px;
@@ -457,7 +461,9 @@ const GamePlay: React.FC<{
           time={gameState.time}
           lettersCorrect={gameState.lettersCorrect}
           score={gameState.score}
+          speed={gameState.speed}
         />
+
         <GameArea gameState={gameState} />
       </GameContainer>
 

@@ -18,7 +18,7 @@ const initialGameState: GameState = {
   level: 1,
   lastKeyPressed: null,
   lastKeyCorrect: true,
-  lives: 3,
+  lives: 10,
 };
 
 export const useTypingGame = () => {
@@ -75,11 +75,19 @@ export const useTypingGame = () => {
         (newState.time % 60 === 0 &&
           newState.letters.length < GAME_CONFIG.MAX_LETTERS)
       ) {
-        const newLetter = generateRandomLetter(
-          newState.letters,
-          letterIdCounter.current++
+        // number of letters to spawn depends on level
+        const spawnCount = Math.min(
+          newState.level,
+          5 - newState.letters.length
         );
-        newState.letters = [...newState.letters, newLetter];
+
+        for (let i = 0; i < spawnCount; i++) {
+          const newLetter = generateRandomLetter(
+            newState.letters,
+            letterIdCounter.current++
+          );
+          newState.letters = [...newState.letters, newLetter];
+        }
       }
 
       newState.level = getLevel(newState.lettersCorrect);
@@ -110,7 +118,10 @@ export const useTypingGame = () => {
         newState.letters = updatedLetters;
         newState.lettersCorrect += 1;
         newState.score += getLetterScore(upperKey);
-        newState.speed = Math.min(GAME_CONFIG.MAX_SPEED, newState.speed * 1.01);
+        newState.speed = Math.min(
+          GAME_CONFIG.MAX_SPEED,
+          newState.speed * 1.015
+        );
         newState.lastKeyCorrect = true;
       }
 

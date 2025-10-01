@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import { GameState } from "../../types/game";
 import { GAME_CONFIG } from "../../constants/gameConfig";
 import { FallingLetter } from "./FallingLetter";
 import { Lives } from "../ui/Lives";
+import { LetterMissEffect } from "../ui/LetterMissEffect";
 
 // Wrapper to center and scale game proportionally
 const GameContainer = styled.div`
@@ -16,6 +17,18 @@ const GameContainer = styled.div`
   overflow: hidden;
 `;
 
+/* Absolutely-centered wrapper */
+const GameCanvasWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  z-index: 5;
+`;
+
 const GameCanvas = styled.div`
   position: relative;
   width: ${GAME_CONFIG.SCREEN_WIDTH}px;
@@ -24,15 +37,6 @@ const GameCanvas = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   box-shadow: 0 0 60px rgba(0, 0, 0, 0.5), inset 0 0 80px rgba(0, 0, 0, 0.3);
-
-  /* Make canvas scale with viewport */
-  transform-origin: top left;
-  transform: scale(
-    min(
-      100vw / ${GAME_CONFIG.SCREEN_WIDTH},
-      100vh / ${GAME_CONFIG.SCREEN_HEIGHT}
-    )
-  );
 `;
 
 // Animation for wrong key feedback
@@ -50,7 +54,7 @@ const WrongKeyFeedback = styled.div`
   left: 50%;
   transform: translateX(-50%);
   color: #ff4d4f;
-  font-size: 24px;
+  font-size: 32px;
   font-weight: bold;
   animation: ${shake} 0.3s linear;
   pointer-events: none;
@@ -62,24 +66,39 @@ interface GameAreaProps {
 }
 
 export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
+  const [triggerMissEffect, setTriggerMissEffect] = useState(false);
+  const prevLivesRef = useRef(gameState.lives);
+
+  // Detect when lives decrease (letter hit bottom)
+  useEffect(() => {
+    if (gameState.lives < prevLivesRef.current) {
+      setTriggerMissEffect(true);
+      // Reset trigger after animation completes
+      const timer = setTimeout(() => setTriggerMissEffect(false), 600);
+      return () => clearTimeout(timer);
+    }
+    prevLivesRef.current = gameState.lives;
+  }, [gameState.lives]);
+
   return (
     <GameContainer>
-      {/* Lives Display - Left Side */}
       <Lives lives={gameState.lives} />
 
-      {/* Main Game Area */}
-      <GameCanvas>
-        {gameState.letters.map((letter) => (
-          <FallingLetter key={letter.id} letter={letter} />
-        ))}
+      <LetterMissEffect triggerEffect={triggerMissEffect}>
+        <GameCanvasWrapper>
+          <GameCanvas>
+            {gameState.letters.map((letter) => (
+              <FallingLetter key={letter.id} letter={letter} />
+            ))}
 
-        {/* Wrong key feedback */}
-        {gameState.lastKeyPressed && gameState.lastKeyCorrect === false && (
-          <WrongKeyFeedback>
-            Wrong key: {gameState.lastKeyPressed}
-          </WrongKeyFeedback>
-        )}
-      </GameCanvas>
+            {gameState.lastKeyPressed && gameState.lastKeyCorrect === false && (
+              <WrongKeyFeedback>
+                Wrong key: {gameState.lastKeyPressed}
+              </WrongKeyFeedback>
+            )}
+          </GameCanvas>
+        </GameCanvasWrapper>
+      </LetterMissEffect>
     </GameContainer>
   );
 };
