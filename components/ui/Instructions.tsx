@@ -248,20 +248,20 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
   return (
     <>
       <InstructionsContainer>
-        <InstructionsPanel show={show} delay={0.2}>
+        <InstructionsPanel show={show} delay={1}>
           <SubText>Type the letters as they cascade downwards</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={0.4}>
+        <InstructionsPanel show={show} delay={1.2}>
           <SubText>Home row letters (A, S, D, F, J, K, L) = 1 point</SubText>
           <SubText>All others = 3 points</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={0.6}>
+        <InstructionsPanel show={show} delay={1.4}>
           <SubText>Incorrect keystrokes negatively affect your score</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={0.8}>
+        <InstructionsPanel show={show} delay={1.6}>
           <SubText>Surviving each level increases difficulty</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={1}>
+        <InstructionsPanel show={show} delay={1.8}>
           <SubText>
             Challenge yourself to beat{" "}
             <HighlightName>Mark Bernstein&apos;s</HighlightName> high score of{" "}
