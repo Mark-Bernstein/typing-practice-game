@@ -236,18 +236,17 @@ const fadeInFromTop = keyframes`
 `;
 
 const StartButton = styled.button`
-  position: relative;
-  top: 45%;
+  position: absolute;
+  top: 740px;
   padding: 100px 15px;
   font-size: 48px;
-
   font-weight: bold;
-  color: cyan;
+  color: #000000;
   letter-spacing: 3px;
   border-radius: 50%;
   cursor: pointer;
   background: linear-gradient(135deg, #91ff00, #8400ff, #ff0000);
-  background-size: 600% 600%;
+  background-size: 100% 150%;
   z-index: 1;
   overflow: visible;
   box-shadow: 0 0 30px rgba(147, 51, 234, 0.9), 0 0 60px rgba(34, 211, 238, 0.8);
@@ -269,11 +268,11 @@ const StartButton = styled.button`
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 600%;
-    height: 200%;
+    width: 800%;
+    height: 100%;
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    filter: blur(80px);
+    filter: blur(250px);
     z-index: -1;
     pointer-events: none;
   }

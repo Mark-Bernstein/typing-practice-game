@@ -21,6 +21,7 @@ const fadeOut = keyframes`
 
 const InstructionsContainer = styled.div`
   position: absolute;
+  min-width: 780px;
   top: 180px;
   left: 50%;
   transform: translateX(-50%);
@@ -92,7 +93,7 @@ export const CreatedBy = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "show",
 })<{ show: boolean }>`
   position: absolute;
-  bottom: 40px;
+  top: 1100px;
   padding: 20px 200px;
   text-align: center;
   max-width: 800px;
