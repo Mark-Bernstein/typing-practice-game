@@ -189,6 +189,13 @@ const SubText = styled.p`
 const HighlightText = styled.span`
   color: #60a5fa;
   font-weight: 700;
+  text-shadow: 0px 0px 20px cyan;
+`;
+
+const HighlightName = styled.span`
+  color: cyan;
+  font-weight: 700;
+  text-shadow: 0px 0px 20px cyan;
 `;
 
 const CreatedByText = styled.span`
@@ -255,7 +262,8 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1}>
           <SubText>
-            Challenge yourself to beat Mark Bernstein's high score of{" "}
+            Challenge yourself to beat{" "}
+            <HighlightName>Mark Bernstein&apos;s</HighlightName> high score of{" "}
             <HighlightText>600</HighlightText>!
           </SubText>
         </InstructionsPanel>
