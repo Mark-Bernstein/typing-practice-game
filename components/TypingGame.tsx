@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import { useTypingGame } from "../hooks/useTypingGame";
 import { calculateGameStats, getLevelMessage } from "../utils/gameUtils";
@@ -259,7 +259,6 @@ const StartButton = styled.button`
     letter-spacing: 15px;
     transform: scale(1.1);
     text-shadow: 5px 5px 10px #22d3ee, 0 0 20px #a855f7, 0 0 30px #ec4899;
-    /* background: linear-gradient(225deg, #9589ff, #8400ff, #3cff00); */
     background: cyan;
   }
 
