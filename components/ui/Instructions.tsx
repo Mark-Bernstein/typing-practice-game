@@ -255,10 +255,10 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
           <SubText>All others = 3 points</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={0.6}>
-          <SubText>Incorrect keystrokes negatively affect your score!</SubText>
+          <SubText>Incorrect keystrokes negatively affect your score</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={0.8}>
-          <SubText>Surviving each level increases difficulty.</SubText>
+          <SubText>Surviving each level increases difficulty</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1}>
           <SubText>
