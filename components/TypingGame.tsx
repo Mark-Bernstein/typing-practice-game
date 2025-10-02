@@ -176,15 +176,11 @@ const StartScreen = styled.div`
   z-index: 1000;
   text-align: center;
   padding: 16px;
-  padding-top: 10%;
+  padding-top: 50px;
 
   h1 {
     font-size: 48px;
     margin-bottom: 100px;
-  }
-
-  p {
-    font-size: 20px;
   }
 `;
 
@@ -219,29 +215,52 @@ const LevelMessage = styled.div`
   }
 `;
 
+const fadeInFromTop = keyframes`
+  0% {
+    transform: translateY(-1000px);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  75% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+`;
+
 const StartButton = styled.button`
   position: relative;
-  padding: 18px 56px;
-  font-size: 40px;
+  top: 45%;
+  padding: 100px 15px;
+  font-size: 48px;
+
   font-weight: bold;
-  color: black;
+  color: cyan;
   letter-spacing: 3px;
-  border: none;
-  border-radius: 50px;
+  border-radius: 50%;
   cursor: pointer;
-  background: limegreen;
+  background: linear-gradient(135deg, #91ff00, #8400ff, #ff0000);
   background-size: 600% 600%;
   z-index: 1;
   overflow: visible;
   box-shadow: 0 0 30px rgba(147, 51, 234, 0.9), 0 0 60px rgba(34, 211, 238, 0.8);
-  transition: all 0.4s ease;
+  transition: all 0.5s ease;
+  animation: ${fadeInFromTop} 2s ease-in-out forwards;
 
   &:hover {
-    color: white;
-    letter-spacing: 10px;
-    transform: scale(1.1) rotateX(5deg) rotateY(5deg);
+    color: #ffffff;
+    letter-spacing: 15px;
+    transform: scale(1.1);
     text-shadow: 5px 5px 10px #22d3ee, 0 0 20px #a855f7, 0 0 30px #ec4899;
-    background: linear-gradient(135deg, #1900ff, #8400ff, #000000);
+    /* background: linear-gradient(225deg, #9589ff, #8400ff, #3cff00); */
+    background: cyan;
   }
 
   /* Cosmic glowing orbs */
@@ -251,11 +270,11 @@ const StartButton = styled.button`
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 400%;
-    height: 400%;
+    width: 600%;
+    height: 200%;
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    filter: blur(90px);
+    filter: blur(80px);
     z-index: -1;
     pointer-events: none;
   }
@@ -279,7 +298,7 @@ const StartButton = styled.button`
       rgba(0, 221, 255, 0.8) 100%,
       transparent 100%
     );
-    animation: orbRotate 12s linear infinite;
+    animation: orbRotate 8s linear infinite;
   }
 
   /* Shooting star streaks */

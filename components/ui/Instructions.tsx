@@ -21,7 +21,7 @@ const fadeOut = keyframes`
 
 const InstructionsContainer = styled.div`
   position: absolute;
-  top: 50%;
+  top: 180px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
@@ -55,7 +55,7 @@ const InstructionsPanel = styled.div.withConfig({
 const dropIn = keyframes`
   0% {
     opacity: 0;
-    transform: translateY(-500px);
+    transform: translateY(-1000px);
   }
   100% {
     opacity: 1;
@@ -91,13 +91,15 @@ const textShimmer = keyframes`
 export const CreatedBy = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "show",
 })<{ show: boolean }>`
-  position: relative;
-  padding: 20px 36px;
+  position: absolute;
+  bottom: 40px;
+  padding: 20px 200px;
   text-align: center;
   max-width: 800px;
   margin-top: 20px;
   overflow: visible;
   z-index: 20;
+  font-size: 28px;
 
   /* Start off-screen and hidden */
   transform: translateY(-1000px);
@@ -139,7 +141,7 @@ export const CreatedBy = styled.div.withConfig({
   span {
     display: inline-block;
     font-family: "Orbitron", sans-serif;
-    font-size: 28px;
+    font-size: 50px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -153,9 +155,9 @@ export const CreatedBy = styled.div.withConfig({
 `;
 
 const MainText = styled.p<{ $reflected?: boolean }>`
-  color: white;
+  color: cyan;
   font-weight: 600;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px #d400ff;
   white-space: nowrap;
 
   ${({ $reflected }) =>
@@ -192,9 +194,9 @@ const HighlightText = styled.span`
 const CreatedByText = styled.span`
   display: inline-block;
   font-family: "Orbitron", sans-serif;
-  font-size: 28px;
+  font-size: 50px;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 4px;
   text-transform: uppercase;
   background: linear-gradient(90deg, #22d3ee, #9333ea, #ec4899);
   background-size: 300% 300%;
@@ -236,31 +238,32 @@ interface InstructionsProps {
 
 export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
   return (
-    <InstructionsContainer>
-      <InstructionsPanel show={show} delay={0.5}>
-        <SubText>
-          Type the letters as they fall and reach the highest score!
-        </SubText>
-      </InstructionsPanel>
-      <InstructionsPanel show={show} delay={0.9}>
-        <SubText>Incorrect letters effects your score negatively!</SubText>
-      </InstructionsPanel>
-      <InstructionsPanel show={show} delay={1.2}>
-        <SubText>Progress through levels to increase difficulty.</SubText>
-      </InstructionsPanel>
-      <InstructionsPanel show={show} delay={1.5}>
-        <SubText>
-          <HighlightText>Home row letters</HighlightText> (A, S, D, F, J, K, L)
-          = 1 point
-        </SubText>
-        <SubText>
-          <HighlightText>All others</HighlightText> = 3 points
-        </SubText>
-      </InstructionsPanel>
+    <>
+      <InstructionsContainer>
+        <InstructionsPanel show={show} delay={0.2}>
+          <SubText>Type the letters as they cascade downwards</SubText>
+        </InstructionsPanel>
+        <InstructionsPanel show={show} delay={0.4}>
+          <SubText>Home row letters (A, S, D, F, J, K, L) = 1 point</SubText>
+          <SubText>All others = 3 points</SubText>
+        </InstructionsPanel>
+        <InstructionsPanel show={show} delay={0.6}>
+          <SubText>Incorrect keystrokes negatively affect your score!</SubText>
+        </InstructionsPanel>
+        <InstructionsPanel show={show} delay={0.8}>
+          <SubText>Surviving each level increases difficulty.</SubText>
+        </InstructionsPanel>
+        <InstructionsPanel show={show} delay={1}>
+          <SubText>
+            Challenge yourself to beat Mark Bernstein's high score of{" "}
+            <HighlightText>600</HighlightText>!
+          </SubText>
+        </InstructionsPanel>
+      </InstructionsContainer>
       <CreatedBy show={show}>
         <MainText>Created by: Mark Bernstein</MainText>
         <MainText $reflected={true}>Created by: Mark Bernstein</MainText>
       </CreatedBy>
-    </InstructionsContainer>
+    </>
   );
 };
