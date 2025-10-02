@@ -51,12 +51,12 @@ const ImpactWave = styled.div<{ $isActive: boolean }>`
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
+  width: 800px;
   height: 100px;
   background: radial-gradient(
     ellipse at center bottom,
     rgba(220, 38, 38, 0.6) 0%,
-    rgba(220, 38, 38, 0.3) 30%,
+    rgba(225, 2, 255, 0.575) 30%,
     transparent 70%
   );
   opacity: 0;

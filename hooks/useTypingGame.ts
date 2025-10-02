@@ -118,7 +118,10 @@ export const useTypingGame = () => {
         newState.letters = updatedLetters;
         newState.lettersCorrect += 1;
         newState.score += getLetterScore(upperKey);
-        newState.speed = Math.min(GAME_CONFIG.MAX_SPEED, newState.speed * 1.01);
+        newState.speed = Math.min(
+          GAME_CONFIG.MAX_SPEED,
+          newState.speed * 1.009
+        );
         newState.lastKeyCorrect = true;
       }
 
