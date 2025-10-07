@@ -39,7 +39,7 @@ export const generateRandomLetter = (
 };
 
 export const getLetterScore = (letter: string): number => {
-  return HOME_ROW_LETTERS.has(letter) ? 1 : 3;
+  return HOME_ROW_LETTERS.has(letter) ? 1 : 2;
 };
 
 export const getLevelMessage = (lettersCorrect: number): string => {

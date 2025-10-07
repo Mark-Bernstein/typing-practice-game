@@ -34,7 +34,7 @@ export const HOME_ROW_LETTERS: ReadonlySet<string> = new Set([
 
 export const LEVEL_THRESHOLDS = {
   LEVEL_2: 10,
-  LEVEL_3: 20,
-  LEVEL_4: 30,
-  MAX_LEVEL: 40,
+  LEVEL_3: 30,
+  LEVEL_4: 70,
+  MAX_LEVEL: 130,
 } as const;

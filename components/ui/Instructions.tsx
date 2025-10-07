@@ -21,7 +21,7 @@ const fadeOut = keyframes`
 
 const InstructionsContainer = styled.div`
   position: absolute;
-  min-width: 780px;
+  min-width: 300px;
   top: 180px;
   left: 50%;
   transform: translateX(-50%);
@@ -182,7 +182,7 @@ const MainText = styled.p<{ $reflected?: boolean }>`
 
 const SubText = styled.p`
   color: rgba(255, 255, 255, 0.8);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 500;
   line-height: 1.5;
 `;
@@ -253,7 +253,7 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1.2}>
           <SubText>Home row letters (A, S, D, F, J, K, L) = 1 point</SubText>
-          <SubText>All others = 3 points</SubText>
+          <SubText>All others = 2 points</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1.4}>
           <SubText>Incorrect keystrokes negatively affect your score</SubText>
@@ -262,11 +262,7 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
           <SubText>Surviving each level increases difficulty</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1.8}>
-          <SubText>
-            Challenge yourself to beat{" "}
-            <HighlightName>Mark Bernstein&apos;s</HighlightName> high score of{" "}
-            <HighlightText>600</HighlightText>!
-          </SubText>
+          <SubText>Challenge yourself to beat the high score!</SubText>
         </InstructionsPanel>
       </InstructionsContainer>
       <CreatedBy show={show}>

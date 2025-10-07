@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import { GameStats } from "../../types/game";
+import { NicknamePrompt } from "./NicknamePrompt";
+import { CreateHighScoreDto } from "../../types/leaderboard";
+import { relative } from "path";
 
 interface GameOverProps {
   gameStats: GameStats;
@@ -8,6 +11,7 @@ interface GameOverProps {
   lettersCorrect: number;
   keysPressed: number;
   onRestart: () => void;
+  onScoreSaved?: () => void;
 }
 
 /* --- Animations --- */
@@ -128,7 +132,6 @@ const StatsGrid = styled.div`
   margin-bottom: 40px;
 `;
 
-// ✅ Use transient props ($show, $delay) so they don't leak into the DOM
 const StatItemContainer = styled.div<{ $show: boolean; $delay: number }>`
   display: flex;
   justify-content: space-between;
@@ -154,6 +157,12 @@ const StatValue = styled.span`
   font-family: monospace;
   font-size: 20px;
   font-weight: 700;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 12px;
+  justify-content: center;
 `;
 
 const PlayButton = styled.button`
@@ -192,6 +201,27 @@ const PlayButton = styled.button`
   }
 `;
 
+const SaveButton = styled(PlayButton)`
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+
+  &::before {
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  }
+
+  &:hover {
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.6);
+  }
+`;
+
+const ScoreSavedMessage = styled.div`
+  color: #00ff7f;
+  margin-right: 12px;
+  font-size: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+`;
+
 /* --- Component --- */
 export const GameOver: React.FC<GameOverProps> = ({
   gameStats,
@@ -199,9 +229,13 @@ export const GameOver: React.FC<GameOverProps> = ({
   lettersCorrect,
   keysPressed,
   onRestart,
+  onScoreSaved,
 }) => {
   const [showStats, setShowStats] = useState(false);
   const [animatedScore, setAnimatedScore] = useState(0);
+  const [showNicknamePrompt, setShowNicknamePrompt] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [scoreSaved, setScoreSaved] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowStats(true), 500);
@@ -241,7 +275,43 @@ export const GameOver: React.FC<GameOverProps> = ({
 
   const performance = getPerformanceMessage(gameStats.successPercentage);
 
-  // ✅ Update usage
+  const handleSaveScore = async (nickname: string) => {
+    setIsSubmitting(true);
+
+    const scoreData: CreateHighScoreDto = {
+      nickname,
+      score,
+      lettersCorrect,
+      accuracy: gameStats.successPercentage,
+      timePlayed: gameStats.timeInSeconds,
+    };
+
+    try {
+      const response = await fetch("/api/scores", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(scoreData),
+      });
+
+      if (!response.ok) throw new Error("Failed to save score");
+
+      setScoreSaved(true);
+      setShowNicknamePrompt(false);
+
+      // Notify parent to refresh leaderboard
+      if (onScoreSaved) {
+        onScoreSaved();
+      }
+    } catch (error) {
+      console.error("Failed to save score:", error);
+      alert("Failed to save score. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const StatItem: React.FC<{ label: string; value: string; delay: number }> = ({
     label,
     value,
@@ -254,43 +324,65 @@ export const GameOver: React.FC<GameOverProps> = ({
   );
 
   return (
-    <Overlay>
-      <Container>
-        <Panel>
-          <Title>GAME OVER</Title>
-          <Performance color={performance.color}>{performance.msg}</Performance>
+    <>
+      <Overlay>
+        <Container>
+          <Panel>
+            <Title>GAME OVER</Title>
+            <Performance color={performance.color}>
+              {performance.msg}
+            </Performance>
 
-          <ScoreBox>
-            <ScoreLabel>FINAL SCORE</ScoreLabel>
-            <ScoreValue>{animatedScore.toLocaleString()}</ScoreValue>
-          </ScoreBox>
+            <ScoreBox>
+              <ScoreLabel>FINAL SCORE</ScoreLabel>
+              <ScoreValue>{animatedScore.toLocaleString()}</ScoreValue>
+            </ScoreBox>
 
-          <StatsGrid>
-            <StatItem
-              label="Time Played"
-              value={`${gameStats.timeInSeconds}s`}
-              delay={100}
-            />
-            <StatItem
-              label="Letters Typed"
-              value={lettersCorrect.toString()}
-              delay={200}
-            />
-            <StatItem
-              label="Total Keystrokes"
-              value={keysPressed.toString()}
-              delay={300}
-            />
-            <StatItem
-              label="Accuracy"
-              value={`${gameStats.successPercentage}%`}
-              delay={400}
-            />
-          </StatsGrid>
+            <StatsGrid>
+              <StatItem
+                label="Time Played"
+                value={`${gameStats.timeInSeconds}s`}
+                delay={100}
+              />
+              <StatItem
+                label="Letters Typed"
+                value={lettersCorrect.toString()}
+                delay={200}
+              />
+              <StatItem
+                label="Total Keystrokes"
+                value={keysPressed.toString()}
+                delay={300}
+              />
+              <StatItem
+                label="Accuracy"
+                value={`${gameStats.successPercentage}%`}
+                delay={400}
+              />
+            </StatsGrid>
 
-          <PlayButton onClick={onRestart}>🚀 PLAY AGAIN</PlayButton>
-        </Panel>
-      </Container>
-    </Overlay>
+            <ButtonGroup>
+              {!scoreSaved && (
+                <SaveButton onClick={() => setShowNicknamePrompt(true)}>
+                  💾 Save Score
+                </SaveButton>
+              )}
+              {scoreSaved && (
+                <ScoreSavedMessage>✓ Score Saved!</ScoreSavedMessage>
+              )}
+              <PlayButton onClick={onRestart}>🚀 Play Again</PlayButton>
+            </ButtonGroup>
+          </Panel>
+        </Container>
+      </Overlay>
+
+      {showNicknamePrompt && (
+        <NicknamePrompt
+          onSubmit={handleSaveScore}
+          onSkip={() => setShowNicknamePrompt(false)}
+          isSubmitting={isSubmitting}
+        />
+      )}
+    </>
   );
 };

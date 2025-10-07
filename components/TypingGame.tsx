@@ -9,6 +9,7 @@ import { GameArea } from "./game/GameArea";
 import { GameOver } from "./ui/GameOver";
 import { Instructions } from "./ui/Instructions";
 import { GameStats } from "./ui/GameStats";
+import { Leaderboard } from "./ui/Leaderboard";
 
 const pulse = keyframes`
   0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -98,15 +99,14 @@ const GlowingOrb = styled.div<{
   animation-delay: ${({ delay }) => delay || "0s"};
 `;
 
-// GameContainer: keeps layout flow but centers the canvas
 const GameContainer = styled.div`
   position: relative;
   z-index: 10;
   width: 100%;
-  min-height: 100vh; /* IMPORTANT: fill viewport if parent has no fixed height */
+  min-height: 100vh;
   display: flex;
-  justify-content: center; /* center horizontally */
-  align-items: center; /* center vertically */
+  justify-content: center;
+  align-items: center;
   backdrop-filter: blur(4px);
 `;
 
@@ -169,7 +169,7 @@ const StartScreen = styled.div`
   inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* push content toward the top */
+  justify-content: flex-start;
   align-items: center;
   background: rgba(0, 0, 0, 0.8);
   color: white;
@@ -261,7 +261,6 @@ const StartButton = styled.button`
     background: cyan;
   }
 
-  /* Cosmic glowing orbs */
   &::after,
   &::before {
     content: "";
@@ -299,41 +298,6 @@ const StartButton = styled.button`
     animation: orbRotate 8s linear infinite;
   }
 
-  /* Shooting star streaks */
-  & > span {
-    position: absolute;
-    width: 2px;
-    height: 40px;
-    background: linear-gradient(transparent, #866bff);
-    top: -10px;
-    left: 50%;
-    opacity: 0.8;
-    animation: shootingStar 3s linear infinite;
-    pointer-events: none;
-  }
-
-  @keyframes cosmicShift {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-
-  @keyframes pulse {
-    0%,
-    100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.15);
-    }
-  }
-
   @keyframes orbPulse {
     0%,
     100% {
@@ -352,24 +316,6 @@ const StartButton = styled.button`
     }
     100% {
       transform: translate(-50%, -50%) rotate(360deg);
-    }
-  }
-
-  @keyframes shootingStar {
-    0% {
-      transform: translateX(0) translateY(0) rotate(45deg);
-      opacity: 0;
-    }
-    10% {
-      opacity: 1;
-    }
-    50% {
-      transform: translateX(200px) translateY(-200px) rotate(45deg);
-      opacity: 0.8;
-    }
-    100% {
-      transform: translateX(400px) translateY(-400px) rotate(45deg);
-      opacity: 0;
     }
   }
 `;
@@ -400,10 +346,6 @@ const Particle: React.FC<ParticleProps> = React.memo(
 
 Particle.displayName = "Particle";
 
-/**
- * Child component that actually mounts the game hook.
- * It's mounted only after the user clicks PLAY.
- */
 const GamePlay: React.FC<{
   onExit: () => void;
   onLevelChange?: (level: number) => void;
@@ -411,6 +353,7 @@ const GamePlay: React.FC<{
   const { gameState, resetGame } = useTypingGame();
   const [particles] = useState(() => Array.from({ length: 50 }, (_, i) => i));
   const [levelMessage, setLevelMessage] = useState(getLevelMessage(0));
+  const [leaderboardRefresh, setLeaderboardRefresh] = useState(0);
 
   const gameStats = calculateGameStats(
     gameState.time,
@@ -418,9 +361,8 @@ const GamePlay: React.FC<{
     gameState.keysPressed
   );
 
-  // Progress relative to current level
   const getProgress = () => {
-    const currentLevel = Math.min(gameState.level, 5); // Cap at level 5
+    const currentLevel = Math.min(gameState.level, 5);
     const thresholds = [
       0,
       LEVEL_THRESHOLDS.LEVEL_2,
@@ -448,6 +390,10 @@ const GamePlay: React.FC<{
 
     onLevelChange?.(gameState.level);
   }, [gameState.lettersCorrect, gameState.level, onLevelChange]);
+
+  const handleScoreSaved = () => {
+    setLeaderboardRefresh((prev) => prev + 1);
+  };
 
   return (
     <>
@@ -494,6 +440,7 @@ const GamePlay: React.FC<{
             resetGame();
             onExit();
           }}
+          onScoreSaved={handleScoreSaved}
         />
       )}
 
@@ -520,7 +467,6 @@ const GamePlay: React.FC<{
   );
 };
 
-// TypingGame with dynamic level
 export const TypingGame: React.FC = () => {
   const [hasStarted, setHasStarted] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(1);
@@ -532,6 +478,7 @@ export const TypingGame: React.FC = () => {
           <h1>Typing Challenge</h1>
           <Instructions show={!hasStarted} />
           <StartButton onClick={() => setHasStarted(true)}>START</StartButton>
+          <Leaderboard />
         </StartScreen>
       )}
 
