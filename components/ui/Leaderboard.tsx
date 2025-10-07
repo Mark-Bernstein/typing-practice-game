@@ -222,11 +222,15 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ refreshTrigger }) => {
       {!loading && !error && scores.length > 0 && (
         <ScoreList>
           {scores.map((score, index) => {
-            const getLocalDate = (utcDateString: string | Date) => {
-              const utcDate = new Date(utcDateString); // parse UTC date
-              const localOffset = utcDate.getTimezoneOffset() * 60000; // offset in ms
-              return new Date(utcDate.getTime() - localOffset); // convert to local time
+            const parseDateSafely = (dateStr: string | Date) => {
+              const d = new Date(dateStr);
+              if (d.getTime() - Date.now() > 5 * 60 * 1000) {
+                const offset = d.getTimezoneOffset() * 60000;
+                return new Date(d.getTime() - offset);
+              }
+              return d;
             };
+
             return (
               <ScoreItem key={score.id} $rank={index + 1}>
                 <Rank $rank={index + 1}>
@@ -239,7 +243,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ refreshTrigger }) => {
                   <Nickname>{score.nickname}</Nickname>
                   <ScoreValue>{score.score.toLocaleString()} pts</ScoreValue>
                   <Timestamp>
-                    {formatDistanceToNow(getLocalDate(score.createdAt), {
+                    {formatDistanceToNow(parseDateSafely(score.createdAt), {
                       addSuffix: true,
                     })}
                   </Timestamp>

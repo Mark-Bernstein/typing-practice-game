@@ -362,7 +362,7 @@ export const GameOver: React.FC<GameOverProps> = ({
               {scoreSaved && (
                 <ScoreSavedMessage>✓ Score Saved!</ScoreSavedMessage>
               )}
-              <PlayButton onClick={onRestart}>🚀 Play Again</PlayButton>
+              <PlayButton onClick={onRestart}>🚀 Main Menu</PlayButton>
             </ButtonGroup>
           </Panel>
         </Container>
