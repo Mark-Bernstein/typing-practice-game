@@ -187,18 +187,6 @@ const SubText = styled.p`
   line-height: 1.5;
 `;
 
-const HighlightText = styled.span`
-  color: #60a5fa;
-  font-weight: 700;
-  text-shadow: 0px 0px 20px cyan;
-`;
-
-const HighlightName = styled.span`
-  color: cyan;
-  font-weight: 700;
-  text-shadow: 0px 0px 20px cyan;
-`;
-
 const CreatedByText = styled.span`
   display: inline-block;
   font-family: "Orbitron", sans-serif;

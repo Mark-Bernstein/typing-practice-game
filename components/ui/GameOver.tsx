@@ -3,7 +3,6 @@ import styled, { keyframes } from "styled-components";
 import { GameStats } from "../../types/game";
 import { NicknamePrompt } from "./NicknamePrompt";
 import { CreateHighScoreDto } from "../../types/leaderboard";
-import { relative } from "path";
 
 interface GameOverProps {
   gameStats: GameStats;
@@ -11,7 +10,6 @@ interface GameOverProps {
   lettersCorrect: number;
   keysPressed: number;
   onRestart: () => void;
-  onScoreSaved?: () => void;
 }
 
 /* --- Animations --- */
@@ -229,7 +227,6 @@ export const GameOver: React.FC<GameOverProps> = ({
   lettersCorrect,
   keysPressed,
   onRestart,
-  onScoreSaved,
 }) => {
   const [showStats, setShowStats] = useState(false);
   const [animatedScore, setAnimatedScore] = useState(0);
@@ -299,11 +296,6 @@ export const GameOver: React.FC<GameOverProps> = ({
 
       setScoreSaved(true);
       setShowNicknamePrompt(false);
-
-      // Notify parent to refresh leaderboard
-      if (onScoreSaved) {
-        onScoreSaved();
-      }
     } catch (error) {
       console.error("Failed to save score:", error);
       alert("Failed to save score. Please try again.");

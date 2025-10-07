@@ -353,7 +353,6 @@ const GamePlay: React.FC<{
   const { gameState, resetGame } = useTypingGame();
   const [particles] = useState(() => Array.from({ length: 50 }, (_, i) => i));
   const [levelMessage, setLevelMessage] = useState(getLevelMessage(0));
-  const [leaderboardRefresh, setLeaderboardRefresh] = useState(0);
 
   const gameStats = calculateGameStats(
     gameState.time,
@@ -390,10 +389,6 @@ const GamePlay: React.FC<{
 
     onLevelChange?.(gameState.level);
   }, [gameState.lettersCorrect, gameState.level, onLevelChange]);
-
-  const handleScoreSaved = () => {
-    setLeaderboardRefresh((prev) => prev + 1);
-  };
 
   return (
     <>
@@ -440,7 +435,6 @@ const GamePlay: React.FC<{
             resetGame();
             onExit();
           }}
-          onScoreSaved={handleScoreSaved}
         />
       )}
 
