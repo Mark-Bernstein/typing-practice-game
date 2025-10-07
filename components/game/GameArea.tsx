@@ -6,6 +6,7 @@ import { FallingLetter } from "./FallingLetter";
 import { Lives } from "../ui/Lives";
 import { LetterMissEffect } from "../ui/LetterMissEffect";
 import { AnimatePresence } from "framer-motion";
+import { LavaFloor } from "./LavaFloor";
 
 // Wrapper to center and scale game proportionally
 const GameContainer = styled.div`
@@ -51,15 +52,17 @@ const shake = keyframes`
 
 const WrongKeyFeedback = styled.div`
   position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #ff4d4f;
+  bottom: 0px;
+  /* left: 20px; */
+  /* left: 50%;
+  transform: translateX(-50%); */
+  color: #ff0004;
   font-size: 32px;
   font-weight: bold;
   animation: ${shake} 0.3s linear;
   pointer-events: none;
   z-index: 20;
+  opacity: 0.5;
 `;
 
 interface GameAreaProps {
@@ -90,20 +93,15 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
           <GameCanvas>
             <AnimatePresence>
               {gameState.letters.map((letter) => (
-                <FallingLetter
-                  key={letter.id}
-                  letter={letter}
-                  isRemoving={letter.isRemoving}
-                />
+                <FallingLetter key={letter.id} letter={letter} />
               ))}
             </AnimatePresence>
 
             {gameState.lastKeyPressed && gameState.lastKeyCorrect === false && (
-              <WrongKeyFeedback>
-                Wrong key: {gameState.lastKeyPressed}
-              </WrongKeyFeedback>
+              <WrongKeyFeedback>Wrong key</WrongKeyFeedback>
             )}
           </GameCanvas>
+          <LavaFloor height={30} />
         </GameCanvasWrapper>
       </LetterMissEffect>
     </GameContainer>

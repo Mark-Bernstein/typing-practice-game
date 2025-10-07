@@ -113,7 +113,7 @@ const ScoreBox = styled.div`
 
 const ScoreLabel = styled.div`
   color: #00eaff;
-  font-size: 14px;
+  font-size: 20px;
   letter-spacing: 2px;
   margin-bottom: 8px;
 `;
@@ -148,7 +148,7 @@ const StatItemContainer = styled.div<{ $show: boolean; $delay: number }>`
 `;
 
 const StatLabel = styled.span`
-  color: rgba(255, 255, 255, 0.8);
+  color: #ffffff;
   font-weight: 500;
 `;
 
@@ -170,7 +170,7 @@ const PlayButton = styled.button`
   padding: 16px 48px;
   font-size: 20px;
   font-weight: 800;
-  color: white;
+  color: #ffffff;
   border: none;
   border-radius: 16px;
   background: linear-gradient(90deg, #00eaff, #007bff);
@@ -194,7 +194,7 @@ const PlayButton = styled.button`
     inset: 0;
     border-radius: 16px;
     background: linear-gradient(90deg, #00f7ff, #007bff);
-    filter: blur(12px);
+    filter: blur(4px);
     opacity: 0.7;
     transition: opacity 0.3s;
     z-index: -1;
@@ -202,7 +202,7 @@ const PlayButton = styled.button`
 `;
 
 const SaveButton = styled(PlayButton)`
-  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  background: linear-gradient(90deg, #00570e, #00a7a7);
 
   &::before {
     background: linear-gradient(90deg, #fbbf24, #f59e0b);
@@ -345,7 +345,7 @@ export const GameOver: React.FC<GameOverProps> = ({
                 delay={100}
               />
               <StatItem
-                label="Letters Typed"
+                label="Correctly typed letters"
                 value={lettersCorrect.toString()}
                 delay={200}
               />

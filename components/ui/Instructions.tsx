@@ -252,11 +252,11 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
           <SubText>Type the letters as they cascade downwards</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1.2}>
-          <SubText>Home row letters (A, S, D, F, J, K, L) = 1 point</SubText>
-          <SubText>All others = 2 points</SubText>
+          <SubText>Home row letters (A, S, D, F, J, K, L) = +1 point</SubText>
+          <SubText>All others = +2 points</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1.4}>
-          <SubText>Incorrect keystrokes negatively affect your score</SubText>
+          <SubText>Incorrect keystrokes = -3 points</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1.6}>
           <SubText>Surviving each level increases difficulty</SubText>

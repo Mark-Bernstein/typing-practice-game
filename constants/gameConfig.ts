@@ -5,7 +5,7 @@ export const GAME_CONFIG = {
   COUNTER_SIZE: 18,
   START_LETTER_SPEED: 1.5,
   FRAME_RATE: 60,
-  MAX_LETTERS: 10,
+  MAX_LETTERS: 12,
   MAX_SPEED: 50,
 } as const;
 

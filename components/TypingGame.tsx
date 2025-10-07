@@ -132,7 +132,7 @@ const LevelIndicator = styled.div`
 
 const ProgressWrapper = styled.div`
   position: absolute;
-  bottom: 3%;
+  bottom: 2.5%;
   left: 50%;
   transform: translateX(-50%);
   width: 500px;

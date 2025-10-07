@@ -78,7 +78,7 @@ export const useTypingGame = () => {
         // number of letters to spawn depends on level
         const spawnCount = Math.min(
           newState.level,
-          5 - newState.letters.length
+          4 - newState.letters.length
         );
 
         for (let i = 0; i < spawnCount; i++) {
@@ -108,6 +108,7 @@ export const useTypingGame = () => {
         keysPressed: prevState.keysPressed + 1,
         lastKeyPressed: upperKey,
         lastKeyCorrect: false, // default to false
+        score: prevState.score, // keep current score by default
       };
 
       const index = newState.letters.findIndex((l) => l.letter === upperKey);
@@ -123,6 +124,10 @@ export const useTypingGame = () => {
           newState.speed * 1.0075
         );
         newState.lastKeyCorrect = true;
+      } else {
+        // Wrong key: subtract 5 points
+        newState.score = Math.max(0, newState.score - 3);
+        newState.lastKeyCorrect = false;
       }
 
       return newState;

@@ -20,11 +20,10 @@ const StyledLetter = styled(motion.div)<{ $color: string }>`
 
 interface FallingLetterProps {
   letter: LetterPosition;
-  isRemoving?: boolean;
 }
 
 export const FallingLetter: React.FC<FallingLetterProps> = memo(
-  ({ letter, isRemoving }) => {
+  ({ letter }) => {
     const entryOffset = useMemo(() => {
       const randomX = Math.random() * 200 - 100; // -100 to +100
       const randomY = Math.random() * 200 - 100; // -100 to +100
@@ -43,24 +42,14 @@ export const FallingLetter: React.FC<FallingLetterProps> = memo(
           rotate: entryOffset.rotate,
           filter: "blur(8px)",
         }}
-        animate={
-          isRemoving
-            ? {
-                opacity: 0,
-                scale: 0.2,
-                y: letter.y - 30,
-                rotate: entryOffset.rotate + 180,
-                filter: "blur(6px) brightness(2)",
-              }
-            : {
-                opacity: 1,
-                x: letter.x,
-                y: letter.y,
-                scale: 1,
-                rotate: 0,
-                filter: "blur(0px)",
-              }
-        }
+        animate={{
+          opacity: 1,
+          x: letter.x,
+          y: letter.y,
+          scale: 1,
+          rotate: 0,
+          filter: "blur(0px)",
+        }}
         exit={{
           opacity: 0,
           scale: 0.2,

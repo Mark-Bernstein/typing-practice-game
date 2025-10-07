@@ -10,7 +10,7 @@ const LeaderboardContainer = styled.div`
   transform: translateY(-50%);
   width: 320px;
   max-height: 70vh;
-  background: rgba(0, 0, 0, 0.6);
+  background: #000000;
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
@@ -81,7 +81,7 @@ const ScoreItem = styled.div<{ $rank: number }>`
     if (props.$rank === 1)
       return "linear-gradient(0deg, #001aff 0%, #f700ff 100%)";
     if (props.$rank === 2)
-      return "linear-gradient(45deg, rgba(136, 153, 255, 1) 0%, #002280 100%)";
+      return "linear-gradient(45deg, #91a1ff 0%, #002280 100%)";
     if (props.$rank === 3)
       return "linear-gradient(90deg, rgba(186, 203, 255, 1) 0%, #000000 100%)";
     return "rgba(255, 255, 255, 0.05)";
@@ -130,7 +130,7 @@ const ScoreInfo = styled.div`
 const Nickname = styled.div`
   font-size: 24px;
   font-weight: 700;
-  color: white;
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
