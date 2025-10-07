@@ -14,7 +14,7 @@ export async function GET() {
         created_at
       FROM high_scores
       ORDER BY score DESC
-      LIMIT 100
+      LIMIT 10
     `;
 
     // Convert timestamps to ISO strings for consistent JS Date parsing

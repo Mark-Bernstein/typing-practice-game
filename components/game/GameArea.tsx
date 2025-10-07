@@ -5,6 +5,7 @@ import { GAME_CONFIG } from "../../constants/gameConfig";
 import { FallingLetter } from "./FallingLetter";
 import { Lives } from "../ui/Lives";
 import { LetterMissEffect } from "../ui/LetterMissEffect";
+import { AnimatePresence } from "framer-motion";
 
 // Wrapper to center and scale game proportionally
 const GameContainer = styled.div`
@@ -87,9 +88,15 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
       <LetterMissEffect triggerEffect={triggerMissEffect}>
         <GameCanvasWrapper>
           <GameCanvas>
-            {gameState.letters.map((letter) => (
-              <FallingLetter key={letter.id} letter={letter} />
-            ))}
+            <AnimatePresence>
+              {gameState.letters.map((letter) => (
+                <FallingLetter
+                  key={letter.id}
+                  letter={letter}
+                  isRemoving={letter.isRemoving}
+                />
+              ))}
+            </AnimatePresence>
 
             {gameState.lastKeyPressed && gameState.lastKeyCorrect === false && (
               <WrongKeyFeedback>
