@@ -90,7 +90,7 @@ const Title = styled.h1`
 `;
 
 const Performance = styled.div<{ color: string }>`
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 800;
   margin-bottom: 32px;
   color: ${(props) => props.color};
@@ -136,13 +136,15 @@ const StatItemContainer = styled.div<{ $show: boolean; $delay: number }>`
   align-items: center;
   padding: 14px 20px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   color: white;
   opacity: ${(props) => (props.$show ? 1 : 0)};
   transform: ${(props) => (props.$show ? "translateY(0)" : "translateY(10px)")};
   transition: all 0.5s ease;
   transition-delay: ${(props) => props.$delay}ms;
+  font-size: 18px;
+  letter-spacing: 2px;
 `;
 
 const StatLabel = styled.span`
@@ -152,7 +154,7 @@ const StatLabel = styled.span`
 
 const StatValue = styled.span`
   color: #00eaff;
-  font-family: monospace;
+  font-family: "Orbitron", sans-serif;
   font-size: 20px;
   font-weight: 700;
 `;
@@ -166,6 +168,7 @@ const ButtonGroup = styled.div`
 const PlayButton = styled.button`
   position: relative;
   padding: 16px 48px;
+  font-family: "Orbitron", sans-serif;
   font-size: 20px;
   font-weight: 800;
   color: #ffffff;

@@ -52,17 +52,15 @@ const shake = keyframes`
 
 const WrongKeyFeedback = styled.div`
   position: absolute;
-  bottom: 0px;
-  /* left: 20px; */
-  /* left: 50%;
-  transform: translateX(-50%); */
-  color: #ff0004;
-  font-size: 32px;
+  bottom: 0;
+  left: 20px;
+  color: #7e0000;
+  font-size: 24px;
   font-weight: bold;
   animation: ${shake} 0.3s linear;
   pointer-events: none;
   z-index: 20;
-  opacity: 0.5;
+  opacity: 0.8;
 `;
 
 interface GameAreaProps {

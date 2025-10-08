@@ -237,28 +237,33 @@ const fadeInFromTop = keyframes`
 
 const StartButton = styled.button`
   position: absolute;
-  top: 740px;
-  padding: 100px 15px;
+  font-family: "Orbitron", sans-serif;
+  top: 710px;
+  padding: 100px 25px;
   font-size: 48px;
   font-weight: bold;
-  color: #000000;
+  color: #000;
   letter-spacing: 3px;
   border-radius: 50%;
   cursor: pointer;
-  background: linear-gradient(135deg, #91ff00, #8400ff, #ff0000);
+  background: linear-gradient(135deg, #000000, #8400ff, #ff0000);
   background-size: 100% 150%;
   z-index: 1;
   overflow: visible;
   box-shadow: 0 0 30px rgba(147, 51, 234, 0.9), 0 0 60px rgba(34, 211, 238, 0.8);
-  transition: all 0.5s ease;
+  transition: all 0.4s ease;
   animation: ${fadeInFromTop} 2s ease-in-out forwards;
+  transform-style: preserve-3d;
+  perspective: 800px;
 
   &:hover {
-    color: #ffffff;
-    letter-spacing: 15px;
-    transform: scale(1.1);
-    text-shadow: 5px 5px 10px #22d3ee, 0 0 20px #a855f7, 0 0 30px #ec4899;
-    background: cyan;
+    color: #fff;
+    letter-spacing: 10px;
+    box-shadow: 0 15px 30px rgba(147, 51, 234, 1),
+      0 0 40px rgba(34, 211, 238, 0.9), inset 0 0 25px rgba(236, 72, 153, 0.6);
+    text-shadow: 0 0 20px #22d3ee, 0 0 40px #a855f7, 0 0 60px #ec4899;
+    background: linear-gradient(135deg, #8400ff, #ff0000, #22d3ee);
+    padding: 100px 8px;
   }
 
   &::after,

@@ -8,13 +8,13 @@ const LeaderboardContainer = styled.div`
   right: 40px;
   top: 50%;
   transform: translateY(-50%);
-  width: 320px;
+  width: 420px;
   max-height: 70vh;
   background: #000000;
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
-  padding: 24px;
+  padding: 20px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   animation: slideInRight 2s ease-in-out;
@@ -125,6 +125,7 @@ const Rank = styled.div<{ $rank: number }>`
 const ScoreInfo = styled.div`
   flex: 1;
   min-width: 0;
+  padding: 4px 0;
 `;
 
 const Nickname = styled.div`
@@ -134,6 +135,7 @@ const Nickname = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0px 0px 2px cyan;
 `;
 
 const ScoreValue = styled.div`

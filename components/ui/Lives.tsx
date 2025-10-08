@@ -66,7 +66,7 @@ interface LivesProps {
   maxLives?: number;
 }
 
-export const Lives: React.FC<LivesProps> = ({ lives, maxLives = 10 }) => {
+export const Lives: React.FC<LivesProps> = ({ lives, maxLives = 5 }) => {
   return (
     <LivesContainer>
       <LivesLabel>Lives</LivesLabel>

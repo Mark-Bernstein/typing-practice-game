@@ -18,7 +18,7 @@ const initialGameState: GameState = {
   level: 1,
   lastKeyPressed: null,
   lastKeyCorrect: true,
-  lives: 10,
+  lives: 5,
 };
 
 export const useTypingGame = () => {

@@ -94,9 +94,9 @@ export const CreatedBy = styled.div.withConfig({
 })<{ show: boolean }>`
   position: absolute;
   top: 1100px;
-  padding: 20px 200px;
+  /* padding: 20px 200px; */
   text-align: center;
-  max-width: 800px;
+  max-width: 600px;
   margin-top: 20px;
   overflow: visible;
   z-index: 20;
@@ -121,10 +121,9 @@ export const CreatedBy = styled.div.withConfig({
     content: "";
     position: absolute;
     top: 50%;
-    left: 25%;
-    width: 50%;
-    height: 50%;
-    border-radius: 25%;
+    left: 0;
+    width: 100%;
+    height: 60%;
     background: radial-gradient(
       circle,
       rgba(34, 211, 238, 1) 0%,
