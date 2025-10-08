@@ -29,10 +29,6 @@ const LeaderboardContainer = styled.div`
       opacity: 1;
     }
   }
-
-  @media (max-width: 1200px) {
-    display: none;
-  }
 `;
 
 const Title = styled.h2`

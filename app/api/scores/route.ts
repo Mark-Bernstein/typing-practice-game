@@ -1,6 +1,8 @@
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
 
+/* ---------------- High Scores ---------------- */
+
 export async function GET() {
   try {
     const { rows } = await sql`
@@ -17,7 +19,6 @@ export async function GET() {
       LIMIT 10
     `;
 
-    // Convert timestamps to ISO strings for consistent JS Date parsing
     const formattedRows = rows.map((row) => ({
       ...row,
       createdAt: new Date(row.created_at).toISOString(),
@@ -38,7 +39,6 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { nickname, score, lettersCorrect, accuracy, timePlayed } = body;
 
-    // Validation
     if (!nickname || nickname.length > 20) {
       return NextResponse.json(
         { error: "Nickname is required and must be 20 characters or less" },
@@ -63,7 +63,6 @@ export async function POST(request: Request) {
         created_at
     `;
 
-    // Convert created_at to ISO string
     const formattedRow = {
       ...rows[0],
       createdAt: new Date(rows[0].created_at).toISOString(),
@@ -74,6 +73,42 @@ export async function POST(request: Request) {
     console.error("Failed to create high score:", error);
     return NextResponse.json(
       { error: "Failed to save high score" },
+      { status: 500 }
+    );
+  }
+}
+
+/* ---------------- Total Plays ---------------- */
+
+// GET total plays
+export async function GET_TOTAL_PLAYS() {
+  try {
+    const { rows } = await sql`SELECT total_plays FROM game_stats LIMIT 1`;
+    const totalPlays = rows[0]?.total_plays ?? 0;
+    return NextResponse.json({ totalPlays });
+  } catch (error) {
+    console.error("Failed to fetch total plays:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch total plays" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST increment total plays
+export async function POST_INCREMENT_PLAY() {
+  try {
+    const { rows } = await sql`
+      UPDATE game_stats
+      SET total_plays = total_plays + 1
+      RETURNING total_plays
+    `;
+    const totalPlays = rows[0]?.total_plays ?? 0;
+    return NextResponse.json({ totalPlays });
+  } catch (error) {
+    console.error("Failed to increment total plays:", error);
+    return NextResponse.json(
+      { error: "Failed to increment total plays" },
       { status: 500 }
     );
   }

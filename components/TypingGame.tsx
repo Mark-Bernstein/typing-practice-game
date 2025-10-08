@@ -325,6 +325,50 @@ const StartButton = styled.button`
   }
 `;
 
+// const TotalPlaysDisplay = styled.div`
+//   margin-top: 24px;
+//   font-size: 20px;
+//   color: #22d3ee;
+//   font-weight: bold;
+// `;
+
+const TotalPlaysDisplay = styled.div`
+  position: absolute;
+  font-size: 28px;
+  right: 40px;
+  top: 25%;
+  transform: translateY(-50%);
+  width: 420px;
+  max-height: 70vh;
+  background: #000000;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  animation: slideInRight 2s ease-in-out;
+
+  @keyframes slideInRight {
+    from {
+      transform: translateY(-50%) translateX(500px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(-50%) translateX(0);
+      opacity: 1;
+    }
+  }
+`;
+
+const HighlightedNumberOfPlays = styled.div`
+  font-size: 32px;
+  color: cyan;
+  background-color: rgba(0, 4, 255, 0.3);
+  border-radius: 10px;
+  margin-top: 20px;
+`;
+
 function seededRandom(seed: number) {
   const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
@@ -469,6 +513,36 @@ const GamePlay: React.FC<{
 export const TypingGame: React.FC = () => {
   const [hasStarted, setHasStarted] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(1);
+  const [totalPlays, setTotalPlays] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetchTotalPlays();
+  }, []);
+
+  const handleStart = () => {
+    incrementTotalPlays();
+    setHasStarted(true);
+  };
+
+  const fetchTotalPlays = async () => {
+    try {
+      const res = await fetch("/api/play-count");
+      const data = await res.json();
+      setTotalPlays(data.totalPlays);
+    } catch (err) {
+      console.error("Failed to fetch total plays:", err);
+    }
+  };
+
+  // Increment total plays when game starts
+  const incrementTotalPlays = async () => {
+    try {
+      await fetch("/api/game-played", { method: "POST" });
+      await fetchTotalPlays();
+    } catch (err) {
+      console.error("Failed to increment total plays:", err);
+    }
+  };
 
   return (
     <GameWrapper level={currentLevel}>
@@ -476,8 +550,14 @@ export const TypingGame: React.FC = () => {
         <StartScreen>
           <h1>Typing Challenge</h1>
           <Instructions show={!hasStarted} />
-          <StartButton onClick={() => setHasStarted(true)}>START</StartButton>
+          <StartButton onClick={handleStart}>START</StartButton>
           <Leaderboard />
+          {totalPlays !== null && (
+            <TotalPlaysDisplay>
+              Total Plays Worldwide:{" "}
+              <HighlightedNumberOfPlays>{totalPlays}</HighlightedNumberOfPlays>
+            </TotalPlaysDisplay>
+          )}
         </StartScreen>
       )}
 
