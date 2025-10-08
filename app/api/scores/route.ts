@@ -77,39 +77,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-/* ---------------- Total Plays ---------------- */
-
-// GET total plays
-export async function GET_TOTAL_PLAYS() {
-  try {
-    const { rows } = await sql`SELECT total_plays FROM game_stats LIMIT 1`;
-    const totalPlays = rows[0]?.total_plays ?? 0;
-    return NextResponse.json({ totalPlays });
-  } catch (error) {
-    console.error("Failed to fetch total plays:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch total plays" },
-      { status: 500 }
-    );
-  }
-}
-
-// POST increment total plays
-export async function POST_INCREMENT_PLAY() {
-  try {
-    const { rows } = await sql`
-      UPDATE game_stats
-      SET total_plays = total_plays + 1
-      RETURNING total_plays
-    `;
-    const totalPlays = rows[0]?.total_plays ?? 0;
-    return NextResponse.json({ totalPlays });
-  } catch (error) {
-    console.error("Failed to increment total plays:", error);
-    return NextResponse.json(
-      { error: "Failed to increment total plays" },
-      { status: 500 }
-    );
-  }
-}
