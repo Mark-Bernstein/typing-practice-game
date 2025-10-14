@@ -12,7 +12,7 @@ import { GameStats } from "./ui/GameStats";
 import { Leaderboard } from "./ui/Leaderboard";
 import { AudioControls } from "./ui/AudioControls";
 import { useAudioContext } from "../app/contexts/AudioContext";
-import { useAudio } from "../hooks/useAudio";
+import { SoundEffect, useAudio } from "../hooks/useAudio";
 
 const pulse = keyframes`
   0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -553,6 +553,7 @@ export const TypingGame: React.FC = () => {
     musicEnabled,
     sfxEnabled,
     toggleSFX,
+    playSFX,
   } = useAudio();
 
   useEffect(() => {
@@ -574,6 +575,7 @@ export const TypingGame: React.FC = () => {
     incrementTotalPlays();
     stopMusic();
     playMusic("gameplay");
+    playSFX("start");
     setHasStarted(true);
   };
 

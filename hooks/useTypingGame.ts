@@ -6,13 +6,7 @@ import {
   getLetterScore,
   getLevel,
 } from "../utils/gameUtils";
-
-// Import will be used in component that uses this hook
-let playSFXCallback: ((effect: string) => void) | null = null;
-
-export const setSFXCallback = (callback: (effect: string) => void) => {
-  playSFXCallback = callback;
-};
+import { useAudio } from "./useAudio";
 
 const initialGameState: GameState = {
   letters: [],
@@ -33,6 +27,17 @@ export const useTypingGame = () => {
   const gameLoopRef = useRef<number | undefined>(undefined);
   const letterIdCounter = useRef(0);
   const prevLivesRef = useRef(5);
+
+  // TODO - get sounds for life-lost and stuff working!!!!!!!!!!!!!
+  const {
+    playMusic,
+    stopMusic,
+    toggleMusic,
+    musicEnabled,
+    sfxEnabled,
+    toggleSFX,
+    playSFX,
+  } = useAudio();
 
   const gameLoop = useCallback(() => {
     setGameState((prevState) => {
@@ -63,15 +68,25 @@ export const useTypingGame = () => {
       const newLives = newState.lives - lettersReachedBottom.length;
 
       // Play life lost sound if lives decreased
-      if (newLives < prevLivesRef.current && playSFXCallback) {
-        playSFXCallback("life-lost");
+      if (newLives < prevLivesRef.current) {
+        console.log(
+          `💔 Life lost detected: prevLives=${prevLivesRef.current}, newLives=${newLives}`
+        );
+
+        if (playSFX) {
+          console.log("🔊 Triggering life-lost SFX");
+          playSFX("life-lost");
+        } else {
+          console.warn("⚠️ playSFX not set, cannot play life-lost SFX");
+        }
+
         prevLivesRef.current = newLives;
       }
 
       // Check for game over (no lives left)
       if (newLives <= 0) {
-        if (playSFXCallback) {
-          playSFXCallback("game-over");
+        if (playSFX) {
+          playSFX("game-over");
         }
         return {
           ...newState,
@@ -128,8 +143,8 @@ export const useTypingGame = () => {
 
       const index = newState.letters.findIndex((l) => l.letter === upperKey);
       if (index !== -1) {
-        if (playSFXCallback) {
-          playSFXCallback("correct");
+        if (playSFX) {
+          playSFX("correct");
         }
 
         const updatedLetters = [...newState.letters];
@@ -143,8 +158,8 @@ export const useTypingGame = () => {
         );
         newState.lastKeyCorrect = true;
       } else {
-        if (playSFXCallback) {
-          playSFXCallback("wrong");
+        if (playSFX) {
+          playSFX("wrong");
         }
         newState.score = Math.max(0, newState.score - 3);
         newState.lastKeyCorrect = false;

@@ -8,8 +8,6 @@ import { LetterMissEffect } from "../ui/LetterMissEffect";
 import { AnimatePresence } from "framer-motion";
 import { LavaFloor } from "./LavaFloor";
 import { useAudioContext } from "../../app/contexts/AudioContext";
-import { setSFXCallback } from "../../hooks/useTypingGame";
-import { SoundEffect } from "@/hooks/useAudio";
 
 const GameContainer = styled.div`
   position: relative;
@@ -71,13 +69,6 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
   const [triggerMissEffect, setTriggerMissEffect] = useState(false);
   const prevLivesRef = useRef(gameState.lives);
   const { playSFX } = useAudioContext();
-
-  // Set up SFX callback for the typing game hook
-  useEffect(() => {
-    setSFXCallback((effect) => {
-      playSFX(effect as SoundEffect);
-    });
-  }, [playSFX]);
 
   // Detect when lives decrease (letter hit bottom)
   useEffect(() => {

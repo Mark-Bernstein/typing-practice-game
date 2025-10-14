@@ -6,7 +6,8 @@ export type SoundEffect =
   | "life-lost"
   | "level-up"
   | "game-over"
-  | "button-click";
+  | "button-click"
+  | "start";
 
 export type MusicTrack = "menu" | "gameplay";
 
@@ -26,6 +27,7 @@ export const useAudio = () => {
       "level-up",
       "game-over",
       "button-click",
+      "start",
     ];
 
     effects.forEach((effect) => {
@@ -109,6 +111,7 @@ export const useAudio = () => {
 
   // Play sound effect
   const playSFX = (effect: SoundEffect) => {
+    console.log("I TRIED TO PLAY A SOUND!!!!!!!!!!!!!");
     if (!sfxEnabled) {
       console.log(`⚠️ SFX disabled, not playing: ${effect}`);
       return;
@@ -144,6 +147,14 @@ export const useAudio = () => {
 
   // Toggle SFX
   const toggleSFX = () => {
+    // Always play this click sound regardless of the current sfxEnabled state
+    const clickAudio = sfxRefs.current.get("button-click");
+    if (clickAudio) {
+      clickAudio.currentTime = 0;
+      clickAudio.play().catch((error) => {
+        console.warn("⚠️ Button click sound playback failed:", error);
+      });
+    }
     const newState = !sfxEnabled;
     setSfxEnabled(newState);
   };
