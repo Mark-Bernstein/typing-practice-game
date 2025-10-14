@@ -531,7 +531,7 @@ const GamePlay: React.FC<{
             <LevelMessage key={levelMessage}>{levelMessage}</LevelMessage>
           )}
           <ProgressWrapper>
-            <ProgressBar progress={getProgress()}>
+            <ProgressBar $progress={getProgress()}>
               <div />
             </ProgressBar>
             <ProgressText>Progress to next level</ProgressText>
