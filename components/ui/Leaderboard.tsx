@@ -6,28 +6,38 @@ import { formatDistanceToNow } from "date-fns";
 const LeaderboardContainer = styled.div`
   position: absolute;
   right: 40px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 40px;
   width: 420px;
-  max-height: 70vh;
+  max-height: 80vh;
   background: #000000;
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 40px rgba(183, 0, 255, 0.5);
   overflow: hidden;
   animation: slideInRight 2s ease-in-out;
 
   @keyframes slideInRight {
-    from {
-      transform: translateY(-50%) translateX(500px);
+    0% {
+      transform: translateX(500px);
       opacity: 0;
     }
-    to {
-      transform: translateY(-50%) translateX(0);
+    60% {
+      transform: translateX(-20px);
       opacity: 1;
     }
+    80% {
+      transform: translateX(10px);
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @media screen and (max-width: 1440px) {
+    width: 300px;
   }
 `;
 
@@ -132,6 +142,10 @@ const Nickname = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   text-shadow: 0px 0px 2px cyan;
+
+  @media screen and (max-width: 1440px) {
+    font-size: 16px;
+  }
 `;
 
 const ScoreValue = styled.div`

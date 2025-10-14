@@ -7,8 +7,10 @@ import { Lives } from "../ui/Lives";
 import { LetterMissEffect } from "../ui/LetterMissEffect";
 import { AnimatePresence } from "framer-motion";
 import { LavaFloor } from "./LavaFloor";
+import { useAudioContext } from "../../app/contexts/AudioContext";
+import { setSFXCallback } from "../../hooks/useTypingGame";
+import { SoundEffect } from "@/hooks/useAudio";
 
-// Wrapper to center and scale game proportionally
 const GameContainer = styled.div`
   position: relative;
   width: 100%;
@@ -19,7 +21,6 @@ const GameContainer = styled.div`
   overflow: hidden;
 `;
 
-/* Absolutely-centered wrapper */
 const GameCanvasWrapper = styled.div`
   position: relative;
   width: 100%;
@@ -41,7 +42,6 @@ const GameCanvas = styled.div`
   box-shadow: 0 0 60px rgba(0, 0, 0, 0.5), inset 0 0 80px rgba(0, 0, 0, 0.3);
 `;
 
-// Animation for wrong key feedback
 const shake = keyframes`
   0% { transform: translateX(0); }
   25% { transform: translateX(-5px); }
@@ -55,7 +55,7 @@ const WrongKeyFeedback = styled.div`
   bottom: 0;
   left: 20px;
   color: #7e0000;
-  font-size: 24px;
+  font-size: clamp(18px, 1.5vw, 24px);
   font-weight: bold;
   animation: ${shake} 0.3s linear;
   pointer-events: none;
@@ -70,12 +70,19 @@ interface GameAreaProps {
 export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
   const [triggerMissEffect, setTriggerMissEffect] = useState(false);
   const prevLivesRef = useRef(gameState.lives);
+  const { playSFX } = useAudioContext();
+
+  // Set up SFX callback for the typing game hook
+  useEffect(() => {
+    setSFXCallback((effect) => {
+      playSFX(effect as SoundEffect);
+    });
+  }, [playSFX]);
 
   // Detect when lives decrease (letter hit bottom)
   useEffect(() => {
     if (gameState.lives < prevLivesRef.current) {
       setTriggerMissEffect(true);
-      // Reset trigger after animation completes
       const timer = setTimeout(() => setTriggerMissEffect(false), 600);
       return () => clearTimeout(timer);
     }

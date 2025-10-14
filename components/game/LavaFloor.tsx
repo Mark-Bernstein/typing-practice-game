@@ -18,7 +18,7 @@ const LavaLine = styled.div<{ height?: number }>`
   position: absolute;
   bottom: 0;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1024px;
   height: ${({ height }) => height || 30}px;
   border-radius: 0 0 12px 12px;
   background: linear-gradient(

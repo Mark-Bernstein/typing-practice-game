@@ -7,6 +7,13 @@ import {
   getLevel,
 } from "../utils/gameUtils";
 
+// Import will be used in component that uses this hook
+let playSFXCallback: ((effect: string) => void) | null = null;
+
+export const setSFXCallback = (callback: (effect: string) => void) => {
+  playSFXCallback = callback;
+};
+
 const initialGameState: GameState = {
   letters: [],
   time: 0,
@@ -25,13 +32,13 @@ export const useTypingGame = () => {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const gameLoopRef = useRef<number | undefined>(undefined);
   const letterIdCounter = useRef(0);
+  const prevLivesRef = useRef(5);
 
   const gameLoop = useCallback(() => {
     setGameState((prevState) => {
       if (prevState.gameOver) return prevState;
 
-      // eslint-disable-next-line prefer-const
-      let newState = { ...prevState };
+      const newState = { ...prevState };
       newState.time += 1;
 
       // Move letters down
@@ -55,8 +62,17 @@ export const useTypingGame = () => {
       // Decrease lives for each letter that reached the bottom
       const newLives = newState.lives - lettersReachedBottom.length;
 
+      // Play life lost sound if lives decreased
+      if (newLives < prevLivesRef.current && playSFXCallback) {
+        playSFXCallback("life-lost");
+        prevLivesRef.current = newLives;
+      }
+
       // Check for game over (no lives left)
       if (newLives <= 0) {
+        if (playSFXCallback) {
+          playSFXCallback("game-over");
+        }
         return {
           ...newState,
           gameOver: true,
@@ -75,7 +91,6 @@ export const useTypingGame = () => {
         (newState.time % 60 === 0 &&
           newState.letters.length < GAME_CONFIG.MAX_LETTERS)
       ) {
-        // number of letters to spawn depends on level
         const spawnCount = Math.min(
           newState.level,
           4 - newState.letters.length
@@ -107,13 +122,16 @@ export const useTypingGame = () => {
         ...prevState,
         keysPressed: prevState.keysPressed + 1,
         lastKeyPressed: upperKey,
-        lastKeyCorrect: false, // default to false
-        score: prevState.score, // keep current score by default
+        lastKeyCorrect: false,
+        score: prevState.score,
       };
 
       const index = newState.letters.findIndex((l) => l.letter === upperKey);
       if (index !== -1) {
-        // Correct key
+        if (playSFXCallback) {
+          playSFXCallback("correct");
+        }
+
         const updatedLetters = [...newState.letters];
         updatedLetters.splice(index, 1);
         newState.letters = updatedLetters;
@@ -125,7 +143,9 @@ export const useTypingGame = () => {
         );
         newState.lastKeyCorrect = true;
       } else {
-        // Wrong key: subtract 5 points
+        if (playSFXCallback) {
+          playSFXCallback("wrong");
+        }
         newState.score = Math.max(0, newState.score - 3);
         newState.lastKeyCorrect = false;
       }
@@ -137,6 +157,7 @@ export const useTypingGame = () => {
   const resetGame = useCallback(() => {
     setGameState(initialGameState);
     letterIdCounter.current = 0;
+    prevLivesRef.current = 5;
   }, []);
 
   useEffect(() => {

@@ -10,6 +10,9 @@ import { GameOver } from "./ui/GameOver";
 import { Instructions } from "./ui/Instructions";
 import { GameStats } from "./ui/GameStats";
 import { Leaderboard } from "./ui/Leaderboard";
+import { AudioControls } from "./ui/AudioControls";
+import { useAudioContext } from "../app/contexts/AudioContext";
+import { useAudio } from "../hooks/useAudio";
 
 const pulse = keyframes`
   0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -21,14 +24,14 @@ const gridMove = keyframes`
   100% { transform: translate3d(50px, 50px, 0); }
 `;
 
-const GameWrapper = styled.div<{ level: number }>`
+const GameWrapper = styled.div<{ $level: number }>`
   position: relative;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
   transition: all 0.5s ease;
 
-  ${({ level }) => {
+  ${({ $level }) => {
     const gradients: Record<number, string> = {
       1: "linear-gradient(to bottom right, #312e81, #581c87, #9d174d)",
       2: "linear-gradient(to bottom right, #581c87, #1e3a8a, #3730a3)",
@@ -36,24 +39,24 @@ const GameWrapper = styled.div<{ level: number }>`
       4: "linear-gradient(to bottom right, #164e63, #065f46, #166534)",
       5: "linear-gradient(to bottom right, #7c2d12, #991b1b, #9d174d)",
     };
-    const clampedLevel = Math.min(Math.max(level, 1), 5);
+    const clampedLevel = Math.min(Math.max($level, 1), 5);
     return `background: ${gradients[clampedLevel]};`;
   }}
 `;
 
-const ParticleDot = styled.div<{ left: number; top: number; delay: number }>`
+const ParticleDot = styled.div<{ $left: number; $top: number; $delay: number }>`
   position: absolute;
   width: 4px;
   height: 4px;
   border-radius: 50%;
   background: white;
   opacity: 0.3;
-  left: ${({ left }) => `${left}%`};
-  top: ${({ top }) => `${top}%`};
+  left: ${({ $left }) => `${$left}%`};
+  top: ${({ $top }) => `${$top}%`};
   animation-name: ${pulse};
   animation-iteration-count: infinite;
   animation-timing-function: linear;
-  animation-delay: ${({ delay }) => `${delay}s`};
+  animation-delay: ${({ $delay }) => `${$delay}s`};
 `;
 
 const ParticleLayer = styled.div`
@@ -76,27 +79,27 @@ const GridBackground = styled.div`
 `;
 
 const GlowingOrb = styled.div<{
-  size: number;
-  color: string;
-  top?: string;
-  left?: string;
-  bottom?: string;
-  right?: string;
-  delay?: string;
+  $size: number;
+  $color: string;
+  $top?: string;
+  $left?: string;
+  $bottom?: string;
+  $right?: string;
+  $delay?: string;
 }>`
   position: absolute;
-  width: ${({ size }) => size}px;
-  height: ${({ size }) => size}px;
+  width: ${({ $size }) => $size}px;
+  height: ${({ $size }) => $size}px;
   border-radius: 50%;
-  background: ${({ color }) => color};
+  background: ${({ $color }) => $color};
   opacity: 0.2;
-  filter: blur(40px);
+  filter: blur(30px);
   animation: ${pulse} 4s infinite;
-  top: ${({ top }) => top || "auto"};
-  left: ${({ left }) => left || "auto"};
-  bottom: ${({ bottom }) => bottom || "auto"};
-  right: ${({ right }) => right || "auto"};
-  animation-delay: ${({ delay }) => delay || "0s"};
+  top: ${({ $top }) => $top || "auto"};
+  left: ${({ $left }) => $left || "auto"};
+  bottom: ${({ $bottom }) => $bottom || "auto"};
+  right: ${({ $right }) => $right || "auto"};
+  animation-delay: ${({ $delay }) => $delay || "0s"};
 `;
 
 const GameContainer = styled.div`
@@ -140,7 +143,7 @@ const ProgressWrapper = styled.div`
   z-index: 1000;
 `;
 
-const ProgressBar = styled.div<{ progress: number }>`
+const ProgressBar = styled.div<{ $progress: number }>`
   height: 50px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -148,7 +151,7 @@ const ProgressBar = styled.div<{ progress: number }>`
 
   div {
     height: 100%;
-    width: ${({ progress }) => `${progress}%`};
+    width: ${({ $progress }) => `${$progress}%`};
     background: linear-gradient(to right, #22d3ee, #a855f7);
     border-radius: 16px;
     transition: width 0.5s ease;
@@ -177,10 +180,16 @@ const StartScreen = styled.div`
   text-align: center;
   padding: 16px;
   padding-top: 50px;
+`;
 
-  h1 {
-    font-size: 48px;
-    margin-bottom: 100px;
+const TitleMainMenu = styled.span`
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 100px;
+  text-shadow: 0 0 20px cyan;
+
+  @media screen and (max-width: 1440px) {
+    font-size: 36px;
   }
 `;
 
@@ -325,19 +334,11 @@ const StartButton = styled.button`
   }
 `;
 
-// const TotalPlaysDisplay = styled.div`
-//   margin-top: 24px;
-//   font-size: 20px;
-//   color: #22d3ee;
-//   font-weight: bold;
-// `;
-
 const TotalPlaysDisplay = styled.div`
   position: absolute;
   font-size: 28px;
-  right: 40px;
-  top: 25%;
-  transform: translateY(-50%);
+  left: 40px;
+  top: 40px;
   width: 420px;
   max-height: 70vh;
   background: #000000;
@@ -350,14 +351,31 @@ const TotalPlaysDisplay = styled.div`
   animation: slideInRight 2s ease-in-out;
 
   @keyframes slideInRight {
-    from {
-      transform: translateY(-50%) translateX(500px);
+    0% {
+      transform: translateX(500px);
       opacity: 0;
     }
-    to {
-      transform: translateY(-50%) translateX(0);
+    60% {
+      transform: translateX(-20px);
       opacity: 1;
     }
+    80% {
+      transform: translateX(10px);
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @media screen and (max-width: 1440px) {
+    font-size: 20px;
+    width: 300px;
+    left: 16px;
+    top: 30px;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
   }
 `;
 
@@ -385,7 +403,7 @@ const Particle: React.FC<ParticleProps> = React.memo(
     const left = +(seededRandom(index * 2) * 100).toFixed(3);
     const top = +(seededRandom(index * 3) * 100).toFixed(3);
 
-    return <ParticleDot left={left} top={top} delay={delay} />;
+    return <ParticleDot $left={left} $top={top} $delay={delay} />;
   },
   (prevProps, nextProps) =>
     prevProps.lettersCorrect === nextProps.lettersCorrect &&
@@ -402,6 +420,8 @@ const GamePlay: React.FC<{
   const { gameState, resetGame } = useTypingGame();
   const [particles] = useState(() => Array.from({ length: 50 }, (_, i) => i));
   const [levelMessage, setLevelMessage] = useState(getLevelMessage(0));
+  const { playSFX } = useAudioContext();
+  const prevLevelRef = React.useRef(gameState.level);
 
   const gameStats = calculateGameStats(
     gameState.time,
@@ -436,8 +456,14 @@ const GamePlay: React.FC<{
     const newMessage = getLevelMessage(gameState.lettersCorrect);
     setLevelMessage(newMessage);
 
+    // Play level up sound
+    if (gameState.level > prevLevelRef.current) {
+      playSFX("level-up");
+    }
+    prevLevelRef.current = gameState.level;
+
     onLevelChange?.(gameState.level);
-  }, [gameState.lettersCorrect, gameState.level, onLevelChange]);
+  }, [gameState.lettersCorrect, gameState.level, onLevelChange, playSFX]);
 
   return (
     <>
@@ -453,15 +479,21 @@ const GamePlay: React.FC<{
       </ParticleLayer>
 
       <GridBackground />
-      <GlowingOrb size={128} color="#06b6d4" top="40px" left="40px" />
+      <GlowingOrb $size={128} $color="#06b6d4" $top="40px" $left="40px" />
       <GlowingOrb
-        size={96}
-        color="#9333ea"
-        bottom="40px"
-        right="40px"
-        delay="1s"
+        $size={96}
+        $color="#9333ea"
+        $bottom="40px"
+        $right="40px"
+        $delay="1s"
       />
-      <GlowingOrb size={64} color="#ec4899" top="50%" left="25%" delay="2s" />
+      <GlowingOrb
+        $size={64}
+        $color="#ec4899"
+        $top="50%"
+        $left="25%"
+        $delay="2s"
+      />
 
       <GameContainer>
         <GameStats
@@ -514,13 +546,34 @@ export const TypingGame: React.FC = () => {
   const [hasStarted, setHasStarted] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(1);
   const [totalPlays, setTotalPlays] = useState<number | null>(null);
+  const {
+    playMusic,
+    stopMusic,
+    toggleMusic,
+    musicEnabled,
+    sfxEnabled,
+    toggleSFX,
+  } = useAudio();
 
   useEffect(() => {
     fetchTotalPlays();
   }, []);
 
+  useEffect(() => {
+    if (musicEnabled) {
+      if (hasStarted) {
+        playMusic("gameplay");
+      } else {
+        playMusic("menu");
+      }
+    } else stopMusic();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [musicEnabled, hasStarted]);
+
   const handleStart = () => {
     incrementTotalPlays();
+    stopMusic();
+    playMusic("gameplay");
     setHasStarted(true);
   };
 
@@ -534,7 +587,6 @@ export const TypingGame: React.FC = () => {
     }
   };
 
-  // Increment total plays when game starts
   const incrementTotalPlays = async () => {
     try {
       await fetch("/api/game-played", { method: "POST" });
@@ -545,10 +597,18 @@ export const TypingGame: React.FC = () => {
   };
 
   return (
-    <GameWrapper level={currentLevel}>
+    <GameWrapper $level={currentLevel}>
+      {/* Audio Controls - Always visible */}
+      <AudioControls
+        musicEnabled={musicEnabled}
+        sfxEnabled={sfxEnabled}
+        onToggleMusic={toggleMusic}
+        onToggleSFX={toggleSFX}
+      />
+
       {!hasStarted && (
         <StartScreen>
-          <h1>Typing Challenge</h1>
+          <TitleMainMenu>Typing Challenge</TitleMainMenu>
           <Instructions show={!hasStarted} />
           <StartButton onClick={handleStart}>START</StartButton>
           <Leaderboard />

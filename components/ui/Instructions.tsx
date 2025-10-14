@@ -26,6 +26,11 @@ const InstructionsContainer = styled.div`
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
+
+  @media screen and (max-width: 1440px) {
+    max-width: 300px;
+    top: 130px;
+  }
 `;
 
 const InstructionsPanel = styled.div.withConfig({
@@ -35,7 +40,7 @@ const InstructionsPanel = styled.div.withConfig({
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
-  padding: 16px 16px;
+  padding: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   text-align: center;
   max-width: 800px;
@@ -50,6 +55,10 @@ const InstructionsPanel = styled.div.withConfig({
       : css`
           animation: ${fadeOut} 0.5s ${delay / 2 || 0}s ease-in-out forwards;
         `}
+
+  @media screen and (max-width: 1440px) {
+    padding: 10px;
+  }
 `;
 
 // Fade in/out + drop from top
@@ -93,7 +102,7 @@ export const CreatedBy = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "show",
 })<{ show: boolean }>`
   position: absolute;
-  top: 1100px;
+  bottom: 40px;
   /* padding: 20px 200px; */
   text-align: center;
   max-width: 600px;
@@ -177,6 +186,10 @@ const MainText = styled.p<{ $reflected?: boolean }>`
       opacity: 1;
     }
   }
+
+  @media screen and (max-width: 1440px) {
+    font-size: 20px;
+  }
 `;
 
 const SubText = styled.p`
@@ -184,6 +197,10 @@ const SubText = styled.p`
   font-size: 20px;
   font-weight: 500;
   line-height: 1.5;
+
+  @media screen and (max-width: 1440px) {
+    font-size: 18px;
+  }
 `;
 
 const CreatedByText = styled.span`
