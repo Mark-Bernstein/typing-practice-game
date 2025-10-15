@@ -11,7 +11,13 @@ export const GAME_CONFIG = {
   START_LETTER_SPEED: 1.5,
   FRAME_RATE: 60,
   MAX_LETTERS: 12,
+  MAX_WORDS: 5,
   MAX_SPEED: 50,
+
+  // Word mode settings
+  WORD_SPEED_MULTIPLIER: 0.7,
+  WORD_MIN_LENGTH: 3,
+  WORD_MAX_LENGTH: 6,
 } as const;
 
 export const LETTER_COLORS: readonly string[] = [
@@ -43,3 +49,10 @@ export const LEVEL_THRESHOLDS = {
   LEVEL_4: 70,
   MAX_LEVEL: 130,
 } as const;
+
+export const WORD_SCORES: Record<number, number> = {
+  3: 5,
+  4: 8,
+  5: 12,
+  6: 18,
+};

@@ -1,0 +1,138 @@
+// Common typing practice words organized by length
+export const WORD_LISTS = {
+  SHORT: [
+    "CAT",
+    "DOG",
+    "RUN",
+    "SUN",
+    "FUN",
+    "BAT",
+    "HAT",
+    "RAT",
+    "SAT",
+    "MAT",
+    "PEN",
+    "TEN",
+    "HEN",
+    "DEN",
+    "BEN",
+    "CUP",
+    "PUP",
+    "TOP",
+    "POP",
+    "MOP",
+    "BIG",
+    "DIG",
+    "FIG",
+    "PIG",
+    "WIG",
+    "BAG",
+    "TAG",
+    "RAG",
+    "WAG",
+    "SAG",
+  ],
+  MEDIUM: [
+    "CODE",
+    "TYPE",
+    "GAME",
+    "PLAY",
+    "FAST",
+    "SLOW",
+    "JUMP",
+    "STOP",
+    "TALK",
+    "WALK",
+    "MAKE",
+    "TAKE",
+    "CAKE",
+    "LAKE",
+    "WAKE",
+    "BOOK",
+    "LOOK",
+    "COOK",
+    "TOOK",
+    "HOOK",
+    "TEAM",
+    "BEAM",
+    "SEAM",
+    "MEAN",
+    "LEAN",
+    "HELP",
+    "SELF",
+    "MELT",
+    "BELT",
+    "FELT",
+    "HAND",
+    "LAND",
+    "SAND",
+    "BAND",
+    "WIND",
+    "MIND",
+    "KIND",
+    "FIND",
+    "BIND",
+    "GRIND",
+  ],
+  LONG: [
+    "BEAST",
+    "FEAST",
+    "LEAST",
+    "COAST",
+    "ROAST",
+    "TOAST",
+    "BOOST",
+    "FROST",
+    "PLANT",
+    "GRANT",
+    "CHANT",
+    "SLANT",
+    "BRAND",
+    "GRAND",
+    "STAND",
+    "STRAND",
+    "LIGHT",
+    "FIGHT",
+    "MIGHT",
+    "NIGHT",
+    "RIGHT",
+    "SIGHT",
+    "TIGHT",
+    "FLIGHT",
+    "THINK",
+    "DRINK",
+    "BLINK",
+    "STINK",
+    "BRING",
+    "THING",
+    "SWING",
+    "SPRING",
+  ],
+} as const;
+
+export const getAllWords = (): string[] => {
+  return [...WORD_LISTS.SHORT, ...WORD_LISTS.MEDIUM, ...WORD_LISTS.LONG];
+};
+
+export const getWordsByLength = (
+  minLength: number,
+  maxLength: number
+): string[] => {
+  return getAllWords().filter(
+    (word) => word.length >= minLength && word.length <= maxLength
+  );
+};
+
+export const getRandomWord = (): string => {
+  const allWords = getAllWords();
+  return allWords[Math.floor(Math.random() * allWords.length)];
+};
+
+export const WORD_COLORS: readonly string[] = [
+  "#ff6b6b",
+  "#ffa726",
+  "#ffee58",
+  "#66bb6a",
+  "#42a5f5",
+  "#ab47bc",
+] as const;

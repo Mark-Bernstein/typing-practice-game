@@ -4,6 +4,8 @@ export interface GameDimensions {
   letterSize: number;
 }
 
+export type GameMode = "letter" | "word";
+
 export interface LetterPosition {
   letter: string;
   x: number;
@@ -12,8 +14,18 @@ export interface LetterPosition {
   id: number;
 }
 
+export interface WordPosition {
+  word: string;
+  x: number;
+  y: number;
+  color: string;
+  id: number;
+  typedProgress: number;
+}
+
 export interface GameState {
   letters: LetterPosition[];
+  words: WordPosition[];
   time: number;
   lettersCorrect: number;
   score: number;
@@ -25,6 +37,8 @@ export interface GameState {
   lastKeyCorrect: boolean;
   lives: number;
   dimensions: GameDimensions;
+  gameMode: GameMode;
+  currentTypingWordId: number | null;
 }
 
 export interface GameStats {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import { GameState } from "../../types/game";
 import { FallingLetter } from "./FallingLetter";
+import { FallingWord } from "./FallingWord"; // ✅ Import new component
 import { Lives } from "../ui/Lives";
 import { LetterMissEffect } from "../ui/LetterMissEffect";
 import { AnimatePresence } from "framer-motion";
@@ -60,6 +61,24 @@ const WrongKeyFeedback = styled.div`
   opacity: 0.8;
 `;
 
+// ✅ Mode indicator
+const ModeIndicator = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 8px 16px;
+  color: #22d3ee;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  z-index: 20;
+`;
+
 interface GameAreaProps {
   gameState: GameState;
 }
@@ -67,6 +86,7 @@ interface GameAreaProps {
 export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
   const [triggerMissEffect, setTriggerMissEffect] = useState(false);
   const prevLivesRef = useRef(gameState.lives);
+  const { playSFX } = useAudioContext();
 
   useEffect(() => {
     if (gameState.lives < prevLivesRef.current) {
@@ -83,26 +103,39 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
 
       <LetterMissEffect triggerEffect={triggerMissEffect}>
         <GameCanvasWrapper>
-          {/* ✅ Pass dynamic dimensions */}
           <GameCanvas
             $width={gameState.dimensions.width}
             $height={gameState.dimensions.height}
           >
+            {/* ✅ Mode indicator */}
+            <ModeIndicator>
+              {gameState.gameMode === "letter" ? "Letter Mode" : "Word Mode"}
+            </ModeIndicator>
+
             <AnimatePresence>
-              {gameState.letters.map((letter) => (
-                <FallingLetter
-                  key={letter.id}
-                  letter={letter}
-                  letterSize={gameState.dimensions.letterSize}
-                />
-              ))}
+              {/* ✅ Render letters OR words based on mode */}
+              {gameState.gameMode === "letter"
+                ? gameState.letters.map((letter) => (
+                    <FallingLetter
+                      key={letter.id}
+                      letter={letter}
+                      letterSize={gameState.dimensions.letterSize}
+                    />
+                  ))
+                : gameState.words.map((word) => (
+                    <FallingWord
+                      key={word.id}
+                      word={word}
+                      letterSize={gameState.dimensions.letterSize}
+                    />
+                  ))}
             </AnimatePresence>
 
             {gameState.lastKeyPressed && gameState.lastKeyCorrect === false && (
               <WrongKeyFeedback>Wrong key</WrongKeyFeedback>
             )}
           </GameCanvas>
-          <LavaFloor height={30} width={gameState.dimensions.width} />
+          <LavaFloor height={30} />
         </GameCanvasWrapper>
       </LetterMissEffect>
     </GameContainer>

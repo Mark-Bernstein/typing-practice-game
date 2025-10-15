@@ -26,6 +26,21 @@ const InstructionsContainer = styled.div`
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
+  transition: left 1.5s ease-in-out;
+
+  animation: moveToLeft 1.5s ease-in-out 2s forwards;
+
+  @keyframes moveToLeft {
+    0% {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    100% {
+      left: 16px;
+      top: 200px;
+      transform: none;
+    }
+  }
 
   @media screen and (max-width: 1440px) {
     max-width: 300px;
@@ -103,7 +118,6 @@ export const CreatedBy = styled.div.withConfig({
 })<{ show: boolean }>`
   position: absolute;
   bottom: 40px;
-  /* padding: 20px 200px; */
   text-align: center;
   max-width: 600px;
   margin-top: 20px;
@@ -168,6 +182,7 @@ const MainText = styled.p<{ $reflected?: boolean }>`
   font-weight: 600;
   text-shadow: 0 2px 4px #d400ff;
   white-space: nowrap;
+  margin: 0;
 
   ${({ $reflected }) =>
     $reflected &&
@@ -244,6 +259,19 @@ export const CreatedByWrapper = styled.div<{ show: boolean }>`
   }
 `;
 
+const StyledLink = styled.a`
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: #ffffff; /* lighter cyan hover */
+    text-shadow: 0 0 8px #ff00ff;
+    outline: none;
+  }
+`;
+
 interface InstructionsProps {
   show: boolean;
 }
@@ -270,7 +298,16 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
         </InstructionsPanel>
       </InstructionsContainer>
       <CreatedBy show={show}>
-        <MainText>Created by: Mark Bernstein</MainText>
+        <MainText>
+          <StyledLink
+            href="https://www.linkedin.com/in/mark-b-bernstein/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit Mark Bernstein's LinkedIn profile"
+          >
+            Created by: Mark Bernstein
+          </StyledLink>
+        </MainText>
         <MainText $reflected={true}>Created by: Mark Bernstein</MainText>
       </CreatedBy>
     </>

@@ -13,6 +13,7 @@ import { Leaderboard } from "./ui/Leaderboard";
 import { AudioControls } from "./ui/AudioControls";
 import { useAudioContext } from "../app/contexts/AudioContext";
 import { useGameDimensions } from "@/hooks/useGameDimensions";
+import { GameMode } from "../types/game";
 
 const pulse = keyframes`
   0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -187,8 +188,39 @@ const TitleMainMenu = styled.span`
   font-weight: bold;
   margin-bottom: 100px;
   text-shadow: 0 0 20px cyan;
+  display: inline-block;
+  opacity: 0;
+  transform: scale(0.8);
+  animation: titleReveal 4s ease-in-out forwards;
 
-  @media screen and (max-width: 1440px) {
+  @keyframes titleReveal {
+    0% {
+      opacity: 0;
+      transform: scale(0.1) rotate(-2deg);
+      text-shadow: 0 0 5px cyan, 0 0 10px #00ffff;
+      letter-spacing: -2px;
+    }
+    40% {
+      opacity: 0.6;
+      transform: scale(2) rotate(1deg);
+      text-shadow: 0 0 15px cyan, 0 0 25px #00ffff;
+      letter-spacing: 2px;
+    }
+    70% {
+      opacity: 1;
+      transform: scale(2) rotate(0deg);
+      text-shadow: 0 0 25px #00ffff, 0 0 40px #00e5ff;
+      letter-spacing: 1px;
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1.5);
+      text-shadow: 0 0 20px cyan, 0 0 40px #00e5ff, 0 0 60px #d400ff;
+      letter-spacing: normal;
+    }
+  }
+
+  @media (max-width: 1440px) {
     font-size: 36px;
   }
 `;
@@ -261,7 +293,8 @@ const StartButton = styled.button`
   overflow: visible;
   box-shadow: 0 0 30px rgba(147, 51, 234, 0.9), 0 0 60px rgba(34, 211, 238, 0.8);
   transition: all 0.4s ease;
-  animation: ${fadeInFromTop} 2s ease-in-out forwards;
+  animation: ${fadeInFromTop} 2s ease-in-out forwards,
+    moveUp 2s ease-in-out 2s forwards;
   transform-style: preserve-3d;
   perspective: 800px;
 
@@ -332,6 +365,15 @@ const StartButton = styled.button`
       transform: translate(-50%, -50%) rotate(360deg);
     }
   }
+
+  @keyframes moveUp {
+    from {
+      top: 710px;
+    }
+    to {
+      top: 450px;
+    }
+  }
 `;
 
 const TotalPlaysDisplay = styled.div`
@@ -387,6 +429,81 @@ const HighlightedNumberOfPlays = styled.div`
   margin-top: 20px;
 `;
 
+const slideInTop = keyframes`
+    0% {
+      transform: translateY(500px);
+      opacity: 0;
+    }
+    60% {
+      transform: translateY(-20px);
+      opacity: 1;
+    }
+    80% {
+      transform: translateY(10px);
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  `;
+
+const ModeSelector = styled.div`
+  display: flex;
+  gap: 24px;
+  margin-bottom: 60px;
+  z-index: 1001;
+  animation: ${fadeInFromTop} 4s ease-in-out forwards;
+`;
+
+const ModeButton = styled.button<{ $active: boolean }>`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 32px;
+  background: ${(props) =>
+    props.$active
+      ? "linear-gradient(135deg, rgba(34, 211, 238, 0.3), rgba(147, 51, 234, 0.3))"
+      : "rgba(0, 0, 0, 0.4)"};
+  border: 2px solid
+    ${(props) => (props.$active ? "#22d3ee" : "rgba(255, 255, 255, 0.2)")};
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 180px;
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: #22d3ee;
+    box-shadow: 0 8px 24px rgba(34, 211, 238);
+  }
+
+  ${(props) =>
+    props.$active &&
+    `
+    box-shadow: 0 0 30px rgba(34, 211, 238, 0.5);
+  `}
+`;
+
+const ModeIcon = styled.div`
+  font-size: 48px;
+`;
+
+const ModeLabel = styled.div`
+  color: #00fa15;
+  font-size: 28px;
+  font-weight: bold;
+  letter-spacing: 1px;
+`;
+
+const ModeDescription = styled.div`
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  text-align: center;
+`;
+
 function seededRandom(seed: number) {
   const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
@@ -413,13 +530,18 @@ const Particle: React.FC<ParticleProps> = React.memo(
 
 Particle.displayName = "Particle";
 
+// ✅ Update GamePlay component to accept gameMode
 const GamePlay: React.FC<{
   onExit: () => void;
   onLevelChange?: (level: number) => void;
-}> = ({ onExit, onLevelChange }) => {
-  const { playSFX } = useAudioContext();
+  gameMode: GameMode; // ✅ Add this
+}> = ({ onExit, onLevelChange, gameMode }) => {
   const dimensions = useGameDimensions();
-  const { gameState, resetGame } = useTypingGame(playSFX, dimensions);
+  const { playSFX } = useAudioContext();
+
+  // ✅ Pass gameMode to the hook
+  const { gameState, resetGame } = useTypingGame(playSFX, dimensions, gameMode);
+
   const [particles] = useState(() => Array.from({ length: 50 }, (_, i) => i));
   const [levelMessage, setLevelMessage] = useState(getLevelMessage(0));
   const prevLevelRef = React.useRef(gameState.level);
@@ -457,7 +579,6 @@ const GamePlay: React.FC<{
     const newMessage = getLevelMessage(gameState.lettersCorrect);
     setLevelMessage(newMessage);
 
-    // Play level up sound
     if (gameState.level > prevLevelRef.current) {
       playSFX("level-up");
     }
@@ -547,6 +668,8 @@ export const TypingGame: React.FC = () => {
   const [hasStarted, setHasStarted] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(1);
   const [totalPlays, setTotalPlays] = useState<number | null>(null);
+  const [gameMode, setGameMode] = useState<GameMode>("letter"); // ✅ Add this
+
   const {
     playMusic,
     stopMusic,
@@ -601,7 +724,6 @@ export const TypingGame: React.FC = () => {
 
   return (
     <GameWrapper $level={currentLevel}>
-      {/* Audio Controls - Always visible */}
       <AudioControls
         musicEnabled={musicEnabled}
         sfxEnabled={sfxEnabled}
@@ -612,6 +734,27 @@ export const TypingGame: React.FC = () => {
       {!hasStarted && (
         <StartScreen>
           <TitleMainMenu>Typing Challenge</TitleMainMenu>
+
+          <ModeSelector>
+            <ModeButton
+              $active={gameMode === "letter"}
+              onClick={() => setGameMode("letter")}
+            >
+              <ModeIcon>🔤</ModeIcon>
+              <ModeLabel>Letter Mode</ModeLabel>
+              <ModeDescription>Type individual letters</ModeDescription>
+            </ModeButton>
+
+            <ModeButton
+              $active={gameMode === "word"}
+              onClick={() => setGameMode("word")}
+            >
+              <ModeIcon>📝</ModeIcon>
+              <ModeLabel>Word Mode</ModeLabel>
+              <ModeDescription>Type complete words</ModeDescription>
+            </ModeButton>
+          </ModeSelector>
+
           <Instructions show={!hasStarted} />
           <StartButton onClick={handleStart}>START</StartButton>
           <Leaderboard />
@@ -628,6 +771,7 @@ export const TypingGame: React.FC = () => {
         <GamePlay
           onExit={() => setHasStarted(false)}
           onLevelChange={(level) => setCurrentLevel(level)}
+          gameMode={gameMode} // ✅ Pass game mode
         />
       )}
     </GameWrapper>
