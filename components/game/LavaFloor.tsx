@@ -1,24 +1,21 @@
 import React from "react";
 import styled, { keyframes } from "styled-components";
 
-// Lava bubbling animation
 const lavaBubble = keyframes`
   0%, 100% { transform: scaleY(1); opacity: 0.5; }
   50% { transform: scaleY(1.2); opacity: 1; }
 `;
 
-// Lava gradient flow
 const lavaFlow = keyframes`
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 `;
 
-const LavaLine = styled.div<{ height?: number }>`
+const LavaLine = styled.div<{ height?: number; width?: number }>`
   position: absolute;
   bottom: 0;
-  width: 100%;
-  max-width: 1024px;
+  width: ${(props) => props.width}px;
   height: ${({ height }) => height || 30}px;
   border-radius: 0 0 12px 12px;
   background: linear-gradient(
@@ -51,8 +48,9 @@ const LavaLine = styled.div<{ height?: number }>`
 
 interface LavaFloorProps {
   height?: number;
+  width?: number;
 }
 
-export const LavaFloor: React.FC<LavaFloorProps> = ({ height }) => {
-  return <LavaLine height={height} />;
+export const LavaFloor: React.FC<LavaFloorProps> = ({ height, width }) => {
+  return <LavaLine height={height} width={width} />;
 };

@@ -12,6 +12,7 @@ import { GameStats } from "./ui/GameStats";
 import { Leaderboard } from "./ui/Leaderboard";
 import { AudioControls } from "./ui/AudioControls";
 import { useAudioContext } from "../app/contexts/AudioContext";
+import { useGameDimensions } from "@/hooks/useGameDimensions";
 
 const pulse = keyframes`
   0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -417,7 +418,8 @@ const GamePlay: React.FC<{
   onLevelChange?: (level: number) => void;
 }> = ({ onExit, onLevelChange }) => {
   const { playSFX } = useAudioContext();
-  const { gameState, resetGame } = useTypingGame(playSFX);
+  const dimensions = useGameDimensions();
+  const { gameState, resetGame } = useTypingGame(playSFX, dimensions);
   const [particles] = useState(() => Array.from({ length: 50 }, (_, i) => i));
   const [levelMessage, setLevelMessage] = useState(getLevelMessage(0));
   const prevLevelRef = React.useRef(gameState.level);

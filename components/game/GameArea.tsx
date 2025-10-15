@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import { GameState } from "../../types/game";
-import { GAME_CONFIG } from "../../constants/gameConfig";
 import { FallingLetter } from "./FallingLetter";
 import { Lives } from "../ui/Lives";
 import { LetterMissEffect } from "../ui/LetterMissEffect";
@@ -30,10 +29,10 @@ const GameCanvasWrapper = styled.div`
   z-index: 5;
 `;
 
-const GameCanvas = styled.div`
+const GameCanvas = styled.div<{ $width: number; $height: number }>`
   position: relative;
-  width: ${GAME_CONFIG.SCREEN_WIDTH}px;
-  height: ${GAME_CONFIG.SCREEN_HEIGHT}px;
+  width: ${(props) => props.$width}px;
+  height: ${(props) => props.$height}px;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
@@ -68,9 +67,7 @@ interface GameAreaProps {
 export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
   const [triggerMissEffect, setTriggerMissEffect] = useState(false);
   const prevLivesRef = useRef(gameState.lives);
-  const { playSFX } = useAudioContext();
 
-  // Detect when lives decrease (letter hit bottom)
   useEffect(() => {
     if (gameState.lives < prevLivesRef.current) {
       setTriggerMissEffect(true);
@@ -86,10 +83,18 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
 
       <LetterMissEffect triggerEffect={triggerMissEffect}>
         <GameCanvasWrapper>
-          <GameCanvas>
+          {/* ✅ Pass dynamic dimensions */}
+          <GameCanvas
+            $width={gameState.dimensions.width}
+            $height={gameState.dimensions.height}
+          >
             <AnimatePresence>
               {gameState.letters.map((letter) => (
-                <FallingLetter key={letter.id} letter={letter} />
+                <FallingLetter
+                  key={letter.id}
+                  letter={letter}
+                  letterSize={gameState.dimensions.letterSize}
+                />
               ))}
             </AnimatePresence>
 
@@ -97,7 +102,7 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
               <WrongKeyFeedback>Wrong key</WrongKeyFeedback>
             )}
           </GameCanvas>
-          <LavaFloor height={30} />
+          <LavaFloor height={30} width={gameState.dimensions.width} />
         </GameCanvasWrapper>
       </LetterMissEffect>
     </GameContainer>

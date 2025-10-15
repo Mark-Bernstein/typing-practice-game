@@ -2,11 +2,10 @@ import React, { memo, useMemo } from "react";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { LetterPosition } from "../../types/game";
-import { GAME_CONFIG } from "../../constants/gameConfig";
 
-const StyledLetter = styled(motion.div)<{ $color: string }>`
+const StyledLetter = styled(motion.div)<{ $color: string; $size: number }>`
   position: absolute;
-  font-size: ${GAME_CONFIG.LETTER_SIZE}px;
+  font-size: ${(props) => props.$size}px;
   font-weight: 900;
   font-family: "Quantico", "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
     monospace;
@@ -21,20 +20,22 @@ const StyledLetter = styled(motion.div)<{ $color: string }>`
 
 interface FallingLetterProps {
   letter: LetterPosition;
+  letterSize: number;
 }
 
 export const FallingLetter: React.FC<FallingLetterProps> = memo(
-  ({ letter }) => {
+  ({ letter, letterSize }) => {
     const entryOffset = useMemo(() => {
-      const randomX = Math.random() * 200 - 100; // -100 to +100
-      const randomY = Math.random() * 200 - 100; // -100 to +100
-      const randomRot = Math.random() * 60 - 30; // -30deg to +30deg
+      const randomX = Math.random() * 200 - 100;
+      const randomY = Math.random() * 200 - 100;
+      const randomRot = Math.random() * 60 - 30;
       return { x: randomX, y: randomY, rotate: randomRot };
     }, []);
 
     return (
       <StyledLetter
         $color={letter.color}
+        $size={letterSize} // ✅ Use dynamic size
         initial={{
           opacity: 0,
           x: letter.x + entryOffset.x,

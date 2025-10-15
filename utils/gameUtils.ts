@@ -1,4 +1,4 @@
-import { LetterPosition, GameStats } from "../types/game";
+import { LetterPosition, GameStats, GameDimensions } from "../types/game";
 import {
   ALPHABET,
   LETTER_COLORS,
@@ -7,23 +7,25 @@ import {
   LEVEL_THRESHOLDS,
 } from "../constants/gameConfig";
 
+// ✅ Accept dimensions parameter
 export const generateRandomLetter = (
   existingLetters: LetterPosition[],
-  letterIdCounter: number
+  letterIdCounter: number,
+  dimensions: GameDimensions
 ): LetterPosition => {
   const getRandomX = (): number => {
     const attempts = 50;
     for (let i = 0; i < attempts; i++) {
-      const x =
-        Math.random() * (GAME_CONFIG.SCREEN_WIDTH - GAME_CONFIG.LETTER_SIZE);
+      // ✅ Use dynamic width and letterSize
+      const x = Math.random() * (dimensions.width - dimensions.letterSize);
       const overlaps = existingLetters.some(
         (letter) =>
-          Math.abs(letter.x - x) < GAME_CONFIG.LETTER_SIZE &&
-          letter.y < GAME_CONFIG.LETTER_SIZE
+          Math.abs(letter.x - x) < dimensions.letterSize &&
+          letter.y < dimensions.letterSize
       );
       if (!overlaps) return x;
     }
-    return Math.random() * (GAME_CONFIG.SCREEN_WIDTH - GAME_CONFIG.LETTER_SIZE);
+    return Math.random() * (dimensions.width - dimensions.letterSize);
   };
 
   const letter = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];

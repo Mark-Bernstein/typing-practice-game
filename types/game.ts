@@ -1,3 +1,9 @@
+export interface GameDimensions {
+  width: number;
+  height: number;
+  letterSize: number;
+}
+
 export interface LetterPosition {
   letter: string;
   x: number;
@@ -18,6 +24,7 @@ export interface GameState {
   lastKeyPressed: string | null;
   lastKeyCorrect: boolean;
   lives: number;
+  dimensions: GameDimensions;
 }
 
 export interface GameStats {

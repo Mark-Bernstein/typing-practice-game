@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { GameState } from "../types/game";
+import { GameState, GameDimensions } from "../types/game";
 import { GAME_CONFIG, ALPHABET } from "../constants/gameConfig";
 import { SoundEffect } from "./useAudio";
 import {
@@ -8,25 +8,42 @@ import {
   getLevel,
 } from "../utils/gameUtils";
 
-const initialGameState: GameState = {
-  letters: [],
-  time: 0,
-  lettersCorrect: 0,
-  score: 0,
-  speed: GAME_CONFIG.START_LETTER_SPEED,
-  keysPressed: 0,
-  gameOver: false,
-  level: 1,
-  lastKeyPressed: null,
-  lastKeyCorrect: true,
-  lives: 5,
-};
+// ✅ Accept dimensions parameter
+export const useTypingGame = (
+  playSFX: (effect: SoundEffect) => void,
+  dimensions: GameDimensions
+) => {
+  // ✅ Create initial state with dimensions
+  const getInitialState = useCallback(
+    (): GameState => ({
+      letters: [],
+      time: 0,
+      lettersCorrect: 0,
+      score: 0,
+      speed: GAME_CONFIG.START_LETTER_SPEED,
+      keysPressed: 0,
+      gameOver: false,
+      level: 1,
+      lastKeyPressed: null,
+      lastKeyCorrect: true,
+      lives: 5,
+      dimensions, // ✅ Include dimensions
+    }),
+    [dimensions]
+  );
 
-export const useTypingGame = (playSFX: (effect: SoundEffect) => void) => {
-  const [gameState, setGameState] = useState<GameState>(initialGameState);
+  const [gameState, setGameState] = useState<GameState>(getInitialState);
   const gameLoopRef = useRef<number | undefined>(undefined);
   const letterIdCounter = useRef(0);
   const prevLivesRef = useRef(5);
+
+  // ✅ Update state when dimensions change
+  useEffect(() => {
+    setGameState((prev) => ({
+      ...prev,
+      dimensions,
+    }));
+  }, [dimensions]);
 
   const gameLoop = useCallback(() => {
     setGameState((prevState) => {
@@ -41,20 +58,20 @@ export const useTypingGame = (playSFX: (effect: SoundEffect) => void) => {
         y: letter.y + newState.speed,
       }));
 
-      // Check for letters that reached the bottom
+      // ✅ Check for letters that reached the bottom using dynamic height
       const lettersReachedBottom = newState.letters.filter(
         (letter) =>
-          letter.y + GAME_CONFIG.LETTER_SIZE >= GAME_CONFIG.SCREEN_HEIGHT
+          letter.y + newState.dimensions.letterSize >=
+          newState.dimensions.height
       );
 
       const remainingLetters = newState.letters.filter(
         (letter) =>
-          letter.y + GAME_CONFIG.LETTER_SIZE < GAME_CONFIG.SCREEN_HEIGHT
+          letter.y + newState.dimensions.letterSize < newState.dimensions.height
       );
 
       const newLives = newState.lives - lettersReachedBottom.length;
 
-      // ✅ FIX: rely on the latest playSFX closure (respects sfxEnabled)
       if (newLives < prevLivesRef.current) {
         playSFX("life-lost");
         prevLivesRef.current = newLives;
@@ -85,9 +102,11 @@ export const useTypingGame = (playSFX: (effect: SoundEffect) => void) => {
         );
 
         for (let i = 0; i < spawnCount; i++) {
+          // ✅ Pass dimensions to generateRandomLetter
           const newLetter = generateRandomLetter(
             newState.letters,
-            letterIdCounter.current++
+            letterIdCounter.current++,
+            newState.dimensions
           );
           newState.letters = [...newState.letters, newLetter];
         }
@@ -98,7 +117,6 @@ export const useTypingGame = (playSFX: (effect: SoundEffect) => void) => {
     });
   }, [playSFX]);
 
-  // ✅ FIX: same for handleKeyPress
   const handleKeyPress = useCallback(
     (key: string) => {
       const upperKey = key.toUpperCase();
@@ -141,10 +159,10 @@ export const useTypingGame = (playSFX: (effect: SoundEffect) => void) => {
   );
 
   const resetGame = useCallback(() => {
-    setGameState(initialGameState);
+    setGameState(getInitialState());
     letterIdCounter.current = 0;
     prevLivesRef.current = 5;
-  }, []);
+  }, [getInitialState]);
 
   useEffect(() => {
     if (!gameState.gameOver) {
