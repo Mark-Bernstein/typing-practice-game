@@ -7,8 +7,7 @@ const StyledLetter = styled(motion.div)<{ $color: string; $size: number }>`
   position: absolute;
   font-size: ${(props) => props.$size}px;
   font-weight: 900;
-  font-family: "Quantico", "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
-    monospace;
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
   color: ${(props) => props.$color};
   user-select: none;
   cursor: default;

@@ -16,8 +16,7 @@ const WordContainer = styled(motion.div)`
 const Letter = styled.span<{ $color: string; $size: number; $typed: boolean }>`
   font-size: ${(props) => props.$size}px;
   font-weight: 900;
-  font-family: "Quantico", "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
-    monospace;
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
   color: ${(props) => (props.$typed ? "#00ff88" : props.$color)};
   text-shadow: ${(props) =>
     props.$typed
