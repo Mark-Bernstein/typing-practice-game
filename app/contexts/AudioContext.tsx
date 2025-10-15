@@ -1,13 +1,15 @@
 "use client";
 
 import React, { createContext, useContext, ReactNode } from "react";
-import { useAudio, SoundEffect } from "../../hooks/useAudio";
+import { useAudio, SoundEffect, MusicTrack } from "../../hooks/useAudio";
 
 interface AudioContextType {
   musicEnabled: boolean;
   sfxEnabled: boolean;
   toggleMusic: () => void;
   toggleSFX: () => void;
+  playMusic: (track: MusicTrack) => void;
+  stopMusic: () => void;
   playSFX: (effect: SoundEffect) => void;
 }
 

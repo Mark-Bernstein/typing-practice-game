@@ -173,7 +173,6 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
         </Label>
         <StatusIndicator $active={musicEnabled} />
       </ToggleButton>
-      <span style={{ color: "cyan" }}>BETA (SFX currently does not work)</span>
       <ToggleButton $active={sfxEnabled} onClick={onToggleSFX}>
         <IconWrapper $active={sfxEnabled}>
           {sfxEnabled ? "🔊" : "🔇"}

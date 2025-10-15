@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { GameState } from "../types/game";
 import { GAME_CONFIG, ALPHABET } from "../constants/gameConfig";
+import { SoundEffect } from "./useAudio";
 import {
   generateRandomLetter,
   getLetterScore,
   getLevel,
 } from "../utils/gameUtils";
-import { useAudio } from "./useAudio";
 
 const initialGameState: GameState = {
   letters: [],
@@ -22,22 +22,11 @@ const initialGameState: GameState = {
   lives: 5,
 };
 
-export const useTypingGame = () => {
+export const useTypingGame = (playSFX: (effect: SoundEffect) => void) => {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const gameLoopRef = useRef<number | undefined>(undefined);
   const letterIdCounter = useRef(0);
   const prevLivesRef = useRef(5);
-
-  // TODO - get sounds for life-lost and stuff working!!!!!!!!!!!!!
-  const {
-    playMusic,
-    stopMusic,
-    toggleMusic,
-    musicEnabled,
-    sfxEnabled,
-    toggleSFX,
-    playSFX,
-  } = useAudio();
 
   const gameLoop = useCallback(() => {
     setGameState((prevState) => {
@@ -58,36 +47,21 @@ export const useTypingGame = () => {
           letter.y + GAME_CONFIG.LETTER_SIZE >= GAME_CONFIG.SCREEN_HEIGHT
       );
 
-      // Remove letters that reached the bottom
       const remainingLetters = newState.letters.filter(
         (letter) =>
           letter.y + GAME_CONFIG.LETTER_SIZE < GAME_CONFIG.SCREEN_HEIGHT
       );
 
-      // Decrease lives for each letter that reached the bottom
       const newLives = newState.lives - lettersReachedBottom.length;
 
-      // Play life lost sound if lives decreased
+      // ✅ FIX: rely on the latest playSFX closure (respects sfxEnabled)
       if (newLives < prevLivesRef.current) {
-        console.log(
-          `💔 Life lost detected: prevLives=${prevLivesRef.current}, newLives=${newLives}`
-        );
-
-        if (playSFX) {
-          console.log("🔊 Triggering life-lost SFX");
-          playSFX("life-lost");
-        } else {
-          console.warn("⚠️ playSFX not set, cannot play life-lost SFX");
-        }
-
+        playSFX("life-lost");
         prevLivesRef.current = newLives;
       }
 
-      // Check for game over (no lives left)
       if (newLives <= 0) {
-        if (playSFX) {
-          playSFX("game-over");
-        }
+        playSFX("game-over");
         return {
           ...newState,
           gameOver: true,
@@ -96,7 +70,6 @@ export const useTypingGame = () => {
         };
       }
 
-      // Update letters and lives
       newState.letters = remainingLetters;
       newState.lives = newLives;
 
@@ -121,53 +94,51 @@ export const useTypingGame = () => {
       }
 
       newState.level = getLevel(newState.lettersCorrect);
-
       return newState;
     });
-  }, []);
+  }, [playSFX]);
 
-  const handleKeyPress = useCallback((key: string) => {
-    const upperKey = key.toUpperCase();
-    if (!ALPHABET.includes(upperKey)) return;
+  // ✅ FIX: same for handleKeyPress
+  const handleKeyPress = useCallback(
+    (key: string) => {
+      const upperKey = key.toUpperCase();
+      if (!ALPHABET.includes(upperKey)) return;
 
-    setGameState((prevState) => {
-      if (prevState.gameOver) return prevState;
+      setGameState((prevState) => {
+        if (prevState.gameOver) return prevState;
 
-      const newState = {
-        ...prevState,
-        keysPressed: prevState.keysPressed + 1,
-        lastKeyPressed: upperKey,
-        lastKeyCorrect: false,
-        score: prevState.score,
-      };
+        const newState = {
+          ...prevState,
+          keysPressed: prevState.keysPressed + 1,
+          lastKeyPressed: upperKey,
+          lastKeyCorrect: false,
+          score: prevState.score,
+        };
 
-      const index = newState.letters.findIndex((l) => l.letter === upperKey);
-      if (index !== -1) {
-        if (playSFX) {
+        const index = newState.letters.findIndex((l) => l.letter === upperKey);
+        if (index !== -1) {
           playSFX("correct");
-        }
-
-        const updatedLetters = [...newState.letters];
-        updatedLetters.splice(index, 1);
-        newState.letters = updatedLetters;
-        newState.lettersCorrect += 1;
-        newState.score += getLetterScore(upperKey);
-        newState.speed = Math.min(
-          GAME_CONFIG.MAX_SPEED,
-          newState.speed * 1.0075
-        );
-        newState.lastKeyCorrect = true;
-      } else {
-        if (playSFX) {
+          const updatedLetters = [...newState.letters];
+          updatedLetters.splice(index, 1);
+          newState.letters = updatedLetters;
+          newState.lettersCorrect += 1;
+          newState.score += getLetterScore(upperKey);
+          newState.speed = Math.min(
+            GAME_CONFIG.MAX_SPEED,
+            newState.speed * 1.0075
+          );
+          newState.lastKeyCorrect = true;
+        } else {
           playSFX("wrong");
+          newState.score = Math.max(0, newState.score - 3);
+          newState.lastKeyCorrect = false;
         }
-        newState.score = Math.max(0, newState.score - 3);
-        newState.lastKeyCorrect = false;
-      }
 
-      return newState;
-    });
-  }, []);
+        return newState;
+      });
+    },
+    [playSFX]
+  );
 
   const resetGame = useCallback(() => {
     setGameState(initialGameState);

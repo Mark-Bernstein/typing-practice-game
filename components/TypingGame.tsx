@@ -12,7 +12,6 @@ import { GameStats } from "./ui/GameStats";
 import { Leaderboard } from "./ui/Leaderboard";
 import { AudioControls } from "./ui/AudioControls";
 import { useAudioContext } from "../app/contexts/AudioContext";
-import { SoundEffect, useAudio } from "../hooks/useAudio";
 
 const pulse = keyframes`
   0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -417,10 +416,10 @@ const GamePlay: React.FC<{
   onExit: () => void;
   onLevelChange?: (level: number) => void;
 }> = ({ onExit, onLevelChange }) => {
-  const { gameState, resetGame } = useTypingGame();
+  const { playSFX } = useAudioContext();
+  const { gameState, resetGame } = useTypingGame(playSFX);
   const [particles] = useState(() => Array.from({ length: 50 }, (_, i) => i));
   const [levelMessage, setLevelMessage] = useState(getLevelMessage(0));
-  const { playSFX } = useAudioContext();
   const prevLevelRef = React.useRef(gameState.level);
 
   const gameStats = calculateGameStats(
@@ -554,7 +553,7 @@ export const TypingGame: React.FC = () => {
     sfxEnabled,
     toggleSFX,
     playSFX,
-  } = useAudio();
+  } = useAudioContext();
 
   useEffect(() => {
     fetchTotalPlays();

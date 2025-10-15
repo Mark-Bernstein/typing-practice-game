@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export type SoundEffect =
   | "correct"
@@ -19,6 +19,12 @@ export const useAudio = () => {
   const sfxRefs = useRef<Map<SoundEffect, HTMLAudioElement>>(new Map());
   const currentTrack = useRef<MusicTrack | null>(null);
 
+  // ✅ Maintain a live ref for sfxEnabled so callbacks always have the current value
+  const sfxEnabledRef = useRef(sfxEnabled);
+  useEffect(() => {
+    sfxEnabledRef.current = sfxEnabled;
+  }, [sfxEnabled]);
+
   useEffect(() => {
     const effects: SoundEffect[] = [
       "correct",
@@ -34,73 +40,63 @@ export const useAudio = () => {
       try {
         const audio = new Audio(`/audio/sfx/${effect}.mp3`);
         audio.preload = "auto";
-        audio.volume = 0.3;
+        audio.volume = 0.35;
         sfxRefs.current.set(effect, audio);
       } catch (error) {
         console.warn(`⚠️ Failed to preload SFX: ${effect}`, error);
       }
     });
 
-    // Cleanup
     return () => {
       if (musicRef.current) {
         musicRef.current.pause();
         musicRef.current = null;
       }
-      sfxRefs.current.forEach((audio) => {
-        audio.pause();
-      });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      sfxRefs.current.forEach((audio) => audio.pause());
       sfxRefs.current.clear();
     };
   }, []);
 
-  // Play music
-  const playMusic = (track: MusicTrack) => {
-    if (!musicEnabled) {
-      return;
-    }
+  // 🎵 Play music
+  const playMusic = useCallback(
+    (track: MusicTrack) => {
+      if (!musicEnabled) return;
 
-    // If already playing the same track, don't restart
-    if (
-      currentTrack.current === track &&
-      musicRef.current &&
-      !musicRef.current.paused
-    ) {
-      return;
-    }
+      if (
+        currentTrack.current === track &&
+        musicRef.current &&
+        !musicRef.current.paused
+      ) {
+        return;
+      }
 
-    // Stop current music
-    if (musicRef.current) {
-      musicRef.current.pause();
-      musicRef.current.currentTime = 0;
-    }
+      if (musicRef.current) {
+        musicRef.current.pause();
+        musicRef.current.currentTime = 0;
+      }
 
-    // Create new audio element
-    const audioPath = `/audio/music/${track}.mp3`;
+      const audioPath = `/audio/music/${track}.mp3`;
+      musicRef.current = new Audio(audioPath);
+      musicRef.current.loop = true;
+      musicRef.current.volume = 0.5;
+      currentTrack.current = track;
 
-    musicRef.current = new Audio(audioPath);
-    musicRef.current.loop = true;
-    musicRef.current.volume = 0.2;
-    currentTrack.current = track;
+      const playPromise = musicRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => console.log("✅ Music playback started successfully"))
+          .catch((error) => {
+            console.error("❌ Music playback failed:", error);
+            console.error(
+              "This is often due to browser autoplay policy. Try clicking the music toggle ON first."
+            );
+          });
+      }
+    },
+    [musicEnabled]
+  );
 
-    // Play with error handling
-    const playPromise = musicRef.current.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          console.log("✅ Music playback started successfully");
-        })
-        .catch((error) => {
-          console.error("❌ Music playback failed:", error);
-          console.error(
-            "This is often due to browser autoplay policy. Try clicking the music toggle ON first."
-          );
-        });
-    }
-  };
-
-  // Stop music
+  // 🛑 Stop music
   const stopMusic = () => {
     if (musicRef.current) {
       musicRef.current.pause();
@@ -109,17 +105,12 @@ export const useAudio = () => {
     }
   };
 
-  // Play sound effect
-  const playSFX = (effect: SoundEffect) => {
-    console.log("I TRIED TO PLAY A SOUND!!!!!!!!!!!!!");
-    if (!sfxEnabled) {
-      console.log(`⚠️ SFX disabled, not playing: ${effect}`);
-      return;
-    }
+  // 🔊 Play sound effect (checks ref for live state)
+  const playSFX = useCallback((effect: SoundEffect) => {
+    if (!sfxEnabledRef.current) return;
 
     const audio = sfxRefs.current.get(effect);
     if (audio) {
-      console.log(`🔊 Playing SFX: ${effect}`);
       audio.currentTime = 0;
       const playPromise = audio.play();
       if (playPromise !== undefined) {
@@ -130,9 +121,9 @@ export const useAudio = () => {
     } else {
       console.warn(`⚠️ SFX not found: ${effect}`);
     }
-  };
+  }, []);
 
-  // Toggle music
+  // 🎚️ Toggle music
   const toggleMusic = () => {
     const newState = !musicEnabled;
     setMusicEnabled(newState);
@@ -140,14 +131,12 @@ export const useAudio = () => {
     if (!newState) {
       stopMusic();
     } else if (currentTrack.current) {
-      // Resume music if it was playing
       playMusic(currentTrack.current);
     }
   };
 
-  // Toggle SFX
+  // 🎛️ Toggle SFX (click sound always plays)
   const toggleSFX = () => {
-    // Always play this click sound regardless of the current sfxEnabled state
     const clickAudio = sfxRefs.current.get("button-click");
     if (clickAudio) {
       clickAudio.currentTime = 0;
@@ -155,8 +144,8 @@ export const useAudio = () => {
         console.warn("⚠️ Button click sound playback failed:", error);
       });
     }
-    const newState = !sfxEnabled;
-    setSfxEnabled(newState);
+
+    setSfxEnabled((prev) => !prev);
   };
 
   return {
