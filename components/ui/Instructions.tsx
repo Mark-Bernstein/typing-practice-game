@@ -76,7 +76,6 @@ const InstructionsPanel = styled.div.withConfig({
   }
 `;
 
-// Fade in/out + drop from top
 const dropIn = keyframes`
   0% {
     opacity: 0;
@@ -88,7 +87,6 @@ const dropIn = keyframes`
   }
 `;
 
-// Fade in/out + up from bottom
 const dropUp = keyframes`
   0% {
     opacity: 0;
@@ -100,13 +98,11 @@ const dropUp = keyframes`
   }
 `;
 
-// Floating & pulse aura
 const float = keyframes`
   0%, 100% { transform: translateY(0) scale(1); }
   50% { transform: translateY(-8px) scale(1.03); }
 `;
 
-// Gradient text shimmer
 const textShimmer = keyframes`
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -281,19 +277,15 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
     <>
       <InstructionsContainer>
         <InstructionsPanel show={show} delay={1}>
-          <SubText>Type the letters as they cascade downwards</SubText>
+          <SubText>Type the letters/words as they fall</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1.2}>
-          <SubText>Home row letters (A, S, D, F, J, K, L) = +1 point</SubText>
-          <SubText>All others = +2 points</SubText>
-        </InstructionsPanel>
-        <InstructionsPanel show={show} delay={1.4}>
           <SubText>Incorrect keystrokes = -3 points</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={1.6}>
+        <InstructionsPanel show={show} delay={1.4}>
           <SubText>Surviving each level increases difficulty</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={1.8}>
+        <InstructionsPanel show={show} delay={1.6}>
           <SubText>Challenge yourself to beat the high score!</SubText>
         </InstructionsPanel>
       </InstructionsContainer>

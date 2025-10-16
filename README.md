@@ -5,8 +5,8 @@ A modern, interactive typing game built with Next.js, TypeScript, and CSS using 
 ## 🎮 Features
 
 - **Progressive Difficulty**: Game speed increases as you improve
-- **Smart Scoring**: Home row letters = +1 point, others = +2 points, incorrect typed letter = -3 points
-- **Level System**: 5 levels with encouraging messages
+- **Smart Scoring**: Bonus points for larger words in Word Mode
+- **Level System**: 10 levels with encouraging messages
 - **Real-time Stats**: Time stamped, accuracy percentage, score tracking
 - **Responsive Design**: Clean, modern UI with smooth animations
 - **Performance Optimized**: 60 FPS gameplay with efficient rendering

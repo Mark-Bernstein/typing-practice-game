@@ -1,14 +1,7 @@
 export const GAME_CONFIG = {
-  // Base values for calculations
-  BASE_LETTER_SIZE: 50,
-  MIN_SCREEN_WIDTH: 1024,
-  MIN_SCREEN_HEIGHT: 768,
-  MAX_SCREEN_WIDTH: 1800,
-  MAX_SCREEN_HEIGHT: 1200,
-
   // Game settings
   COUNTER_SIZE: 18,
-  START_LETTER_SPEED: 1.5,
+  START_LETTER_SPEED: 1.2,
   FRAME_RATE: 60,
   MAX_LETTERS: 12,
   MAX_WORDS: 5,
@@ -44,15 +37,24 @@ export const HOME_ROW_LETTERS: ReadonlySet<string> = new Set([
 ]);
 
 export const LEVEL_THRESHOLDS = {
-  LEVEL_2: 10,
-  LEVEL_3: 30,
-  LEVEL_4: 70,
-  MAX_LEVEL: 130,
+  LEVEL_2: 20,
+  LEVEL_3: 50,
+  LEVEL_4: 100,
+  LEVEL_5: 180,
+  LEVEL_6: 300,
+  LEVEL_7: 450,
+  LEVEL_8: 650,
+  LEVEL_9: 1000,
+  MAX_LEVEL: 1500,
 } as const;
 
 export const WORD_SCORES: Record<number, number> = {
-  3: 5,
-  4: 8,
-  5: 12,
-  6: 18,
+  3: 3,
+  4: 4,
+  5: 5,
+  6: 7,
+  7: 9,
+  8: 11,
+  9: 13,
+  10: 15,
 };

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export type SoundEffect =
   | "correct"
+  | "correct-word"
   | "wrong"
   | "life-lost"
   | "level-up"
@@ -34,6 +35,7 @@ export const useAudio = () => {
       "game-over",
       "button-click",
       "start",
+      "correct-word",
     ];
 
     effects.forEach((effect) => {

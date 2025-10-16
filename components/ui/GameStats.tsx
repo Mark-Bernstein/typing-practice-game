@@ -49,7 +49,7 @@ interface GameStatsProps {
   time: number;
   lettersCorrect: number;
   score: number;
-  speed: number; // should be the *current* falling speed
+  speed: number;
 }
 
 export const GameStats: React.FC<GameStatsProps> = ({
@@ -59,8 +59,6 @@ export const GameStats: React.FC<GameStatsProps> = ({
   speed,
 }) => {
   const timeInSeconds = Math.floor(time / GAME_CONFIG.FRAME_RATE);
-
-  // Protect against undefined or 0
   const baseSpeed = GAME_CONFIG.START_LETTER_SPEED || 1;
   const speedPercent = speed ? ((speed / baseSpeed) * 100).toFixed(0) : null;
 

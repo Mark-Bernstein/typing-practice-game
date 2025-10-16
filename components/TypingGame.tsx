@@ -34,13 +34,18 @@ const GameWrapper = styled.div<{ $level: number }>`
 
   ${({ $level }) => {
     const gradients: Record<number, string> = {
-      1: "linear-gradient(to bottom right, #312e81, #581c87, #9d174d)",
-      2: "linear-gradient(to bottom right, #581c87, #1e3a8a, #3730a3)",
-      3: "linear-gradient(to bottom right, #1e3a8a, #164e63, #115e59)",
-      4: "linear-gradient(to bottom right, #164e63, #065f46, #166534)",
-      5: "linear-gradient(to bottom right, #7c2d12, #991b1b, #9d174d)",
+      1: "linear-gradient(to bottom right, #312e81, #581c87, #9d174d)", // deep violet
+      2: "linear-gradient(to bottom right, #581c87, #1e3a8a, #3730a3)", // indigo blend
+      3: "linear-gradient(to bottom right, #1e3a8a, #164e63, #115e59)", // blue-green oceanic
+      4: "linear-gradient(to bottom right, #164e63, #065f46, #166534)", // emerald depth
+      5: "linear-gradient(to bottom right, #7c2d12, #991b1b, #9d174d)", // crimson energy
+      6: "linear-gradient(to bottom right, #9d174d, #b91c1c, #c2410c)", // fiery red-orange
+      7: "linear-gradient(to bottom right, #c2410c, #ca8a04, #a16207)", // molten gold
+      8: "linear-gradient(to bottom right, #a16207, #3f6212, #15803d)", // forest vitality
+      9: "linear-gradient(to bottom right, #15803d, #065f46, #0e7490)", // deep aqua-teal
+      10: "linear-gradient(to bottom right, #0e7490, #2563eb, #7e22ce)", // radiant blue-violet finale
     };
-    const clampedLevel = Math.min(Math.max($level, 1), 5);
+    const clampedLevel = Math.min(Math.max($level, 1), 10);
     return `background: ${gradients[clampedLevel]};`;
   }}
 `;
@@ -530,7 +535,6 @@ const Particle: React.FC<ParticleProps> = React.memo(
 
 Particle.displayName = "Particle";
 
-// ✅ Update GamePlay component to accept gameMode
 const GamePlay: React.FC<{
   onExit: () => void;
   onLevelChange?: (level: number) => void;
@@ -538,8 +542,6 @@ const GamePlay: React.FC<{
 }> = ({ onExit, onLevelChange, gameMode }) => {
   const dimensions = useGameDimensions();
   const { playSFX } = useAudioContext();
-
-  // ✅ Pass gameMode to the hook
   const { gameState, resetGame } = useTypingGame(playSFX, dimensions, gameMode);
 
   const [particles] = useState(() => Array.from({ length: 50 }, (_, i) => i));
@@ -553,16 +555,21 @@ const GamePlay: React.FC<{
   );
 
   const getProgress = () => {
-    const currentLevel = Math.min(gameState.level, 5);
+    const currentLevel = Math.min(gameState.level, 10);
     const thresholds = [
       0,
       LEVEL_THRESHOLDS.LEVEL_2,
       LEVEL_THRESHOLDS.LEVEL_3,
       LEVEL_THRESHOLDS.LEVEL_4,
+      LEVEL_THRESHOLDS.LEVEL_5,
+      LEVEL_THRESHOLDS.LEVEL_6,
+      LEVEL_THRESHOLDS.LEVEL_7,
+      LEVEL_THRESHOLDS.LEVEL_8,
+      LEVEL_THRESHOLDS.LEVEL_9,
       LEVEL_THRESHOLDS.MAX_LEVEL,
     ];
 
-    if (currentLevel >= 5) return 100;
+    if (currentLevel >= 10) return 100;
 
     const minThreshold = thresholds[currentLevel - 1];
     const maxThreshold = thresholds[currentLevel];

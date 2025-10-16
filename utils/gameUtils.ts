@@ -45,14 +45,13 @@ export const generateRandomLetter = (
   };
 };
 
-// ✅ New function to generate words
 export const generateRandomWord = (
   existingWords: WordPosition[],
   wordIdCounter: number,
   dimensions: GameDimensions
 ): WordPosition => {
   const getRandomX = (): number => {
-    const wordWidth = dimensions.letterSize * 6; // Max 6 letters
+    const wordWidth = dimensions.letterSize * 10;
     const attempts = 50;
     for (let i = 0; i < attempts; i++) {
       const x = Math.random() * (dimensions.width - wordWidth);
@@ -90,19 +89,34 @@ export const getWordScore = (word: string): number => {
 
 export const getLevelMessage = (lettersCorrect: number): string => {
   if (lettersCorrect >= LEVEL_THRESHOLDS.MAX_LEVEL)
-    return "MAX LEVEL ACHIEVED!";
+    return "Level 10: GOD MODE!";
+  if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_9)
+    return "Level 9: Lightning Fingers!";
+  if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_8)
+    return "Level 8: Master of Speed!";
+  if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_7)
+    return "Level 7: Precision Expert!";
+  if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_6)
+    return "Level 6: Typing Virtuoso!";
+  if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_5)
+    return "Level 5: Word Warrior!";
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_4)
     return "Level 4: Master Typist!";
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_3)
     return "Level 3: Expert Mode!";
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_2)
     return "Level 2: Getting Better!";
-  if (lettersCorrect >= 0) return "Level 1";
+  if (lettersCorrect >= 0) return "Level 1: Beginner Mode!";
   return "";
 };
 
 export const getLevel = (lettersCorrect: number): number => {
-  if (lettersCorrect >= LEVEL_THRESHOLDS.MAX_LEVEL) return 5;
+  if (lettersCorrect >= LEVEL_THRESHOLDS.MAX_LEVEL) return 10;
+  if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_9) return 9;
+  if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_8) return 8;
+  if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_7) return 7;
+  if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_6) return 6;
+  if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_5) return 5;
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_4) return 4;
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_3) return 3;
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_2) return 2;

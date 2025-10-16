@@ -8,6 +8,7 @@ import { LetterMissEffect } from "../ui/LetterMissEffect";
 import { AnimatePresence } from "framer-motion";
 import { LavaFloor } from "./LavaFloor";
 import { useAudioContext } from "../../app/contexts/AudioContext";
+import { useGameDimensions } from "@/hooks/useGameDimensions";
 
 const GameContainer = styled.div`
   position: relative;
@@ -61,7 +62,6 @@ const WrongKeyFeedback = styled.div`
   opacity: 0.8;
 `;
 
-// ✅ Mode indicator
 const ModeIndicator = styled.div`
   position: absolute;
   top: 10px;
@@ -86,7 +86,7 @@ interface GameAreaProps {
 export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
   const [triggerMissEffect, setTriggerMissEffect] = useState(false);
   const prevLivesRef = useRef(gameState.lives);
-  const { playSFX } = useAudioContext();
+  const { width } = useGameDimensions();
 
   useEffect(() => {
     if (gameState.lives < prevLivesRef.current) {
@@ -135,7 +135,7 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
               <WrongKeyFeedback>Wrong key</WrongKeyFeedback>
             )}
           </GameCanvas>
-          <LavaFloor height={30} />
+          <LavaFloor height={40} width={width} />
         </GameCanvasWrapper>
       </LetterMissEffect>
     </GameContainer>

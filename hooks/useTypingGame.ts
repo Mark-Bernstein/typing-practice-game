@@ -13,12 +13,12 @@ import {
 export const useTypingGame = (
   playSFX: (effect: SoundEffect) => void,
   dimensions: GameDimensions,
-  initialGameMode: GameMode = "letter" // ✅ Accept game mode
+  initialGameMode: GameMode = "letter"
 ) => {
   const getInitialState = useCallback(
     (): GameState => ({
       letters: [],
-      words: [], // ✅ Added
+      words: [],
       time: 0,
       lettersCorrect: 0,
       score: 0,
@@ -30,8 +30,8 @@ export const useTypingGame = (
       lastKeyCorrect: true,
       lives: 5,
       dimensions,
-      gameMode: initialGameMode, // ✅ Added
-      currentTypingWordId: null, // ✅ Added
+      gameMode: initialGameMode,
+      currentTypingWordId: null,
     }),
     [dimensions, initialGameMode]
   );
@@ -39,14 +39,11 @@ export const useTypingGame = (
   const [gameState, setGameState] = useState<GameState>(getInitialState);
   const gameLoopRef = useRef<number | undefined>(undefined);
   const letterIdCounter = useRef(0);
-  const wordIdCounter = useRef(0); // ✅ Added
+  const wordIdCounter = useRef(0);
   const prevLivesRef = useRef(5);
 
   useEffect(() => {
-    setGameState((prev) => ({
-      ...prev,
-      dimensions,
-    }));
+    setGameState((prev) => ({ ...prev, dimensions }));
   }, [dimensions]);
 
   const gameLoop = useCallback(() => {
@@ -56,29 +53,26 @@ export const useTypingGame = (
       const newState = { ...prevState };
       newState.time += 1;
 
-      // Determine speed based on mode
       const effectiveSpeed =
         prevState.gameMode === "word"
           ? prevState.speed * GAME_CONFIG.WORD_SPEED_MULTIPLIER
           : prevState.speed;
 
+      // ===== LETTER MODE =====
       if (prevState.gameMode === "letter") {
-        // ===== LETTER MODE LOGIC =====
         newState.letters = newState.letters.map((letter) => ({
           ...letter,
           y: letter.y + effectiveSpeed,
         }));
 
         const lettersReachedBottom = newState.letters.filter(
-          (letter) =>
-            letter.y + newState.dimensions.letterSize >=
-            newState.dimensions.height
+          (l) =>
+            l.y + newState.dimensions.letterSize >= newState.dimensions.height
         );
 
         const remainingLetters = newState.letters.filter(
-          (letter) =>
-            letter.y + newState.dimensions.letterSize <
-            newState.dimensions.height
+          (l) =>
+            l.y + newState.dimensions.letterSize < newState.dimensions.height
         );
 
         const newLives = newState.lives - lettersReachedBottom.length;
@@ -121,22 +115,23 @@ export const useTypingGame = (
             newState.letters = [...newState.letters, newLetter];
           }
         }
-      } else {
-        // ===== WORD MODE LOGIC =====
+      }
+
+      // ===== WORD MODE =====
+      else {
         newState.words = newState.words.map((word) => ({
           ...word,
           y: word.y + effectiveSpeed,
         }));
 
         const wordsReachedBottom = newState.words.filter(
-          (word) =>
-            word.y + newState.dimensions.letterSize >=
-            newState.dimensions.height
+          (w) =>
+            w.y + newState.dimensions.letterSize >= newState.dimensions.height
         );
 
         const remainingWords = newState.words.filter(
-          (word) =>
-            word.y + newState.dimensions.letterSize < newState.dimensions.height
+          (w) =>
+            w.y + newState.dimensions.letterSize < newState.dimensions.height
         );
 
         const newLives = newState.lives - wordsReachedBottom.length;
@@ -144,9 +139,9 @@ export const useTypingGame = (
         if (newLives < prevLivesRef.current) {
           playSFX("life-lost");
           prevLivesRef.current = newLives;
-          // Reset typing progress for any word that hit bottom
+
           if (newState.currentTypingWordId !== null) {
-            const hitBottom = wordsReachedBottom.find(
+            const hitBottom = wordsReachedBottom.some(
               (w) => w.id === newState.currentTypingWordId
             );
             if (hitBottom) {
@@ -168,25 +163,19 @@ export const useTypingGame = (
         newState.words = remainingWords;
         newState.lives = newLives;
 
-        // Spawn new words
+        // Spawn logic — one word per allowed window
         if (
           newState.words.length === 0 ||
           (newState.time % 90 === 0 &&
             newState.words.length < GAME_CONFIG.MAX_WORDS)
         ) {
-          const spawnCount = Math.min(
-            Math.ceil(newState.level / 2),
-            GAME_CONFIG.MAX_WORDS - newState.words.length
+          // Only spawn one new word per cycle
+          const newWord = generateRandomWord(
+            newState.words,
+            wordIdCounter.current++,
+            newState.dimensions
           );
-
-          for (let i = 0; i < spawnCount; i++) {
-            const newWord = generateRandomWord(
-              newState.words,
-              wordIdCounter.current++,
-              newState.dimensions
-            );
-            newState.words = [...newState.words, newWord];
-          }
+          newState.words = [...newState.words, newWord];
         }
       }
 
@@ -211,11 +200,12 @@ export const useTypingGame = (
           score: prevState.score,
         };
 
+        // ===== LETTER MODE =====
         if (prevState.gameMode === "letter") {
-          // ===== LETTER MODE KEY HANDLING =====
           const index = newState.letters.findIndex(
             (l) => l.letter === upperKey
           );
+
           if (index !== -1) {
             playSFX("correct");
             const updatedLetters = [...newState.letters];
@@ -231,11 +221,12 @@ export const useTypingGame = (
           } else {
             playSFX("wrong");
             newState.score = Math.max(0, newState.score - 3);
-            newState.lastKeyCorrect = false;
           }
-        } else {
-          // ===== WORD MODE KEY HANDLING =====
-          // If not currently typing a word, find one that starts with this letter
+        }
+
+        // ===== WORD MODE =====
+        else {
+          // If not typing a word, find one that starts with this key
           if (newState.currentTypingWordId === null) {
             const wordIndex = newState.words.findIndex(
               (w) => w.typedProgress === 0 && w.word[0] === upperKey
@@ -254,10 +245,9 @@ export const useTypingGame = (
             } else {
               playSFX("wrong");
               newState.score = Math.max(0, newState.score - 3);
-              newState.lastKeyCorrect = false;
             }
           } else {
-            // Continue typing the current word
+            // Continue typing the active word
             const wordIndex = newState.words.findIndex(
               (w) => w.id === newState.currentTypingWordId
             );
@@ -275,9 +265,7 @@ export const useTypingGame = (
                   typedProgress: nextLetterIndex + 1,
                 };
 
-                // Check if word is complete
                 if (nextLetterIndex + 1 === currentWord.word.length) {
-                  // Word completed!
                   updatedWords.splice(wordIndex, 1);
                   newState.lettersCorrect += currentWord.word.length;
                   newState.score += getWordScore(currentWord.word);
@@ -286,14 +274,14 @@ export const useTypingGame = (
                     newState.speed * 1.005
                   );
                   newState.currentTypingWordId = null;
-                  playSFX("level-up"); // Extra satisfaction for completing word
+                  playSFX("correct-word");
                 }
 
                 newState.words = updatedWords;
                 newState.lastKeyCorrect = true;
               } else {
+                // Wrong key — reset current word progress
                 playSFX("wrong");
-                // Reset word progress on wrong key
                 const updatedWords = [...newState.words];
                 updatedWords[wordIndex] = {
                   ...updatedWords[wordIndex],
@@ -302,7 +290,30 @@ export const useTypingGame = (
                 newState.words = updatedWords;
                 newState.currentTypingWordId = null;
                 newState.score = Math.max(0, newState.score - 5);
-                newState.lastKeyCorrect = false;
+              }
+            } else {
+              // ✅ Edge case: active word was removed or hit bottom
+              // Reset and try to start a new word with this keystroke
+              newState.currentTypingWordId = null;
+
+              // Try to start a new word with the current key
+              const newWordIndex = newState.words.findIndex(
+                (w) => w.typedProgress === 0 && w.word[0] === upperKey
+              );
+
+              if (newWordIndex !== -1) {
+                playSFX("correct");
+                const updatedWords = [...newState.words];
+                updatedWords[newWordIndex] = {
+                  ...updatedWords[newWordIndex],
+                  typedProgress: 1,
+                };
+                newState.words = updatedWords;
+                newState.currentTypingWordId = updatedWords[newWordIndex].id;
+                newState.lastKeyCorrect = true;
+              } else {
+                playSFX("wrong");
+                newState.score = Math.max(0, newState.score - 3);
               }
             }
           }
