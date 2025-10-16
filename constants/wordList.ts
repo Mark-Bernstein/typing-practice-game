@@ -564,8 +564,6 @@ export const WORD_LISTS = {
     "DENT",
     "DESK",
     "DIAL",
-    "DIDY",
-    "DIEH",
     "DIET",
     "DISC",
     "DOCK",

@@ -135,7 +135,7 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
               <WrongKeyFeedback>Wrong key</WrongKeyFeedback>
             )}
           </GameCanvas>
-          <LavaFloor height={40} width={width} />
+          <LavaFloor height={30} width={width} />
         </GameCanvasWrapper>
       </LetterMissEffect>
     </GameContainer>

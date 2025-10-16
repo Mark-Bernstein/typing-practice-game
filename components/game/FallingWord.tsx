@@ -7,15 +7,18 @@ const WordContainer = styled(motion.div)`
   position: absolute;
   display: flex;
   gap: 4px;
+  align-items: flex-end; /* ensures letters align visually to bottom */
   user-select: none;
   cursor: default;
   z-index: 10;
   will-change: transform, opacity;
+  line-height: 0.8;
 `;
 
 const Letter = styled.span<{ $color: string; $size: number; $typed: boolean }>`
   font-size: ${(props) => props.$size}px;
   font-weight: 900;
+  line-height: 0.8;
   font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
   color: ${(props) => (props.$typed ? "#00ff88" : props.$color)};
   text-shadow: ${(props) =>

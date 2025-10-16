@@ -15,7 +15,7 @@ const fadeOut = keyframes`
   to { 
     opacity: 0; 
     transform: translateX(1000px);
-    filter: blur(50px); /* Adjust the blur intensity as desired */
+    filter: blur(50px);
   }
 `;
 
@@ -28,7 +28,7 @@ const InstructionsContainer = styled.div`
   z-index: 20;
   transition: left 1.5s ease-in-out;
 
-  animation: moveToLeft 1.5s ease-in-out 2s forwards;
+  animation: moveToLeft 1s ease-in-out 2s forwards;
 
   @keyframes moveToLeft {
     0% {
@@ -98,6 +98,18 @@ const dropUp = keyframes`
   }
 `;
 
+const dropRight = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateX(1000px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+    transform: translateY(0);
+  }
+`;
+
 const float = keyframes`
   0%, 100% { transform: translateY(0) scale(1); }
   50% { transform: translateY(-8px) scale(1.03); }
@@ -113,13 +125,12 @@ export const CreatedBy = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "show",
 })<{ show: boolean }>`
   position: absolute;
-  bottom: 40px;
+  bottom: 80px;
   text-align: center;
-  max-width: 600px;
   margin-top: 20px;
   overflow: visible;
   z-index: 20;
-  font-size: 28px;
+  font-size: 32px;
 
   /* Start off-screen and hidden */
   transform: translateY(-1000px);
@@ -262,10 +273,35 @@ const StyledLink = styled.a`
 
   &:hover,
   &:focus-visible {
-    color: #ffffff; /* lighter cyan hover */
+    color: #ffffff;
     text-shadow: 0 0 8px #ff00ff;
     outline: none;
   }
+`;
+
+const SoundcloudLink = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "show",
+})<{ show: boolean }>`
+  position: absolute;
+  color: #ff00ff;
+  text-shadow: 0 0 30px purple;
+  bottom: 30px;
+  right: 30px;
+  z-index: 15;
+  font-size: 28px;
+  font-weight: bold;
+  text-align: right;
+  transform: translateY(-2000px);
+  opacity: 0;
+
+  ${({ show }) =>
+    show
+      ? css`
+          animation: ${dropRight} 2s ease-out forwards;
+        `
+      : css`
+          animation: ${fadeOut} 1s ease-in-out forwards;
+        `}
 `;
 
 interface InstructionsProps {
@@ -297,11 +333,23 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
             rel="noopener noreferrer"
             aria-label="Visit Mark Bernstein's LinkedIn profile"
           >
-            Created by: Mark Bernstein
+            Created by / Music by: Mark Bernstein
           </StyledLink>
         </MainText>
-        <MainText $reflected={true}>Created by: Mark Bernstein</MainText>
+        <MainText $reflected={true}>
+          Created by / Music by: Mark Bernstein
+        </MainText>
       </CreatedBy>
+      <SoundcloudLink show={show}>
+        <StyledLink
+          href="https://soundcloud.com/waydank"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Mark Bernstein's Soundcloud profile"
+        >
+          🎵 My SoundCloud 🎵
+        </StyledLink>
+      </SoundcloudLink>
     </>
   );
 };
