@@ -5,6 +5,7 @@ import { SoundEffect } from "./useAudio";
 import {
   generateRandomLetter,
   generateRandomWord,
+  generateShieldPowerUp,
   getLetterScore,
   getWordScore,
   getLevel,
@@ -19,6 +20,7 @@ export const useTypingGame = (
     (): GameState => ({
       letters: [],
       words: [],
+      shields: [],
       time: 0,
       lettersCorrect: 0,
       score: 0,
@@ -32,6 +34,11 @@ export const useTypingGame = (
       dimensions,
       gameMode: initialGameMode,
       currentTypingWordId: null,
+      shieldState: {
+        active: false,
+        charges: 0,
+        maxCharges: GAME_CONFIG.SHIELD_CHARGES * GAME_CONFIG.MAX_SHIELD_STACKS,
+      },
     }),
     [dimensions, initialGameMode]
   );
@@ -40,7 +47,9 @@ export const useTypingGame = (
   const gameLoopRef = useRef<number | undefined>(undefined);
   const letterIdCounter = useRef(0);
   const wordIdCounter = useRef(0);
+  const shieldIdCounter = useRef(0);
   const prevLivesRef = useRef(5);
+  const lastShieldSpawnTime = useRef(0);
 
   useEffect(() => {
     setGameState((prev) => ({ ...prev, dimensions }));
@@ -57,6 +66,34 @@ export const useTypingGame = (
         prevState.gameMode === "word"
           ? prevState.speed * GAME_CONFIG.WORD_SPEED_MULTIPLIER
           : prevState.speed;
+
+      // ===== MOVE SHIELDS =====
+      const shieldSpeed = effectiveSpeed * GAME_CONFIG.SHIELD_SPEED_MULTIPLIER;
+
+      // Move shields downward
+      newState.shields = newState.shields.map((shield) => ({
+        id: shield.id,
+        x: shield.x,
+        y: shield.y + shieldSpeed,
+      }));
+
+      // Remove shields that reach bottom of screen
+      const shieldsReachedBottom = newState.shields.filter(
+        (shield) =>
+          shield.y + newState.dimensions.letterSize * 2 >=
+          newState.dimensions.height
+      );
+
+      if (shieldsReachedBottom.length > 0) {
+        playSFX("shield-despawn");
+      }
+
+      // Keep only shields that are still visible
+      newState.shields = newState.shields.filter(
+        (shield) =>
+          shield.y + newState.dimensions.letterSize * 2 <
+          newState.dimensions.height
+      );
 
       // ===== LETTER MODE =====
       if (prevState.gameMode === "letter") {
@@ -75,9 +112,30 @@ export const useTypingGame = (
             l.y + newState.dimensions.letterSize < newState.dimensions.height
         );
 
-        const newLives = newState.lives - lettersReachedBottom.length;
+        // Shield protection logic
+        let livesCost = lettersReachedBottom.length;
+        let shieldChargesUsed = 0;
 
-        if (newLives < prevLivesRef.current) {
+        if (newState.shieldState.active && livesCost > 0) {
+          const chargesAvailable = newState.shieldState.charges;
+          shieldChargesUsed = Math.min(livesCost, chargesAvailable);
+
+          if (shieldChargesUsed > 0) {
+            playSFX("shield-lost");
+          }
+
+          livesCost -= shieldChargesUsed;
+
+          newState.shieldState = {
+            ...newState.shieldState,
+            charges: chargesAvailable - shieldChargesUsed,
+            active: chargesAvailable - shieldChargesUsed > 0,
+          };
+        }
+
+        const newLives = newState.lives - livesCost;
+
+        if (livesCost > 0 && newLives < prevLivesRef.current) {
           playSFX("life-lost");
           prevLivesRef.current = newLives;
         }
@@ -134,9 +192,25 @@ export const useTypingGame = (
             w.y + newState.dimensions.letterSize < newState.dimensions.height
         );
 
-        const newLives = newState.lives - wordsReachedBottom.length;
+        // Shield protection logic
+        let livesCost = wordsReachedBottom.length;
+        let shieldChargesUsed = 0;
 
-        if (newLives < prevLivesRef.current) {
+        if (newState.shieldState.active && livesCost > 0) {
+          const chargesAvailable = newState.shieldState.charges;
+          shieldChargesUsed = Math.min(livesCost, chargesAvailable);
+          livesCost -= shieldChargesUsed;
+
+          newState.shieldState = {
+            ...newState.shieldState,
+            charges: chargesAvailable - shieldChargesUsed,
+            active: chargesAvailable - shieldChargesUsed > 0,
+          };
+        }
+
+        const newLives = newState.lives - livesCost;
+
+        if (livesCost > 0 && newLives < prevLivesRef.current) {
           playSFX("life-lost");
           prevLivesRef.current = newLives;
 
@@ -163,13 +237,12 @@ export const useTypingGame = (
         newState.words = remainingWords;
         newState.lives = newLives;
 
-        // Spawn logic — one word per allowed window
+        // Spawn logic
         if (
           newState.words.length === 0 ||
           (newState.time % 90 === 0 &&
             newState.words.length < GAME_CONFIG.MAX_WORDS)
         ) {
-          // Only spawn one new word per cycle
           const newWord = generateRandomWord(
             newState.words,
             wordIdCounter.current++,
@@ -179,6 +252,23 @@ export const useTypingGame = (
         }
       }
 
+      // ===== SHIELD SPAWN =====
+      const timeSinceLastShield = newState.time - lastShieldSpawnTime.current;
+      const shouldSpawnShield =
+        timeSinceLastShield >= GAME_CONFIG.SHIELD_SPAWN_INTERVAL &&
+        Math.random() < 0.02; // ~2% chance each frame after interval
+
+      if (shouldSpawnShield) {
+        const newShield = generateShieldPowerUp(
+          shieldIdCounter.current++,
+          newState.dimensions
+        );
+
+        // Append new shield instead of replacing existing ones
+        newState.shields = [...newState.shields, newShield];
+        lastShieldSpawnTime.current = newState.time;
+      }
+
       newState.level = getLevel(newState.lettersCorrect);
       return newState;
     });
@@ -186,6 +276,37 @@ export const useTypingGame = (
 
   const handleKeyPress = useCallback(
     (key: string) => {
+      // ===== SHIELD PICKUP ("!" key) =====
+      if (key === "!") {
+        setGameState((prevState) => {
+          if (prevState.gameOver || prevState.shields.length === 0)
+            return prevState;
+
+          const newState = { ...prevState };
+          newState.shields = [];
+
+          const currentCharges = newState.shieldState.charges;
+          const maxCharges =
+            GAME_CONFIG.SHIELD_CHARGES * GAME_CONFIG.MAX_SHIELD_STACKS;
+          const newCharges = Math.min(
+            currentCharges + GAME_CONFIG.SHIELD_CHARGES,
+            maxCharges
+          );
+
+          newState.shieldState = {
+            active: true,
+            charges: newCharges,
+            maxCharges,
+          };
+
+          playSFX("shield-gain");
+          newState.lastKeyCorrect = true;
+
+          return newState;
+        });
+        return;
+      }
+
       const upperKey = key.toUpperCase();
       if (!ALPHABET.includes(upperKey)) return;
 
@@ -226,7 +347,6 @@ export const useTypingGame = (
 
         // ===== WORD MODE =====
         else {
-          // If not typing a word, find one that starts with this key
           if (newState.currentTypingWordId === null) {
             const wordIndex = newState.words.findIndex(
               (w) => w.typedProgress === 0 && w.word[0] === upperKey
@@ -247,7 +367,6 @@ export const useTypingGame = (
               newState.score = Math.max(0, newState.score - 3);
             }
           } else {
-            // Continue typing the active word
             const wordIndex = newState.words.findIndex(
               (w) => w.id === newState.currentTypingWordId
             );
@@ -280,7 +399,6 @@ export const useTypingGame = (
                 newState.words = updatedWords;
                 newState.lastKeyCorrect = true;
               } else {
-                // Wrong key — reset current word progress
                 playSFX("wrong");
                 const updatedWords = [...newState.words];
                 updatedWords[wordIndex] = {
@@ -292,11 +410,8 @@ export const useTypingGame = (
                 newState.score = Math.max(0, newState.score - 5);
               }
             } else {
-              // ✅ Edge case: active word was removed or hit bottom
-              // Reset and try to start a new word with this keystroke
               newState.currentTypingWordId = null;
 
-              // Try to start a new word with the current key
               const newWordIndex = newState.words.findIndex(
                 (w) => w.typedProgress === 0 && w.word[0] === upperKey
               );
@@ -329,7 +444,9 @@ export const useTypingGame = (
     setGameState(getInitialState());
     letterIdCounter.current = 0;
     wordIdCounter.current = 0;
+    shieldIdCounter.current = 0;
     prevLivesRef.current = 5;
+    lastShieldSpawnTime.current = 0;
   }, [getInitialState]);
 
   useEffect(() => {

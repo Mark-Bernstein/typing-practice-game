@@ -8,7 +8,10 @@ export type SoundEffect =
   | "level-up"
   | "game-over"
   | "button-click"
-  | "start";
+  | "start"
+  | "shield-gain"
+  | "shield-lost"
+  | "shield-despawn";
 
 export type MusicTrack = "menu" | "gameplay";
 
@@ -36,6 +39,9 @@ export const useAudio = () => {
       "button-click",
       "start",
       "correct-word",
+      "shield-gain",
+      "shield-lost",
+      "shield-despawn",
     ];
 
     effects.forEach((effect) => {

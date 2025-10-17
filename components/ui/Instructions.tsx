@@ -59,7 +59,7 @@ const InstructionsPanel = styled.div.withConfig({
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   text-align: center;
   max-width: 800px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   opacity: 0;
 
   ${({ show, delay }) =>
@@ -323,6 +323,9 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1.6}>
           <SubText>Challenge yourself to beat the high score!</SubText>
+        </InstructionsPanel>
+        <InstructionsPanel show={show} delay={1.8}>
+          <SubText>Watch for special symbols for power ups!</SubText>
         </InstructionsPanel>
       </InstructionsContainer>
       <CreatedBy show={show}>

@@ -14,6 +14,7 @@ import { AudioControls } from "./ui/AudioControls";
 import { useAudioContext } from "../app/contexts/AudioContext";
 import { useGameDimensions } from "@/hooks/useGameDimensions";
 import { GameMode } from "../types/game";
+import { motion } from "framer-motion";
 
 const pulse = keyframes`
   0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -189,7 +190,7 @@ const StartScreen = styled.div`
 `;
 
 const TitleMainMenu = styled.span`
-  font-size: 48px;
+  font-size: 40px;
   font-weight: bold;
   margin-bottom: 100px;
   text-shadow: 0 0 20px cyan;
@@ -434,32 +435,30 @@ const HighlightedNumberOfPlays = styled.div`
   margin-top: 20px;
 `;
 
-const slideInTop = keyframes`
-    0% {
-      transform: translateY(500px);
-      opacity: 0;
-    }
-    60% {
-      transform: translateY(-20px);
-      opacity: 1;
-    }
-    80% {
-      transform: translateY(10px);
-    }
-    100% {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  `;
-
-const ModeSelector = styled.div`
-  display: flex;
-  gap: 30px;
-  justify-content: center;
-  margin-bottom: 80px;
-  z-index: 1001;
-  animation: ${fadeInFromTop} 2s ease-out forwards;
-`;
+export const ModeSelector = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <motion.div
+      style={{
+        display: "flex",
+        gap: "30px",
+        justifyContent: "center",
+        marginBottom: "80px",
+        zIndex: 1001,
+      }}
+      initial={{ opacity: 0, scale: 0.1, rotate: -45 }}
+      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 200,
+        damping: 15,
+        mass: 1,
+        delay: 3,
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 const ModeButton = styled.button<{ $active: boolean }>`
   position: relative;
@@ -507,12 +506,12 @@ const ModeButton = styled.button<{ $active: boolean }>`
     content: "";
     position: absolute;
     width: 100%;
-    height: 15px;
+    height: 18px;
     bottom: 0;
     background: linear-gradient(180deg, #00fff2, #9000f0, #ff0000);
     background-size: 200% 200%;
     opacity: ${(props) => (props.$active ? 1 : 0)};
-    filter: blur(1px);
+    filter: blur(4px);
     animation: ${(props) =>
       props.$active
         ? "energyFlow 1s linear infinite, flicker 3s ease-in-out infinite"
@@ -579,25 +578,6 @@ const ModeButton = styled.button<{ $active: boolean }>`
     }
   }
 
-  /* 💥 Pulse Ring Effect */
-  @keyframes pulseGlow {
-    0% {
-      transform: translateX(-50%) scale(1);
-      opacity: 0.6;
-      box-shadow: 0 0 10px #00fff7;
-    }
-    50% {
-      transform: translateX(-50%) scale(1.8);
-      opacity: 1;
-      box-shadow: 0 0 40px #9333ea;
-    }
-    100% {
-      transform: translateX(-50%) scale(1);
-      opacity: 0.6;
-      box-shadow: 0 0 10px #00fff7;
-    }
-  }
-
   & > * {
     position: relative;
     z-index: 1;
@@ -660,7 +640,7 @@ Particle.displayName = "Particle";
 const GamePlay: React.FC<{
   onExit: () => void;
   onLevelChange?: (level: number) => void;
-  gameMode: GameMode; // ✅ Add this
+  gameMode: GameMode;
 }> = ({ onExit, onLevelChange, gameMode }) => {
   const dimensions = useGameDimensions();
   const { playSFX } = useAudioContext();
@@ -802,7 +782,7 @@ export const TypingGame: React.FC = () => {
   const [hasStarted, setHasStarted] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(1);
   const [totalPlays, setTotalPlays] = useState<number | null>(null);
-  const [gameMode, setGameMode] = useState<GameMode>("letter"); // ✅ Add this
+  const [gameMode, setGameMode] = useState<GameMode>("letter");
 
   const {
     playMusic,
@@ -905,7 +885,7 @@ export const TypingGame: React.FC = () => {
         <GamePlay
           onExit={() => setHasStarted(false)}
           onLevelChange={(level) => setCurrentLevel(level)}
-          gameMode={gameMode} // ✅ Pass game mode
+          gameMode={gameMode}
         />
       )}
     </GameWrapper>

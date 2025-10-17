@@ -34,7 +34,7 @@ export const FallingLetter: React.FC<FallingLetterProps> = memo(
     return (
       <StyledLetter
         $color={letter.color}
-        $size={letterSize} // ✅ Use dynamic size
+        $size={letterSize}
         initial={{
           opacity: 0,
           x: letter.x + entryOffset.x,

@@ -1,9 +1,9 @@
 export const GAME_CONFIG = {
   // Game settings
   COUNTER_SIZE: 18,
-  START_LETTER_SPEED: 1.2,
+  START_LETTER_SPEED: 1,
   FRAME_RATE: 60,
-  MAX_LETTERS: 12,
+  MAX_LETTERS: 5,
   MAX_WORDS: 5,
   MAX_SPEED: 50,
 
@@ -11,6 +11,12 @@ export const GAME_CONFIG = {
   WORD_SPEED_MULTIPLIER: 0.8,
   WORD_MIN_LENGTH: 3,
   WORD_MAX_LENGTH: 6,
+
+  // ✅ Shield power-up settings
+  SHIELD_SPAWN_INTERVAL: 600, // Spawn every 30 seconds (60 fps * 30)
+  SHIELD_CHARGES: 3,
+  MAX_SHIELD_STACKS: 3,
+  SHIELD_SPEED_MULTIPLIER: 4,
 } as const;
 
 export const LETTER_COLORS: readonly string[] = [

@@ -23,6 +23,18 @@ export interface WordPosition {
   typedProgress: number;
 }
 
+export interface ShieldPowerUp {
+  x: number;
+  y: number;
+  id: number;
+}
+
+export interface ShieldState {
+  active: boolean;
+  charges: number;
+  maxCharges: number;
+}
+
 export interface GameState {
   letters: LetterPosition[];
   words: WordPosition[];
@@ -39,6 +51,8 @@ export interface GameState {
   dimensions: GameDimensions;
   gameMode: GameMode;
   currentTypingWordId: number | null;
+  shields: ShieldPowerUp[];
+  shieldState: ShieldState;
 }
 
 export interface GameStats {

@@ -1,6 +1,7 @@
 import {
   LetterPosition,
   WordPosition,
+  ShieldPowerUp,
   GameStats,
   GameDimensions,
 } from "../types/game";
@@ -77,13 +78,26 @@ export const generateRandomWord = (
   };
 };
 
+export const generateShieldPowerUp = (
+  shieldIdCounter: number,
+  dimensions: GameDimensions
+): ShieldPowerUp => {
+  const shieldSize = dimensions.letterSize * 2;
+  const x = Math.random() * (dimensions.width - shieldSize);
+
+  return {
+    x,
+    y: 0,
+    id: shieldIdCounter,
+  };
+};
+
 export const getLetterScore = (letter: string): number => {
   return HOME_ROW_LETTERS.has(letter) ? 1 : 2;
 };
 
-// ✅ New function to get word score
 export const getWordScore = (word: string): number => {
-  const length = Math.min(word.length, 6);
+  const length = Math.min(word.length, 10);
   return WORD_SCORES[length] || word.length * 2;
 };
 
