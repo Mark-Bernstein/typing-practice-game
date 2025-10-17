@@ -10,6 +10,7 @@ interface GameOverProps {
   lettersCorrect: number;
   keysPressed: number;
   onRestart: () => void;
+  onTryAgain: () => void;
 }
 
 /* --- Animations --- */
@@ -165,16 +166,17 @@ const ButtonGroup = styled.div`
   justify-content: center;
 `;
 
-const PlayButton = styled.button`
+const MainMenuButton = styled.button`
   position: relative;
-  padding: 16px 48px;
+  margin-bottom: 16px;
+  padding: 16px 40px;
   font-family: "Orbitron", sans-serif;
   font-size: 20px;
   font-weight: 800;
   color: #ffffff;
   border: none;
   border-radius: 16px;
-  background: linear-gradient(90deg, #00eaff, #007bff);
+  background: linear-gradient(90deg, #3e6bff, #007bff);
   cursor: pointer;
   overflow: hidden;
   z-index: 1;
@@ -202,27 +204,131 @@ const PlayButton = styled.button`
   }
 `;
 
-const SaveButton = styled(PlayButton)`
-  background: linear-gradient(90deg, #00570e, #00a7a7);
-
-  &::before {
-    background: linear-gradient(90deg, #fbbf24, #f59e0b);
-  }
+const SubmitScoreButton = styled(MainMenuButton)`
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #ff007a, #9333ea, #22d3ee);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 14px;
+  padding: 16px 40px;
+  font-size: 22px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 0 20px rgba(255, 0, 122, 0.6), 0 0 40px rgba(147, 51, 234, 0.3),
+    inset 0 0 10px rgba(255, 255, 255, 0.2);
+  animation: pulseGlow 3s ease-in-out infinite;
 
   &:hover {
-    box-shadow: 0 0 25px rgba(251, 191, 36, 0.6);
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 0, 122, 0.9),
+      0 0 60px rgba(147, 51, 234, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.4);
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.2) 0%,
+      transparent 60%
+    );
+    transform: rotate(25deg);
+    animation: shimmer 4s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%) rotate(25deg);
+    }
+    100% {
+      transform: translateX(100%) rotate(25deg);
+    }
+  }
+
+  @keyframes pulseGlow {
+    0%,
+    100% {
+      box-shadow: 0 0 15px rgba(255, 0, 122, 0.5),
+        0 0 40px rgba(147, 51, 234, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(255, 0, 122, 0.9),
+        0 0 60px rgba(147, 51, 234, 0.7);
+    }
   }
 `;
 
-const ScoreSavedMessage = styled.div`
-  color: #00ff7f;
+const ScoreSubmittedButton = styled.div`
+  color: #00ff9f;
   margin-right: 12px;
-  font-size: 20px;
+  font-size: 22px;
   position: relative;
   display: flex;
+  justify-content: center;
   align-items: center;
+  gap: 6px;
+  text-shadow: 0 0 10px #00ff9f, 0 0 20px #00ffaa;
+  animation: successGlow 1s ease-in-out infinite alternate;
+
+  @keyframes successGlow {
+    from {
+      text-shadow: 0 0 10px #00ff9f, 0 0 20px #00ffaa;
+    }
+    to {
+      text-shadow: 0 0 20px #00ffaa, 0 0 40px #00ffcc;
+    }
+  }
 `;
 
+const TryAgainButton = styled.button`
+  background: black;
+  background-color: black;
+  position: relative;
+  margin-bottom: 16px;
+  padding: 16px 48px;
+  font-family: "Orbitron", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 1;
+  transition: transform 0.2s ease;
+  background: linear-gradient(90deg, #00570e, #00a7a7);
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(0, 238, 255, 0.6);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    filter: blur(4px);
+    opacity: 0.7;
+    transition: opacity 0.3s;
+    z-index: -1;
+
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  }
+`;
 /* --- Component --- */
 export const GameOver: React.FC<GameOverProps> = ({
   gameStats,
@@ -230,6 +336,7 @@ export const GameOver: React.FC<GameOverProps> = ({
   lettersCorrect,
   keysPressed,
   onRestart,
+  onTryAgain,
 }) => {
   const [showStats, setShowStats] = useState(false);
   const [animatedScore, setAnimatedScore] = useState(0);
@@ -356,17 +463,18 @@ export const GameOver: React.FC<GameOverProps> = ({
               />
             </StatsGrid>
 
+            {!scoreSaved && (
+              <SubmitScoreButton onClick={() => setShowNicknamePrompt(true)}>
+                💾 Submit Score
+              </SubmitScoreButton>
+            )}
             <ButtonGroup>
-              {!scoreSaved && (
-                <SaveButton onClick={() => setShowNicknamePrompt(true)}>
-                  💾 Save Score
-                </SaveButton>
-              )}
-              {scoreSaved && (
-                <ScoreSavedMessage>✓ Score Saved!</ScoreSavedMessage>
-              )}
-              <PlayButton onClick={onRestart}>🚀 Main Menu</PlayButton>
+              <TryAgainButton onClick={onTryAgain}>🔁 Try Again</TryAgainButton>
+              <MainMenuButton onClick={onRestart}>🚀 Main Menu</MainMenuButton>
             </ButtonGroup>
+            {scoreSaved && (
+              <ScoreSubmittedButton>✓ Score Submitted!</ScoreSubmittedButton>
+            )}
           </Panel>
         </Container>
       </Overlay>

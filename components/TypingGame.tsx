@@ -454,10 +454,11 @@ const slideInTop = keyframes`
 
 const ModeSelector = styled.div`
   display: flex;
-  gap: 24px;
-  margin-bottom: 60px;
+  gap: 30px;
+  justify-content: center;
+  margin-bottom: 80px;
   z-index: 1001;
-  animation: ${fadeInFromTop} 4s ease-in-out forwards;
+  animation: ${fadeInFromTop} 2s ease-out forwards;
 `;
 
 const ModeButton = styled.button<{ $active: boolean }>`
@@ -465,48 +466,92 @@ const ModeButton = styled.button<{ $active: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 24px 32px;
-  background: ${(props) =>
-    props.$active
-      ? "linear-gradient(135deg, rgba(34, 211, 238, 0.3), rgba(147, 51, 234, 0.3))"
-      : "rgba(0, 0, 0, 0.4)"};
-  border: 2px solid
-    ${(props) => (props.$active ? "#22d3ee" : "rgba(255, 255, 255, 0.2)")};
-  border-radius: 16px;
+  padding: 0 18px 12px;
+  width: 300px;
+  border-radius: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 180px;
-  backdrop-filter: blur(10px);
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(20px);
+  transition: all 0.5s ease;
+  box-shadow: ${(props) =>
+    props.$active
+      ? "0 0 30px rgba(34,211,238,0.7), 0 0 60px rgba(147,51,234,0.5)"
+      : "0 0 10px rgba(255,255,255,0.1)"};
 
   &:hover {
-    transform: translateY(-4px);
-    border-color: #22d3ee;
-    box-shadow: 0 8px 24px rgba(34, 211, 238);
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 0 40px rgba(0, 255, 247, 0.8),
+      0 0 80px rgba(147, 51, 234, 0.6), 0 0 120px rgba(236, 72, 153, 0.4);
   }
 
-  ${(props) =>
-    props.$active &&
-    `
-    box-shadow: 0 0 30px rgba(34, 211, 238, 0.5);
-  `}
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 26px;
+    background: linear-gradient(60deg, #22d3ee, #9333ea, #800000, #22d3ee);
+    background-size: 400% 400%;
+    opacity: ${(props) => (props.$active ? 1 : 0)};
+    animation: ${(props) =>
+      props.$active ? "gradientShift 5s ease infinite" : "none"};
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
 `;
 
 const ModeIcon = styled.div`
-  font-size: 48px;
+  font-size: 60px;
+  color: #00fff7;
+  text-shadow: 0 0 12px #00fff7, 0 0 24px #9333ea, 0 0 36px #ec4899;
+  animation: iconGlow 2.5s ease-in-out infinite alternate;
+  @keyframes iconGlow {
+    from {
+      text-shadow: 0 0 12px #00fff7, 0 0 24px #9333ea, 0 0 36px #ec4899;
+    }
+    to {
+      text-shadow: 0 0 24px #00fff7, 0 0 48px #9333ea, 0 0 72px #ec4899;
+    }
+  }
 `;
 
 const ModeLabel = styled.div`
-  color: #00fa15;
+  font-family: "Orbitron", sans-serif;
+  color: #00fff7;
   font-size: 28px;
-  font-weight: bold;
-  letter-spacing: 1px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px #00fff7, 0 0 20px #9333ea, 0 0 30px #ec4899;
 `;
 
 const ModeDescription = styled.div`
-  color: rgba(255, 255, 255, 0.7);
+  font-family: "SF Mono", monospace;
+  color: rgba(255, 255, 255, 0.85);
   font-size: 18px;
   text-align: center;
+  line-height: 1.4;
+  text-shadow: 0 0 6px rgba(0, 255, 247, 0.4), 0 0 12px rgba(147, 51, 234, 0.3);
 `;
 
 function seededRandom(seed: number) {
@@ -594,6 +639,10 @@ const GamePlay: React.FC<{
     onLevelChange?.(gameState.level);
   }, [gameState.lettersCorrect, gameState.level, onLevelChange, playSFX]);
 
+  const onTryAgain = () => {
+    resetGame();
+  };
+
   return (
     <>
       <ParticleLayer>
@@ -645,6 +694,7 @@ const GamePlay: React.FC<{
             resetGame();
             onExit();
           }}
+          onTryAgain={onTryAgain}
         />
       )}
 
@@ -747,7 +797,7 @@ export const TypingGame: React.FC = () => {
               $active={gameMode === "letter"}
               onClick={() => setGameMode("letter")}
             >
-              <ModeIcon>🔤</ModeIcon>
+              <ModeIcon>⚡</ModeIcon>
               <ModeLabel>Letter Mode</ModeLabel>
               <ModeDescription>Type individual letters</ModeDescription>
             </ModeButton>
@@ -756,7 +806,7 @@ export const TypingGame: React.FC = () => {
               $active={gameMode === "word"}
               onClick={() => setGameMode("word")}
             >
-              <ModeIcon>📝</ModeIcon>
+              <ModeIcon>🏹</ModeIcon>
               <ModeLabel>Word Mode</ModeLabel>
               <ModeDescription>Type complete words</ModeDescription>
             </ModeButton>

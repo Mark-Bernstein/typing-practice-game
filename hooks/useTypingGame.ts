@@ -103,7 +103,7 @@ export const useTypingGame = (
         ) {
           const spawnCount = Math.min(
             newState.level,
-            4 - newState.letters.length
+            12 - newState.letters.length
           );
 
           for (let i = 0; i < spawnCount; i++) {
@@ -215,7 +215,7 @@ export const useTypingGame = (
             newState.score += getLetterScore(upperKey);
             newState.speed = Math.min(
               GAME_CONFIG.MAX_SPEED,
-              newState.speed * 1.0075
+              newState.speed * 1.007
             );
             newState.lastKeyCorrect = true;
           } else {
@@ -271,7 +271,7 @@ export const useTypingGame = (
                   newState.score += getWordScore(currentWord.word);
                   newState.speed = Math.min(
                     GAME_CONFIG.MAX_SPEED,
-                    newState.speed * 1.005
+                    newState.speed * 1.007
                   );
                   newState.currentTypingWordId = null;
                   playSFX("correct-word");

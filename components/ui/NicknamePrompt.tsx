@@ -69,6 +69,7 @@ const Subtitle = styled.p`
 
 const Input = styled.input`
   width: 100%;
+  font-family: "Orbitron", monospace;
   padding: 16px;
   font-size: 18px;
   font-weight: 600;
@@ -108,6 +109,7 @@ const ButtonGroup = styled.div`
 
 const Button = styled.button<{ $variant?: "primary" | "secondary" }>`
   flex: 1;
+  font-family: "Orbitron", monospace;
   padding: 14px 24px;
   font-size: 16px;
   font-weight: 700;

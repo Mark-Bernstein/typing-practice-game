@@ -8,7 +8,7 @@ export const GAME_CONFIG = {
   MAX_SPEED: 50,
 
   // Word mode settings
-  WORD_SPEED_MULTIPLIER: 0.7,
+  WORD_SPEED_MULTIPLIER: 0.8,
   WORD_MIN_LENGTH: 3,
   WORD_MAX_LENGTH: 6,
 } as const;
