@@ -21,10 +21,7 @@ const Letter = styled.span<{ $color: string; $size: number; $typed: boolean }>`
   line-height: 0.8;
   font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
   color: ${(props) => (props.$typed ? "#00ff88" : props.$color)};
-  text-shadow: ${(props) =>
-    props.$typed
-      ? "0 0 15px #00ff88, 0 0 30px #00ff88, 2px 2px 4px rgba(0, 0, 0, 0.8)"
-      : `0 0 10px ${props.$color}CC, 0 0 20px ${props.$color}80, 2px 2px 4px rgba(0, 0, 0, 0.8)`};
+  -webkit-text-stroke: 0.5px #d0ff00; /* cyan outline */
   transition: all 0.2s ease;
   transform: ${(props) => (props.$typed ? "scale(1.1)" : "scale(1)")};
 `;

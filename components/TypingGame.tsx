@@ -502,6 +502,41 @@ const ModeButton = styled.button<{ $active: boolean }>`
     pointer-events: none;
   }
 
+  /* ⚡ Energy Line */
+  &::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 15px;
+    bottom: 0;
+    background: linear-gradient(180deg, #00fff2, #9000f0, #ff0000);
+    background-size: 200% 200%;
+    opacity: ${(props) => (props.$active ? 1 : 0)};
+    filter: blur(1px);
+    animation: ${(props) =>
+      props.$active
+        ? "energyFlow 1s linear infinite, flicker 3s ease-in-out infinite"
+        : "none"};
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* 💥 Glowing Pulse Ring */
+  &::before,
+  &::after {
+    transition: opacity 0.5s ease;
+  }
+
+  ${(props) =>
+    props.$active &&
+    `
+    &::before {
+      box-shadow: 0 0 30px rgba(34,211,238,0.7),
+                  0 0 60px rgba(147,51,234,0.5),
+                  inset 0 0 15px rgba(34,211,238,0.5);
+    }
+  `}
+
   @keyframes gradientShift {
     0% {
       background-position: 0% 50%;
@@ -514,6 +549,55 @@ const ModeButton = styled.button<{ $active: boolean }>`
     }
   }
 
+  @keyframes energyFlow {
+    0% {
+      background-position: 0% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    100% {
+      background-position: 0% 0%;
+    }
+  }
+
+  @keyframes flicker {
+    0%,
+    19%,
+    21%,
+    23%,
+    25%,
+    54%,
+    56%,
+    100% {
+      opacity: 1;
+    }
+    20%,
+    24%,
+    55% {
+      opacity: 0.4;
+    }
+  }
+
+  /* 💥 Pulse Ring Effect */
+  @keyframes pulseGlow {
+    0% {
+      transform: translateX(-50%) scale(1);
+      opacity: 0.6;
+      box-shadow: 0 0 10px #00fff7;
+    }
+    50% {
+      transform: translateX(-50%) scale(1.8);
+      opacity: 1;
+      box-shadow: 0 0 40px #9333ea;
+    }
+    100% {
+      transform: translateX(-50%) scale(1);
+      opacity: 0.6;
+      box-shadow: 0 0 10px #00fff7;
+    }
+  }
+
   & > * {
     position: relative;
     z-index: 1;
@@ -522,17 +606,9 @@ const ModeButton = styled.button<{ $active: boolean }>`
 
 const ModeIcon = styled.div`
   font-size: 60px;
-  color: #00fff7;
-  text-shadow: 0 0 12px #00fff7, 0 0 24px #9333ea, 0 0 36px #ec4899;
-  animation: iconGlow 2.5s ease-in-out infinite alternate;
-  @keyframes iconGlow {
-    from {
-      text-shadow: 0 0 12px #00fff7, 0 0 24px #9333ea, 0 0 36px #ec4899;
-    }
-    to {
-      text-shadow: 0 0 24px #00fff7, 0 0 48px #9333ea, 0 0 72px #ec4899;
-    }
-  }
+  margin-top: 8px;
+  border-radius: 50px;
+  box-shadow: 0 0 20px #a200ff, 0 0 24px #9333ea, 0 0 36px #ec4899;
 `;
 
 const ModeLabel = styled.div`
@@ -547,6 +623,7 @@ const ModeLabel = styled.div`
 
 const ModeDescription = styled.div`
   font-family: "SF Mono", monospace;
+  margin-bottom: 8px;
   color: rgba(255, 255, 255, 0.85);
   font-size: 18px;
   text-align: center;
