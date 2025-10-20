@@ -154,7 +154,7 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
 
   return (
     <GameContainer>
-      <Lives lives={gameState.lives} />
+      <Lives lives={gameState.lives} maxLives={gameState.maxLives} />
       <ShieldIndicator shieldState={gameState.shieldState} />
       <LetterMissEffect triggerEffect={triggerMissEffect}>
         <GameCanvasWrapper>

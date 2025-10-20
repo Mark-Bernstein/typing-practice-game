@@ -48,6 +48,7 @@ export interface GameState {
   lastKeyPressed: string | null;
   lastKeyCorrect: boolean;
   lives: number;
+  maxLives: number;
   dimensions: GameDimensions;
   gameMode: GameMode;
   currentTypingWordId: number | null;

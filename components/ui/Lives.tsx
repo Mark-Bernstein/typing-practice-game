@@ -2,14 +2,13 @@ import React from "react";
 import styled from "styled-components";
 
 const LivesContainer = styled.div`
-  position: absolute; /* remove from flow */
-  top: 50%; /* center vertically */
-  left: 0; /* stick to left */
+  position: absolute;
+  top: 50%;
+  left: 0;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
+  padding: 8px;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -33,11 +32,13 @@ const HeartsContainer = styled.div`
 `;
 
 const Heart = styled.div<{ $filled: boolean }>`
-  font-size: 60px;
+  font-size: 50px;
   transition: all 0.4s ease;
   filter: ${(props) =>
     props.$filled ? "none" : "grayscale(100%) brightness(0.5)"};
   opacity: ${(props) => (props.$filled ? "1" : "0.5")};
+  display: flex;
+  justify-content: center;
 
   ${(props) =>
     props.$filled &&

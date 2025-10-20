@@ -31,6 +31,7 @@ export const useTypingGame = (
       lastKeyPressed: null,
       lastKeyCorrect: true,
       lives: 5,
+      maxLives: 5,
       dimensions,
       gameMode: initialGameMode,
       currentTypingWordId: null,
@@ -267,6 +268,22 @@ export const useTypingGame = (
         // Append new shield instead of replacing existing ones
         newState.shields = [...newState.shields, newShield];
         lastShieldSpawnTime.current = newState.time;
+      }
+
+      // Calculate new level
+      const newLevel = getLevel(newState.lettersCorrect);
+
+      // Check if level increased and add life + max life
+      if (newLevel > prevState.level) {
+        console.log(`🎉 LEVEL UP! ${prevState.level} → ${newLevel}`);
+        newState.maxLives = prevState.maxLives + 1;
+        newState.lives = Math.min(prevState.lives + 1, newState.maxLives);
+        console.log(
+          `❤️ Lives: ${prevState.lives} → ${newState.lives}, Max: ${prevState.maxLives} → ${newState.maxLives}`
+        );
+      } else {
+        // Keep existing maxLives if no level up
+        newState.maxLives = prevState.maxLives;
       }
 
       newState.level = getLevel(newState.lettersCorrect);
