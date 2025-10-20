@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import { GameState } from "../../types/game";
 import { FallingLetter } from "./FallingLetter";
 import { FallingWord } from "./FallingWord";
@@ -32,28 +32,74 @@ const GameCanvasWrapper = styled.div`
   z-index: 5;
 `;
 
-const GameCanvas = styled.div<{
+const flicker = keyframes`
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.8; }
+  50% { opacity: 1; }
+  55% { opacity: 0.7; }
+  60% { opacity: 1; }
+`;
+
+const pulse = keyframes`
+  0%,100% { box-shadow: 0 0 25px rgba(255,215,0,0.4), inset 0 0 25px rgba(255,215,0,0.2); }
+  50% { box-shadow: 0 0 45px rgba(255,255,180,0.6), inset 0 0 45px rgba(255,215,0,0.3); }
+`;
+
+const arcFlash = keyframes`
+  0% { opacity: 0; transform: scale(0.1) rotate(0deg); }
+  5% { opacity: 1; transform: scale(1) rotate(90deg); }
+  20% { opacity: 1; transform: scale(1.1) rotate(0); }
+  100% { opacity: 0; }
+`;
+
+export const GameCanvas = styled.div<{
   $width: number;
   $height: number;
   $shieldActive: boolean;
 }>`
   position: relative;
-  width: ${(props) => props.$width}px;
-  height: ${(props) => props.$height}px;
+  width: ${(p) => p.$width}px;
+  height: ${(p) => p.$height}px;
   background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  box-shadow: ${(props) =>
-    props.$shieldActive
-      ? "0 0 60px rgba(255, 215, 0, 0.4), inset 0 0 80px rgba(255, 215, 0, 0.1)"
-      : "0 0 60px rgba(0, 0, 0, 0.5), inset 0 0 80px rgba(0, 0, 0, 0.3)"};
-  transition: box-shadow 0.3s ease;
+  border-radius: 25px;
+  overflow: hidden;
+  transition: all 0.3s ease;
 
-  ${(props) =>
-    props.$shieldActive &&
-    `
-    border-color: rgba(255, 215, 0, 1);
-  `}
+  ${(p) =>
+    p.$shieldActive
+      ? css`
+          border: 2px solid rgba(255, 215, 0, 0.8);
+          animation: ${pulse} 2s ease-in-out infinite;
+
+          &::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            border: 5px solid rgba(255, 255, 200, 0.5);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            opacity: 0.4;
+            animation: ${flicker} 1.6s ease-in-out infinite;
+            pointer-events: none;
+          }
+
+          &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            border: 20px dashed rgba(0, 204, 255, 0.9);
+            opacity: 0;
+            animation: ${arcFlash} 1.8s ease-out infinite;
+            animation-delay: 0.3s;
+            pointer-events: none;
+          }
+        `
+      : css`
+          border: 2px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 0 40px rgba(0, 0, 0, 0.5),
+            inset 0 0 60px rgba(0, 0, 0, 0.3);
+        `}
 `;
 
 const shake = keyframes`

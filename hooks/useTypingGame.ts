@@ -273,14 +273,17 @@ export const useTypingGame = (
       // Calculate new level
       const newLevel = getLevel(newState.lettersCorrect);
 
-      // Check if level increased and add life + max life
+      // Check if level increased and add life + max life every 2 levels
       if (newLevel > prevState.level) {
-        console.log(`🎉 LEVEL UP! ${prevState.level} → ${newLevel}`);
-        newState.maxLives = prevState.maxLives + 1;
+        // Only add a max life every 2 levels (2, 4, 6, etc.)
+        if (newLevel % 2 === 0) {
+          newState.maxLives = prevState.maxLives + 1;
+        } else {
+          newState.maxLives = prevState.maxLives;
+        }
+
+        // Always restore one life on level up, up to the current max
         newState.lives = Math.min(prevState.lives + 1, newState.maxLives);
-        console.log(
-          `❤️ Lives: ${prevState.lives} → ${newState.lives}, Max: ${prevState.maxLives} → ${newState.maxLives}`
-        );
       } else {
         // Keep existing maxLives if no level up
         newState.maxLives = prevState.maxLives;

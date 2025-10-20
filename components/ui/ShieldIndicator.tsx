@@ -53,7 +53,7 @@ const ShieldContainer = styled.div<{ $active: boolean }>`
 `;
 
 const ShieldIcon = styled.div<{ $active: boolean }>`
-  font-size: 32px;
+  font-size: 50px;
   filter: ${(props) =>
     props.$active
       ? "drop-shadow(0 0 10px #ffd700)"
@@ -62,16 +62,17 @@ const ShieldIcon = styled.div<{ $active: boolean }>`
 `;
 
 const ChargesContainer = styled.div`
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 charges per row */
+  gap: 8px;
+  justify-items: center;
+  align-items: center;
   max-width: 100px;
 `;
 
 const ChargeIcon = styled.div<{ $filled: boolean }>`
-  width: 12px;
-  height: 12px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: ${(props) =>
     props.$filled
@@ -84,7 +85,7 @@ const ChargeIcon = styled.div<{ $filled: boolean }>`
 
 const ChargeText = styled.div<{ $active: boolean }>`
   color: ${(props) => (props.$active ? "#ffd700" : "rgba(255, 255, 255, 0.5)")};
-  font-size: 14px;
+  font-size: 28px;
   font-weight: bold;
   letter-spacing: 1px;
 `;
