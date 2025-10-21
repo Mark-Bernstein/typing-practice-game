@@ -46,9 +46,9 @@ const pulse = keyframes`
 `;
 
 const arcFlash = keyframes`
-  0% { opacity: 0; transform: scale(0.1) rotate(0deg); }
-  5% { opacity: 1; transform: scale(1) rotate(90deg); }
-  20% { opacity: 1; transform: scale(1.1) rotate(0); }
+  0% { opacity: 0; transform: scale(0.1) rotate(90deg); }
+  10% { opacity: 1; transform: scale(1) rotate(30deg); }
+  25% { opacity: 1; transform: scale(1.1) rotate(0deg); }
   100% { opacity: 0; }
 `;
 
@@ -88,7 +88,7 @@ export const GameCanvas = styled.div<{
             position: absolute;
             inset: 0;
             border-radius: 16px;
-            border: 20px dashed rgba(0, 204, 255, 0.9);
+            border: 20px dotted rgba(0, 204, 255, 0.8);
             opacity: 0;
             animation: ${arcFlash} 1.8s ease-out infinite;
             animation-delay: 0.3s;

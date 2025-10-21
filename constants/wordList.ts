@@ -343,7 +343,7 @@ export const WORD_LISTS = {
     "DOG",
     "EAR",
     "EAT",
-    "ELL",
+
     "FED",
     "FIG",
     "FIX",
@@ -425,7 +425,7 @@ export const WORD_LISTS = {
     "DOG",
     "EAR",
     "EAT",
-    "ELL",
+
     "FED",
     "FIG",
     "FIX",
@@ -1580,7 +1580,6 @@ export const WORD_LISTS = {
     "DEPEND",
     "DEVICE",
     "DIRECT",
-    "DISCIP",
     "DIFFER",
     "DIGEST",
     "DINNER",

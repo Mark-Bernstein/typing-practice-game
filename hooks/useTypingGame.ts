@@ -121,9 +121,7 @@ export const useTypingGame = (
           const chargesAvailable = newState.shieldState.charges;
           shieldChargesUsed = Math.min(livesCost, chargesAvailable);
 
-          if (shieldChargesUsed > 0) {
-            playSFX("shield-lost");
-          }
+          if (shieldChargesUsed > 0) playSFX("shield-lost");
 
           livesCost -= shieldChargesUsed;
 
@@ -200,6 +198,9 @@ export const useTypingGame = (
         if (newState.shieldState.active && livesCost > 0) {
           const chargesAvailable = newState.shieldState.charges;
           shieldChargesUsed = Math.min(livesCost, chargesAvailable);
+
+          if (shieldChargesUsed > 0) playSFX("shield-lost");
+
           livesCost -= shieldChargesUsed;
 
           newState.shieldState = {
@@ -356,7 +357,7 @@ export const useTypingGame = (
             newState.score += getLetterScore(upperKey);
             newState.speed = Math.min(
               GAME_CONFIG.MAX_SPEED,
-              newState.speed * 1.007
+              newState.speed * 1.01
             );
             newState.lastKeyCorrect = true;
           } else {

@@ -11,6 +11,7 @@ const glow = keyframes`
 const StyledShield = styled(motion.div)<{ $size: number }>`
   position: absolute;
   font-size: ${(props) => props.$size * 1.5}px;
+  line-height: 1.6;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,15 +24,13 @@ const StyledShield = styled(motion.div)<{ $size: number }>`
 
 const KeyHint = styled.div<{ $size: number }>`
   position: absolute;
-  color: black !important;
   font-size: 50px !important;
-  top: 50%;
+  top: 48%;
   left: 48%;
   transform: translate(-50%, -50%);
   font-size: ${(props) => props.$size * 0.6}px;
-  font-weight: 900;
-  color: #000;
-  text-shadow: 0 0 5px #ffd700;
+  font-weight: bold;
+  color: #000000;
   z-index: 1;
 `;
 
@@ -50,8 +49,7 @@ export const FallingShield: React.FC<FallingShieldProps> = memo(
   ({ shield, letterSize }) => {
     const entryOffset = useMemo(() => {
       const randomX = Math.random() * 200 - 100;
-      const randomY = Math.random() * 200 - 100;
-      return { x: randomX, y: randomY };
+      return { x: randomX, y: -100 };
     }, []);
 
     return (
@@ -73,6 +71,7 @@ export const FallingShield: React.FC<FallingShieldProps> = memo(
           opacity: 0,
           scale: 0.2,
           y: shield.y - 30,
+          rotateZ: 360,
         }}
         transition={{
           duration: 0.5,

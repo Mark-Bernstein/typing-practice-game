@@ -12,13 +12,13 @@ const WordContainer = styled(motion.div)`
   cursor: default;
   z-index: 10;
   will-change: transform, opacity;
-  line-height: 0.8;
+  line-height: 0.6;
 `;
 
 const Letter = styled.span<{ $color: string; $size: number; $typed: boolean }>`
   font-size: ${(props) => props.$size}px;
   font-weight: 900;
-  line-height: 0.8;
+  line-height: 0.6;
   font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
   color: ${(props) => (props.$typed ? "#00ff88" : props.$color)};
   -webkit-text-stroke: 0.5px #d0ff00; /* cyan outline */
