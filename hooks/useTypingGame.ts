@@ -11,6 +11,11 @@ import {
   getLevel,
 } from "../utils/gameUtils";
 
+// Helper function to calculate multiplier based on combo count
+const getComboMultiplier = (comboCount: number): number => {
+  return 1 + Math.floor(comboCount / 10) * 0.5;
+};
+
 export const useTypingGame = (
   playSFX: (effect: SoundEffect) => void,
   dimensions: GameDimensions,
@@ -39,6 +44,11 @@ export const useTypingGame = (
         active: false,
         charges: 0,
         maxCharges: GAME_CONFIG.SHIELD_CHARGES * GAME_CONFIG.MAX_SHIELD_STACKS,
+      },
+      combo: {
+        count: 0,
+        multiplier: 1,
+        lastCorrectTime: 0,
       },
     }),
     [dimensions, initialGameMode]
@@ -354,6 +364,18 @@ export const useTypingGame = (
             updatedLetters.splice(index, 1);
             newState.letters = updatedLetters;
             newState.lettersCorrect += 1;
+
+            // Update combo
+            newState.combo = {
+              count: prevState.combo.count + 1,
+              multiplier: getComboMultiplier(prevState.combo.count + 1),
+              lastCorrectTime: newState.time,
+            };
+
+            // Apply multiplier to score
+            const baseScore = getLetterScore(upperKey);
+            newState.score += Math.floor(baseScore * newState.combo.multiplier);
+
             newState.score += getLetterScore(upperKey);
             newState.speed = Math.min(
               GAME_CONFIG.MAX_SPEED,
@@ -363,6 +385,13 @@ export const useTypingGame = (
           } else {
             playSFX("wrong");
             newState.score = Math.max(0, newState.score - 3);
+
+            // Break combo on wrong key
+            newState.combo = {
+              count: 0,
+              multiplier: 1,
+              lastCorrectTime: 0,
+            };
           }
         }
 
@@ -386,6 +415,13 @@ export const useTypingGame = (
             } else {
               playSFX("wrong");
               newState.score = Math.max(0, newState.score - 3);
+
+              // Break combo
+              newState.combo = {
+                count: 0,
+                multiplier: 1,
+                lastCorrectTime: 0,
+              };
             }
           } else {
             const wordIndex = newState.words.findIndex(
@@ -408,7 +444,20 @@ export const useTypingGame = (
                 if (nextLetterIndex + 1 === currentWord.word.length) {
                   updatedWords.splice(wordIndex, 1);
                   newState.lettersCorrect += currentWord.word.length;
-                  newState.score += getWordScore(currentWord.word);
+
+                  // Update combo (count words, not letters)
+                  newState.combo = {
+                    count: prevState.combo.count + 1,
+                    multiplier: getComboMultiplier(prevState.combo.count + 1),
+                    lastCorrectTime: newState.time,
+                  };
+
+                  // Apply multiplier to score
+                  const baseScore = getWordScore(currentWord.word);
+                  newState.score += Math.floor(
+                    baseScore * newState.combo.multiplier
+                  );
+
                   newState.speed = Math.min(
                     GAME_CONFIG.MAX_SPEED,
                     newState.speed * 1.007
@@ -429,6 +478,13 @@ export const useTypingGame = (
                 newState.words = updatedWords;
                 newState.currentTypingWordId = null;
                 newState.score = Math.max(0, newState.score - 5);
+
+                // Break combo
+                newState.combo = {
+                  count: 0,
+                  multiplier: 1,
+                  lastCorrectTime: 0,
+                };
               }
             } else {
               newState.currentTypingWordId = null;
@@ -450,6 +506,13 @@ export const useTypingGame = (
               } else {
                 playSFX("wrong");
                 newState.score = Math.max(0, newState.score - 3);
+
+                // Break combo
+                newState.combo = {
+                  count: 0,
+                  multiplier: 1,
+                  lastCorrectTime: 0,
+                };
               }
             }
           }

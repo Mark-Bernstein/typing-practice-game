@@ -35,6 +35,12 @@ export interface ShieldState {
   maxCharges: number;
 }
 
+export interface ComboState {
+  count: number;
+  multiplier: number;
+  lastCorrectTime: number;
+}
+
 export interface GameState {
   letters: LetterPosition[];
   words: WordPosition[];
@@ -54,6 +60,7 @@ export interface GameState {
   currentTypingWordId: number | null;
   shields: ShieldPowerUp[];
   shieldState: ShieldState;
+  combo: ComboState;
 }
 
 export interface GameStats {

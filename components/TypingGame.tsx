@@ -736,6 +736,8 @@ const GamePlay: React.FC<{
           lettersCorrect={gameState.lettersCorrect}
           score={gameState.score}
           speed={gameState.speed}
+          comboCount={gameState.combo.count}
+          comboMultiplier={gameState.combo.multiplier}
         />
 
         <GameArea gameState={gameState} />
