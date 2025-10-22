@@ -188,7 +188,7 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
     prevLivesRef.current = gameState.lives;
   }, [gameState.lives]);
 
-  // ✅ Shield catch effect
+  // Shield catch effect
   useEffect(() => {
     if (gameState.shieldState.charges > prevShieldChargesRef.current) {
       setShowShieldCatch(true);

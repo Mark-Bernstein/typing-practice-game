@@ -26,9 +26,8 @@ export const FallingLetter: React.FC<FallingLetterProps> = memo(
   ({ letter, letterSize }) => {
     const entryOffset = useMemo(() => {
       const randomX = Math.random() * 200 - 100;
-      const randomY = Math.random() * 200 - 100;
       const randomRot = Math.random() * 60 - 30;
-      return { x: randomX, y: randomY, rotate: randomRot };
+      return { x: randomX, y: -200, rotate: randomRot };
     }, []);
 
     return (

@@ -12,7 +12,7 @@ export const GAME_CONFIG = {
   WORD_MIN_LENGTH: 3,
   WORD_MAX_LENGTH: 6,
 
-  // ✅ Shield power-up settings
+  // Shield power-up settings
   SHIELD_SPAWN_INTERVAL: 600,
   SHIELD_CHARGES: 3,
   MAX_SHIELD_STACKS: 3,

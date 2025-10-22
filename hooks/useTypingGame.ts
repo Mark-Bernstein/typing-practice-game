@@ -78,21 +78,37 @@ export const useTypingGame = (
           ? prevState.speed * GAME_CONFIG.WORD_SPEED_MULTIPLIER
           : prevState.speed;
 
+      // ===== GLOBAL VISUAL CORRECTION =====
+      const correctionFactor = 16;
+      const minSpeedForCorrection = 1.5;
+
+      const speedCorrection =
+        effectiveSpeed > minSpeedForCorrection
+          ? (effectiveSpeed - minSpeedForCorrection) * correctionFactor
+          : 0;
+
+      // Cap correction so it doesn't overshoot visually at high speeds
+      const clampedCorrection = Math.min(speedCorrection, 150);
+
       // ===== MOVE SHIELDS =====
       const shieldSpeed = effectiveSpeed * GAME_CONFIG.SHIELD_SPEED_MULTIPLIER;
 
-      // Move shields downward
-      newState.shields = newState.shields.map((shield) => ({
-        id: shield.id,
-        x: shield.x,
-        y: shield.y + shieldSpeed,
-      }));
+      const shieldBottomLimit =
+        newState.dimensions.height -
+        newState.dimensions.letterSize +
+        clampedCorrection;
+
+      newState.shields = newState.shields.map((shield) => {
+        const nextY = shield.y + shieldSpeed;
+        return {
+          ...shield,
+          y: Math.min(nextY, shieldBottomLimit),
+        };
+      });
 
       // Remove shields that reach bottom of screen
       const shieldsReachedBottom = newState.shields.filter(
-        (shield) =>
-          shield.y + newState.dimensions.letterSize * 2 >=
-          newState.dimensions.height
+        (shield) => shield.y >= shieldBottomLimit
       );
 
       if (shieldsReachedBottom.length > 0) {
@@ -101,26 +117,31 @@ export const useTypingGame = (
 
       // Keep only shields that are still visible
       newState.shields = newState.shields.filter(
-        (shield) =>
-          shield.y + newState.dimensions.letterSize * 2 <
-          newState.dimensions.height
+        (shield) => shield.y < shieldBottomLimit
       );
 
       // ===== LETTER MODE =====
       if (prevState.gameMode === "letter") {
-        newState.letters = newState.letters.map((letter) => ({
-          ...letter,
-          y: letter.y + effectiveSpeed,
-        }));
+        const letterBottomLimit =
+          newState.dimensions.height -
+          newState.dimensions.letterSize +
+          clampedCorrection;
 
-        const lettersReachedBottom = newState.letters.filter(
-          (l) =>
-            l.y + newState.dimensions.letterSize >= newState.dimensions.height
-        );
+        const lettersReachedBottom: typeof newState.letters = [];
+
+        newState.letters = newState.letters.map((letter) => {
+          const nextY = letter.y + effectiveSpeed;
+
+          if (nextY >= letterBottomLimit) {
+            lettersReachedBottom.push({ ...letter, y: letterBottomLimit });
+            return { ...letter, y: letterBottomLimit };
+          }
+
+          return { ...letter, y: nextY };
+        });
 
         const remainingLetters = newState.letters.filter(
-          (l) =>
-            l.y + newState.dimensions.letterSize < newState.dimensions.height
+          (l) => l.y < letterBottomLimit
         );
 
         // Shield protection logic
@@ -162,43 +183,46 @@ export const useTypingGame = (
         newState.letters = remainingLetters;
         newState.lives = newLives;
 
-        // Spawn new letters
-        if (
-          newState.letters.length === 0 ||
-          (newState.time % 60 === 0 &&
-            newState.letters.length < GAME_CONFIG.MAX_LETTERS)
-        ) {
-          const spawnCount = Math.min(
-            newState.level,
-            12 - newState.letters.length
-          );
+        // Max letters allowed depends on level (up to 10)
+        const maxLettersForLevel = Math.min(7, newState.level + 2);
+        const spawnInterval = 40; // every 40 frames ≈ 0.67s
 
-          for (let i = 0; i < spawnCount; i++) {
-            const newLetter = generateRandomLetter(
-              newState.letters,
-              letterIdCounter.current++,
-              newState.dimensions
-            );
-            newState.letters = [...newState.letters, newLetter];
-          }
+        // Spawn new letter if under limit and enough time has passed
+        if (
+          newState.time % spawnInterval === 0 &&
+          newState.letters.length < maxLettersForLevel
+        ) {
+          const newLetter = generateRandomLetter(
+            newState.letters,
+            letterIdCounter.current++,
+            newState.dimensions
+          );
+          newState.letters = [...newState.letters, newLetter];
         }
       }
 
       // ===== WORD MODE =====
-      else {
-        newState.words = newState.words.map((word) => ({
-          ...word,
-          y: word.y + effectiveSpeed,
-        }));
+      else if (prevState.gameMode === "word") {
+        const wordBottomLimit =
+          newState.dimensions.height -
+          newState.dimensions.letterSize +
+          clampedCorrection;
 
-        const wordsReachedBottom = newState.words.filter(
-          (w) =>
-            w.y + newState.dimensions.letterSize >= newState.dimensions.height
-        );
+        const wordsReachedBottom: typeof newState.words = [];
+
+        newState.words = newState.words.map((word) => {
+          const nextY = word.y + effectiveSpeed;
+
+          if (nextY >= wordBottomLimit) {
+            wordsReachedBottom.push({ ...word, y: wordBottomLimit });
+            return { ...word, y: wordBottomLimit };
+          }
+
+          return { ...word, y: nextY };
+        });
 
         const remainingWords = newState.words.filter(
-          (w) =>
-            w.y + newState.dimensions.letterSize < newState.dimensions.height
+          (w) => w.y < wordBottomLimit
         );
 
         // Shield protection logic
@@ -226,6 +250,7 @@ export const useTypingGame = (
           playSFX("life-lost");
           prevLivesRef.current = newLives;
 
+          // Cancel typing if the active word hit bottom
           if (newState.currentTypingWordId !== null) {
             const hitBottom = wordsReachedBottom.some(
               (w) => w.id === newState.currentTypingWordId
@@ -275,32 +300,26 @@ export const useTypingGame = (
           shieldIdCounter.current++,
           newState.dimensions
         );
-
-        // Append new shield instead of replacing existing ones
         newState.shields = [...newState.shields, newShield];
         lastShieldSpawnTime.current = newState.time;
       }
 
-      // Calculate new level
+      // ===== LEVEL-UP LOGIC =====
       const newLevel = getLevel(newState.lettersCorrect);
 
-      // Check if level increased and add life + max life every 2 levels
       if (newLevel > prevState.level) {
-        // Only add a max life every 2 levels (2, 4, 6, etc.)
         if (newLevel % 2 === 0) {
           newState.maxLives = prevState.maxLives + 1;
         } else {
           newState.maxLives = prevState.maxLives;
         }
 
-        // Always restore one life on level up, up to the current max
         newState.lives = Math.min(prevState.lives + 1, newState.maxLives);
       } else {
-        // Keep existing maxLives if no level up
         newState.maxLives = prevState.maxLives;
       }
 
-      newState.level = getLevel(newState.lettersCorrect);
+      newState.level = newLevel;
       return newState;
     });
   }, [playSFX]);
@@ -379,7 +398,7 @@ export const useTypingGame = (
             newState.score += getLetterScore(upperKey);
             newState.speed = Math.min(
               GAME_CONFIG.MAX_SPEED,
-              newState.speed * 1.01
+              newState.speed * 1.005
             );
             newState.lastKeyCorrect = true;
           } else {
