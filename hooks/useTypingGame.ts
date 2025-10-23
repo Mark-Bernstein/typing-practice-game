@@ -5,11 +5,13 @@ import { SoundEffect } from "./useAudio";
 import {
   generateRandomLetter,
   generateRandomWord,
+  generateStoryWord,
   generateShieldPowerUp,
   getLetterScore,
   getWordScore,
   getLevel,
 } from "../utils/gameUtils";
+import { getStory } from "../constants/wordList";
 
 // Helper function to calculate multiplier based on combo count
 const getComboMultiplier = (comboCount: number): number => {
@@ -21,8 +23,8 @@ export const useTypingGame = (
   dimensions: GameDimensions,
   initialGameMode: GameMode = "letter"
 ) => {
-  const getInitialState = useCallback(
-    (): GameState => ({
+  const getInitialState = useCallback((): GameState => {
+    const baseState: GameState = {
       letters: [],
       words: [],
       shields: [],
@@ -50,9 +52,25 @@ export const useTypingGame = (
         multiplier: 1,
         lastCorrectTime: 0,
       },
-    }),
-    [dimensions, initialGameMode]
-  );
+    };
+
+    // Initialize story state with single string
+    if (initialGameMode === "story") {
+      const story = getStory();
+      const allWords = story.story.split(" ");
+
+      baseState.storyState = {
+        currentStoryId: story.id,
+        currentSentenceIndex: 0,
+        totalSentences: allWords.length,
+        storyTitle: story.title,
+        currentSentence: allWords,
+        sentenceWordIndex: 0,
+      };
+    }
+
+    return baseState;
+  }, [dimensions, initialGameMode]);
 
   const [gameState, setGameState] = useState<GameState>(getInitialState);
   const gameLoopRef = useRef<number | undefined>(undefined);
@@ -74,77 +92,52 @@ export const useTypingGame = (
       newState.time += 1;
 
       const effectiveSpeed =
-        prevState.gameMode === "word"
+        prevState.gameMode === "word" || prevState.gameMode === "story"
           ? prevState.speed * GAME_CONFIG.WORD_SPEED_MULTIPLIER
           : prevState.speed;
-
-      // ===== GLOBAL VISUAL CORRECTION =====
-      const correctionFactor = 16;
-      const minSpeedForCorrection = 1.5;
-
-      const speedCorrection =
-        effectiveSpeed > minSpeedForCorrection
-          ? (effectiveSpeed - minSpeedForCorrection) * correctionFactor
-          : 0;
-
-      // Cap correction so it doesn't overshoot visually at high speeds
-      const clampedCorrection = Math.min(speedCorrection, 150);
 
       // ===== MOVE SHIELDS =====
       const shieldSpeed = effectiveSpeed * GAME_CONFIG.SHIELD_SPEED_MULTIPLIER;
 
-      const shieldBottomLimit =
-        newState.dimensions.height -
-        newState.dimensions.letterSize +
-        clampedCorrection;
+      newState.shields = newState.shields.map((shield) => ({
+        id: shield.id,
+        x: shield.x,
+        y: shield.y + shieldSpeed,
+      }));
 
-      newState.shields = newState.shields.map((shield) => {
-        const nextY = shield.y + shieldSpeed;
-        return {
-          ...shield,
-          y: Math.min(nextY, shieldBottomLimit),
-        };
-      });
-
-      // Remove shields that reach bottom of screen
       const shieldsReachedBottom = newState.shields.filter(
-        (shield) => shield.y >= shieldBottomLimit
+        (shield) =>
+          shield.y + newState.dimensions.letterSize * 2 >=
+          newState.dimensions.height
       );
 
       if (shieldsReachedBottom.length > 0) {
         playSFX("shield-despawn");
       }
 
-      // Keep only shields that are still visible
       newState.shields = newState.shields.filter(
-        (shield) => shield.y < shieldBottomLimit
+        (shield) =>
+          shield.y + newState.dimensions.letterSize * 2 <
+          newState.dimensions.height
       );
 
       // ===== LETTER MODE =====
       if (prevState.gameMode === "letter") {
-        const letterBottomLimit =
-          newState.dimensions.height -
-          newState.dimensions.letterSize +
-          clampedCorrection;
+        newState.letters = newState.letters.map((letter) => ({
+          ...letter,
+          y: letter.y + effectiveSpeed,
+        }));
 
-        const lettersReachedBottom: typeof newState.letters = [];
-
-        newState.letters = newState.letters.map((letter) => {
-          const nextY = letter.y + effectiveSpeed;
-
-          if (nextY >= letterBottomLimit) {
-            lettersReachedBottom.push({ ...letter, y: letterBottomLimit });
-            return { ...letter, y: letterBottomLimit };
-          }
-
-          return { ...letter, y: nextY };
-        });
-
-        const remainingLetters = newState.letters.filter(
-          (l) => l.y < letterBottomLimit
+        const lettersReachedBottom = newState.letters.filter(
+          (l) =>
+            l.y + newState.dimensions.letterSize >= newState.dimensions.height
         );
 
-        // Shield protection logic
+        const remainingLetters = newState.letters.filter(
+          (l) =>
+            l.y + newState.dimensions.letterSize < newState.dimensions.height
+        );
+
         let livesCost = lettersReachedBottom.length;
         let shieldChargesUsed = 0;
 
@@ -152,7 +145,9 @@ export const useTypingGame = (
           const chargesAvailable = newState.shieldState.charges;
           shieldChargesUsed = Math.min(livesCost, chargesAvailable);
 
-          if (shieldChargesUsed > 0) playSFX("shield-lost");
+          if (shieldChargesUsed > 0) {
+            playSFX("shield-lost");
+          }
 
           livesCost -= shieldChargesUsed;
 
@@ -183,49 +178,54 @@ export const useTypingGame = (
         newState.letters = remainingLetters;
         newState.lives = newLives;
 
-        // Max letters allowed depends on level (up to 10)
-        const maxLettersForLevel = Math.min(7, newState.level + 2);
-        const spawnInterval = 40; // every 40 frames ≈ 0.67s
-
-        // Spawn new letter if under limit and enough time has passed
         if (
-          newState.time % spawnInterval === 0 &&
-          newState.letters.length < maxLettersForLevel
+          newState.letters.length === 0 ||
+          (newState.time % 60 === 0 &&
+            newState.letters.length < GAME_CONFIG.MAX_LETTERS)
         ) {
-          const newLetter = generateRandomLetter(
-            newState.letters,
-            letterIdCounter.current++,
-            newState.dimensions
+          const spawnCount = Math.min(
+            newState.level,
+            12 - newState.letters.length
           );
-          newState.letters = [...newState.letters, newLetter];
+
+          for (let i = 0; i < spawnCount; i++) {
+            const newLetter = generateRandomLetter(
+              newState.letters,
+              letterIdCounter.current++,
+              newState.dimensions
+            );
+            newState.letters = [...newState.letters, newLetter];
+          }
         }
       }
 
-      // ===== WORD MODE =====
-      else if (prevState.gameMode === "word") {
-        const wordBottomLimit =
-          newState.dimensions.height -
-          newState.dimensions.letterSize +
-          clampedCorrection;
+      // ===== WORD MODE & STORY MODE =====
+      else if (
+        prevState.gameMode === "word" ||
+        prevState.gameMode === "story"
+      ) {
+        newState.words = newState.words.map((word) => ({
+          ...word,
+          y: word.y + effectiveSpeed,
+        }));
 
-        const wordsReachedBottom: typeof newState.words = [];
-
-        newState.words = newState.words.map((word) => {
-          const nextY = word.y + effectiveSpeed;
-
-          if (nextY >= wordBottomLimit) {
-            wordsReachedBottom.push({ ...word, y: wordBottomLimit });
-            return { ...word, y: wordBottomLimit };
-          }
-
-          return { ...word, y: nextY };
-        });
-
-        const remainingWords = newState.words.filter(
-          (w) => w.y < wordBottomLimit
+        const wordsReachedBottom = newState.words.filter(
+          (w) =>
+            w.y + newState.dimensions.letterSize >= newState.dimensions.height
         );
 
-        // Shield protection logic
+        const remainingWords = newState.words.filter(
+          (w) =>
+            w.y + newState.dimensions.letterSize < newState.dimensions.height
+        );
+
+        if (
+          newState.currentTypingWordId &&
+          wordsReachedBottom.some((w) => w.id === newState.currentTypingWordId)
+        ) {
+          newState.currentTypingWordId = null;
+        }
+
         let livesCost = wordsReachedBottom.length;
         let shieldChargesUsed = 0;
 
@@ -274,18 +274,53 @@ export const useTypingGame = (
         newState.words = remainingWords;
         newState.lives = newLives;
 
-        // Spawn logic
-        if (
-          newState.words.length === 0 ||
-          (newState.time % 90 === 0 &&
-            newState.words.length < GAME_CONFIG.MAX_WORDS)
-        ) {
-          const newWord = generateRandomWord(
-            newState.words,
-            wordIdCounter.current++,
-            newState.dimensions
-          );
-          newState.words = [...newState.words, newWord];
+        // WORD MODE spawn logic
+        if (prevState.gameMode === "word") {
+          if (
+            newState.words.length === 0 ||
+            (newState.time % 90 === 0 &&
+              newState.words.length < GAME_CONFIG.MAX_WORDS)
+          ) {
+            const newWord = generateRandomWord(
+              newState.words,
+              wordIdCounter.current++,
+              newState.dimensions
+            );
+            newState.words = [...newState.words, newWord];
+          }
+        }
+
+        // STORY MODE spawn logic
+        if (prevState.gameMode === "story" && newState.storyState) {
+          const { currentSentence, sentenceWordIndex } = newState.storyState;
+
+          // Check if we've reached the end of the story
+          if (sentenceWordIndex >= currentSentence.length) {
+            // Story complete - prevent further spawning
+            return newState;
+          }
+
+          // Spawn next word from story
+          if (
+            newState.words.length === 0 ||
+            (newState.time % 90 === 0 &&
+              newState.words.length < GAME_CONFIG.MAX_WORDS)
+          ) {
+            const nextWord = currentSentence[sentenceWordIndex];
+            if (nextWord) {
+              const newWord = generateStoryWord(
+                nextWord,
+                newState.words,
+                wordIdCounter.current++,
+                newState.dimensions
+              );
+              newState.words = [...newState.words, newWord];
+              newState.storyState = {
+                ...newState.storyState,
+                sentenceWordIndex: sentenceWordIndex + 1,
+              };
+            }
+          }
         }
       }
 
@@ -293,18 +328,18 @@ export const useTypingGame = (
       const timeSinceLastShield = newState.time - lastShieldSpawnTime.current;
       const shouldSpawnShield =
         timeSinceLastShield >= GAME_CONFIG.SHIELD_SPAWN_INTERVAL &&
-        Math.random() < 0.02; // ~2% chance each frame after interval
+        Math.random() < 0.02;
 
       if (shouldSpawnShield) {
         const newShield = generateShieldPowerUp(
           shieldIdCounter.current++,
           newState.dimensions
         );
+
         newState.shields = [...newState.shields, newShield];
         lastShieldSpawnTime.current = newState.time;
       }
 
-      // ===== LEVEL-UP LOGIC =====
       const newLevel = getLevel(newState.lettersCorrect);
 
       if (newLevel > prevState.level) {
@@ -319,7 +354,7 @@ export const useTypingGame = (
         newState.maxLives = prevState.maxLives;
       }
 
-      newState.level = newLevel;
+      newState.level = getLevel(newState.lettersCorrect);
       return newState;
     });
   }, [playSFX]);
@@ -358,7 +393,11 @@ export const useTypingGame = (
       }
 
       const upperKey = key.toUpperCase();
-      if (!ALPHABET.includes(upperKey)) return;
+
+      // Accept letters, numbers, space, and punctuation
+      if (!/^[A-Za-z0-9 .,'";:?-]$/.test(key)) {
+        return;
+      }
 
       setGameState((prevState) => {
         if (prevState.gameOver) return prevState;
@@ -384,28 +423,23 @@ export const useTypingGame = (
             newState.letters = updatedLetters;
             newState.lettersCorrect += 1;
 
-            // Update combo
             newState.combo = {
               count: prevState.combo.count + 1,
               multiplier: getComboMultiplier(prevState.combo.count + 1),
               lastCorrectTime: newState.time,
             };
 
-            // Apply multiplier to score
             const baseScore = getLetterScore(upperKey);
             newState.score += Math.floor(baseScore * newState.combo.multiplier);
 
-            newState.score += getLetterScore(upperKey);
             newState.speed = Math.min(
               GAME_CONFIG.MAX_SPEED,
-              newState.speed * 1.005
+              newState.speed * 1.01
             );
             newState.lastKeyCorrect = true;
           } else {
             playSFX("wrong");
             newState.score = Math.max(0, newState.score - 3);
-
-            // Break combo on wrong key
             newState.combo = {
               count: 0,
               multiplier: 1,
@@ -414,28 +448,63 @@ export const useTypingGame = (
           }
         }
 
-        // ===== WORD MODE =====
-        else {
+        // ===== WORD MODE & STORY MODE =====
+        else if (
+          prevState.gameMode === "word" ||
+          prevState.gameMode === "story"
+        ) {
           if (newState.currentTypingWordId === null) {
-            const wordIndex = newState.words.findIndex(
-              (w) => w.typedProgress === 0 && w.word[0] === upperKey
-            );
+            // Find word that starts with the typed key (case-insensitive for letters)
+            const wordIndex = newState.words.findIndex((w) => {
+              if (w.typedProgress !== 0) return false;
+              const firstChar = w.word[0];
+              // For letters, match case-insensitive. For punctuation, match exact
+              if (/[A-Za-z]/.test(firstChar)) {
+                return firstChar.toUpperCase() === upperKey;
+              } else {
+                return firstChar === key;
+              }
+            });
 
             if (wordIndex !== -1) {
               playSFX("correct");
               const updatedWords = [...newState.words];
-              updatedWords[wordIndex] = {
-                ...updatedWords[wordIndex],
-                typedProgress: 1,
-              };
-              newState.words = updatedWords;
-              newState.currentTypingWordId = updatedWords[wordIndex].id;
+              const currentWord = updatedWords[wordIndex];
+
+              if (currentWord.word.length === 1) {
+                updatedWords.splice(wordIndex, 1);
+                newState.words = updatedWords;
+                newState.lettersCorrect += currentWord.word.length;
+
+                newState.combo = {
+                  count: prevState.combo.count + 1,
+                  multiplier: getComboMultiplier(prevState.combo.count + 1),
+                  lastCorrectTime: newState.time,
+                };
+
+                const baseScore = getWordScore(currentWord.word);
+                newState.score += Math.floor(
+                  baseScore * newState.combo.multiplier
+                );
+
+                newState.speed = Math.min(
+                  GAME_CONFIG.MAX_SPEED,
+                  newState.speed * 1.007
+                );
+                playSFX("correct-word");
+              } else {
+                updatedWords[wordIndex] = {
+                  ...updatedWords[wordIndex],
+                  typedProgress: 1,
+                };
+                newState.words = updatedWords;
+                newState.currentTypingWordId = updatedWords[wordIndex].id;
+              }
+
               newState.lastKeyCorrect = true;
             } else {
               playSFX("wrong");
               newState.score = Math.max(0, newState.score - 3);
-
-              // Break combo
               newState.combo = {
                 count: 0,
                 multiplier: 1,
@@ -450,9 +519,17 @@ export const useTypingGame = (
             if (wordIndex !== -1) {
               const currentWord = newState.words[wordIndex];
               const nextLetterIndex = currentWord.typedProgress;
-              const expectedLetter = currentWord.word[nextLetterIndex];
+              const expectedChar = currentWord.word[nextLetterIndex];
 
-              if (upperKey === expectedLetter) {
+              // For letters, match case-insensitive. For punctuation, match exact
+              let isMatch = false;
+              if (/[A-Za-z]/.test(expectedChar)) {
+                isMatch = upperKey === expectedChar.toUpperCase();
+              } else {
+                isMatch = key === expectedChar;
+              }
+
+              if (isMatch) {
                 playSFX("correct");
                 const updatedWords = [...newState.words];
                 updatedWords[wordIndex] = {
@@ -460,18 +537,19 @@ export const useTypingGame = (
                   typedProgress: nextLetterIndex + 1,
                 };
 
-                if (nextLetterIndex + 1 === currentWord.word.length) {
+                if (
+                  updatedWords[wordIndex].typedProgress >=
+                  currentWord.word.length
+                ) {
                   updatedWords.splice(wordIndex, 1);
                   newState.lettersCorrect += currentWord.word.length;
 
-                  // Update combo (count words, not letters)
                   newState.combo = {
                     count: prevState.combo.count + 1,
                     multiplier: getComboMultiplier(prevState.combo.count + 1),
                     lastCorrectTime: newState.time,
                   };
 
-                  // Apply multiplier to score
                   const baseScore = getWordScore(currentWord.word);
                   newState.score += Math.floor(
                     baseScore * newState.combo.multiplier
@@ -498,35 +576,6 @@ export const useTypingGame = (
                 newState.currentTypingWordId = null;
                 newState.score = Math.max(0, newState.score - 5);
 
-                // Break combo
-                newState.combo = {
-                  count: 0,
-                  multiplier: 1,
-                  lastCorrectTime: 0,
-                };
-              }
-            } else {
-              newState.currentTypingWordId = null;
-
-              const newWordIndex = newState.words.findIndex(
-                (w) => w.typedProgress === 0 && w.word[0] === upperKey
-              );
-
-              if (newWordIndex !== -1) {
-                playSFX("correct");
-                const updatedWords = [...newState.words];
-                updatedWords[newWordIndex] = {
-                  ...updatedWords[newWordIndex],
-                  typedProgress: 1,
-                };
-                newState.words = updatedWords;
-                newState.currentTypingWordId = updatedWords[newWordIndex].id;
-                newState.lastKeyCorrect = true;
-              } else {
-                playSFX("wrong");
-                newState.score = Math.max(0, newState.score - 3);
-
-                // Break combo
                 newState.combo = {
                   count: 0,
                   multiplier: 1,

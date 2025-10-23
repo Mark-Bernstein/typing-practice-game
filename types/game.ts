@@ -4,7 +4,7 @@ export interface GameDimensions {
   letterSize: number;
 }
 
-export type GameMode = "letter" | "word";
+export type GameMode = "letter" | "word" | "story";
 
 export interface LetterPosition {
   letter: string;
@@ -41,6 +41,15 @@ export interface ComboState {
   lastCorrectTime: number;
 }
 
+export interface StoryState {
+  currentStoryId: number;
+  currentSentenceIndex: number;
+  totalSentences: number;
+  storyTitle: string;
+  currentSentence: string[];
+  sentenceWordIndex: number;
+}
+
 export interface GameState {
   letters: LetterPosition[];
   words: WordPosition[];
@@ -61,6 +70,7 @@ export interface GameState {
   shields: ShieldPowerUp[];
   shieldState: ShieldState;
   combo: ComboState;
+  storyState?: StoryState;
 }
 
 export interface GameStats {

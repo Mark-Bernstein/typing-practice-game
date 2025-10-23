@@ -51,15 +51,18 @@ export const generateRandomWord = (
   wordIdCounter: number,
   dimensions: GameDimensions
 ): WordPosition => {
-  const getRandomX = (): number => {
-    const wordWidth = dimensions.letterSize * 10;
+  const getRandomX = (wordLength: number): number => {
+    const wordWidth = dimensions.letterSize * Math.max(wordLength, 5);
+    const minVerticalSpacing = dimensions.letterSize * 3;
     const attempts = 50;
+
     for (let i = 0; i < attempts; i++) {
       const x = Math.random() * (dimensions.width - wordWidth);
-      const overlaps = existingWords.some(
-        (word) =>
-          Math.abs(word.x - x) < wordWidth && word.y < dimensions.letterSize
-      );
+      const overlaps = existingWords.some((word) => {
+        const horizontalOverlap = Math.abs(word.x - x) < wordWidth;
+        const verticalOverlap = word.y < minVerticalSpacing;
+        return horizontalOverlap && verticalOverlap;
+      });
       if (!overlaps) return x;
     }
     return Math.random() * (dimensions.width - wordWidth);
@@ -70,7 +73,42 @@ export const generateRandomWord = (
 
   return {
     word,
-    x: getRandomX(),
+    x: getRandomX(word.length),
+    y: 0,
+    color,
+    id: wordIdCounter,
+    typedProgress: 0,
+  };
+};
+
+export const generateStoryWord = (
+  word: string,
+  existingWords: WordPosition[],
+  wordIdCounter: number,
+  dimensions: GameDimensions
+): WordPosition => {
+  const getRandomX = (wordLength: number): number => {
+    const wordWidth = dimensions.letterSize * Math.max(wordLength, 5);
+    const minVerticalSpacing = dimensions.letterSize * 3;
+    const attempts = 50;
+
+    for (let i = 0; i < attempts; i++) {
+      const x = Math.random() * (dimensions.width - wordWidth);
+      const overlaps = existingWords.some((w) => {
+        const horizontalOverlap = Math.abs(w.x - x) < wordWidth;
+        const verticalOverlap = w.y < minVerticalSpacing;
+        return horizontalOverlap && verticalOverlap;
+      });
+      if (!overlaps) return x;
+    }
+    return Math.random() * (dimensions.width - wordWidth);
+  };
+
+  const color = WORD_COLORS[Math.floor(Math.random() * WORD_COLORS.length)];
+
+  return {
+    word: word.toUpperCase(),
+    x: getRandomX(word.length),
     y: 0,
     color,
     id: wordIdCounter,

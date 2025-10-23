@@ -190,33 +190,97 @@ const StartScreen = styled.div`
 `;
 
 const TitleMainMenu = styled.span`
+  position: relative;
+  display: inline-block;
   font-size: 40px;
   font-weight: bold;
   margin-bottom: 100px;
   text-shadow: 0 0 20px cyan;
-  display: inline-block;
+  color: #e0ffff;
   opacity: 0;
   transform: scale(0.8);
   animation: titleReveal 4s ease-in-out forwards;
 
+  /* ⚡ Animated Underline */
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    height: 5px;
+    width: 0%;
+    background: linear-gradient(90deg, cyan, #00e5ff, #e100ff);
+    box-shadow: 0 0 10px cyan, 0 0 20px #00e5ff, 0 0 30px #d400ff;
+    border-radius: 2px;
+    animation: underlineGrow 1.5s ease-in-out 2.5s forwards;
+  }
+
+  @keyframes underlineGrow {
+    0% {
+      width: 0%;
+      opacity: 0;
+      transform: scaleX(0.2);
+    }
+    40% {
+      opacity: 1;
+      width: 60%;
+    }
+    100% {
+      width: 100%;
+      opacity: 1;
+      transform: scaleX(1);
+    }
+  }
+
   @keyframes titleReveal {
     0% {
       opacity: 0;
-      transform: scale(0.1) rotate(-2deg);
+      transform: scale(0.1);
       text-shadow: 0 0 5px cyan, 0 0 10px #00ffff;
       letter-spacing: -2px;
+      color: black;
     }
-    40% {
+    30% {
       opacity: 0.6;
-      transform: scale(2) rotate(1deg);
+      transform: scale(1.5);
       text-shadow: 0 0 15px cyan, 0 0 25px #00ffff;
       letter-spacing: 2px;
     }
     70% {
       opacity: 1;
-      transform: scale(2) rotate(0deg);
+      transform: scale(1.5);
       text-shadow: 0 0 25px #00ffff, 0 0 40px #00e5ff;
       letter-spacing: 1px;
+    }
+    90% {
+      color: black;
+    }
+    91% {
+      color: white;
+    }
+    92% {
+      color: black;
+    }
+    93% {
+      color: white;
+    }
+    94% {
+      color: black;
+    }
+    95% {
+      color: white;
+    }
+    96% {
+      color: black;
+    }
+    97% {
+      color: white;
+    }
+    98% {
+      color: black;
+    }
+    99% {
+      color: white;
     }
     100% {
       opacity: 1;
@@ -284,60 +348,101 @@ const fadeInFromTop = keyframes`
 
 const StartButton = styled.button`
   position: absolute;
-  font-family: "Orbitron", sans-serif;
   top: 710px;
   padding: 100px 25px;
   font-size: 48px;
   font-weight: bold;
-  color: #000;
+  font-family: "Orbitron", sans-serif;
   letter-spacing: 3px;
+  color: #000;
+  border: none;
   border-radius: 50%;
   cursor: pointer;
-  background: linear-gradient(135deg, #000000, #8400ff, #ff0000);
-  background-size: 100% 150%;
   z-index: 1;
   overflow: visible;
+  background: radial-gradient(
+    circle at center,
+    #000000 0%,
+    #8400ff 40%,
+    #ff0000 80%
+  );
   box-shadow: 0 0 30px rgba(147, 51, 234, 0.9), 0 0 60px rgba(34, 211, 238, 0.8);
-  transition: all 0.4s ease;
-  animation: ${fadeInFromTop} 2s ease-in-out forwards,
-    moveUp 2s ease-in-out 2s forwards;
+  background-size: 200% 200%;
   transform-style: preserve-3d;
-  perspective: 800px;
+  perspective: 1200px;
+  transition: all 0.4s ease;
 
+  /* Run initial animations once */
+  animation: ${fadeInFromTop} 2s ease-in-out forwards,
+    moveUp 2s ease-in-out 2s forwards, coinSpin 2s linear 0s 1 both;
+
+  /* 🪙 Coin spin (plays once) */
+  @keyframes coinSpin {
+    0% {
+      transform: rotateY(0deg) scale(1);
+    }
+    25% {
+      transform: rotateY(90deg) scale(0.9);
+    }
+    50% {
+      transform: rotateY(180deg) scale(1);
+    }
+    75% {
+      transform: rotateY(270deg) scale(0.9);
+    }
+    100% {
+      transform: rotateY(360deg) scale(1);
+    }
+  }
+
+  /* 🛸 Hover: Ultra Sci-Fi effect */
   &:hover {
     color: #fff;
     letter-spacing: 10px;
-    box-shadow: 0 15px 30px rgba(147, 51, 234, 1),
-      0 0 40px rgba(34, 211, 238, 0.9), inset 0 0 25px rgba(236, 72, 153, 0.6);
-    text-shadow: 0 0 20px #22d3ee, 0 0 40px #a855f7, 0 0 60px #ec4899;
-    background: linear-gradient(135deg, #8400ff, #ff0000, #22d3ee);
-    padding: 100px 8px;
+    background: linear-gradient(135deg, #22d3ee, #9333ea, #ff007f, #00fff2);
+    background-size: 300% 300%;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.9),
+      0 0 60px rgba(147, 51, 234, 0.9), 0 0 100px rgba(236, 72, 153, 0.8),
+      inset 0 0 30px rgba(255, 255, 255, 0.6);
+    text-shadow: 0 0 25px #22d3ee, 0 0 45px #9333ea, 0 0 65px #ec4899,
+      0 0 85px #00fff2;
+    transform: scale(1.1);
   }
 
-  &::after,
-  &::before {
+  @keyframes hoverWarp {
+    0% {
+      background-position: 0% 50%;
+      filter: hue-rotate(0deg);
+    }
+    50% {
+      background-position: 100% 50%;
+      filter: hue-rotate(180deg);
+    }
+    100% {
+      background-position: 0% 50%;
+      filter: hue-rotate(360deg);
+    }
+  }
+
+  @keyframes hoverPulse {
+    0%,
+    100% {
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.9),
+        0 0 60px rgba(147, 51, 234, 0.9);
+    }
+    50% {
+      box-shadow: 0 0 80px rgba(236, 72, 153, 1), 0 0 150px rgba(0, 255, 255, 1);
+    }
+  }
+
+  &::before,
+  &::after {
     content: "";
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 800%;
-    height: 100%;
+    inset: -2px;
     border-radius: 50%;
-    transform: translate(-50%, -50%);
-    filter: blur(250px);
     z-index: -1;
     pointer-events: none;
-  }
-
-  &::after {
-    background: radial-gradient(
-      circle,
-      rgba(147, 51, 234, 0.6) 65%,
-      rgba(34, 211, 238, 0.5) 70%,
-      rgba(236, 72, 153, 0.3) 75%,
-      transparent 100%
-    );
-    animation: orbPulse 5s ease-in-out infinite;
   }
 
   &::before {
@@ -345,30 +450,41 @@ const StartButton = styled.button`
       circle,
       rgba(250, 204, 21, 0.8) 0%,
       rgba(236, 72, 153, 0.8) 70%,
-      rgba(0, 221, 255, 0.8) 100%,
+      rgba(0, 221, 255, 0.8) 100%
+    );
+    animation: orbRotate 2s linear infinite;
+    filter: blur(120px);
+  }
+
+  &::after {
+    background: radial-gradient(
+      circle,
+      rgba(147, 51, 234, 0.6) 60%,
+      rgba(34, 211, 238, 0.5) 80%,
       transparent 100%
     );
-    animation: orbRotate 8s linear infinite;
+    animation: orbPulse 1.5s ease-in-out infinite;
+    filter: blur(180px);
+  }
+
+  @keyframes orbRotate {
+    0% {
+      transform: rotate(0deg) scale(1);
+    }
+    100% {
+      transform: rotate(360deg) scale(1);
+    }
   }
 
   @keyframes orbPulse {
     0%,
     100% {
-      transform: translate(-50%, -50%) scale(1);
-      opacity: 1;
+      transform: scale(1);
+      opacity: 0.9;
     }
     50% {
-      transform: translate(-50%, -50%) scale(0.5);
+      transform: scale(0.8);
       opacity: 0.5;
-    }
-  }
-
-  @keyframes orbRotate {
-    0% {
-      transform: translate(-50%, -50%) rotate(0deg);
-    }
-    100% {
-      transform: translate(-50%, -50%) rotate(360deg);
     }
   }
 
@@ -385,7 +501,7 @@ const StartButton = styled.button`
 const TotalPlaysDisplay = styled.div`
   position: absolute;
   font-size: 28px;
-  left: 40px;
+  left: 16px;
   top: 40px;
   width: 420px;
   max-height: 70vh;
@@ -419,7 +535,6 @@ const TotalPlaysDisplay = styled.div`
   @media screen and (max-width: 1440px) {
     font-size: 20px;
     width: 300px;
-    left: 16px;
     top: 30px;
     padding: 16px;
     border-radius: 16px;
@@ -466,23 +581,32 @@ const ModeButton = styled.button<{ $active: boolean }>`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
   padding: 0 18px 12px;
-  width: 300px;
+  width: 190px;
   border-radius: 24px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   cursor: pointer;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 225, 255, 0.3);
   backdrop-filter: blur(20px);
   transition: all 0.5s ease;
+  transform: ${(props) =>
+    props.$active ? "translateY(-4px) scale(1.05)" : "scale(1)"};
   box-shadow: ${(props) =>
     props.$active
-      ? "0 0 30px rgba(34,211,238,0.7), 0 0 60px rgba(147,51,234,0.5)"
+      ? "0 0 30px rgba(34,211,238,1), 0 0 60px rgba(147,51,234,1)"
       : "0 0 10px rgba(255,255,255,0.1)"};
 
+  @media (max-width: 1440px) {
+    width: 140px;
+  }
+
   &:hover {
-    transform: translateY(-8px) scale(1.05);
+    transform: ${(props) =>
+      props.$active
+        ? "translateY(-8px) scale(1.05)" // keep same scale while adding a subtle lift
+        : "translateY(-8px) scale(1.05)"};
     box-shadow: 0 0 40px rgba(0, 255, 247, 0.8),
       0 0 80px rgba(147, 51, 234, 0.6), 0 0 120px rgba(236, 72, 153, 0.4);
   }
@@ -492,7 +616,7 @@ const ModeButton = styled.button<{ $active: boolean }>`
     position: absolute;
     inset: -2px;
     border-radius: 26px;
-    background: linear-gradient(60deg, #22d3ee, #9333ea, #800000, #22d3ee);
+    background: linear-gradient(60deg, #22d3ee, #9333ea, #ff0000, #22d3ee);
     background-size: 400% 400%;
     opacity: ${(props) => (props.$active ? 1 : 0)};
     animation: ${(props) =>
@@ -530,9 +654,9 @@ const ModeButton = styled.button<{ $active: boolean }>`
     props.$active &&
     `
     &::before {
-      box-shadow: 0 0 30px rgba(34,211,238,0.7),
-                  0 0 60px rgba(147,51,234,0.5),
-                  inset 0 0 15px rgba(34,211,238,0.5);
+      box-shadow: 0 0 30px rgba(34,211,238,1),
+                  0 0 60px rgba(147,51,234,1),
+                  inset 0 0 15px rgba(34,211,238,1);
     }
   `}
 
@@ -586,9 +710,10 @@ const ModeButton = styled.button<{ $active: boolean }>`
 
 const ModeIcon = styled.div`
   font-size: 60px;
-  margin-top: 8px;
-  border-radius: 50px;
-  box-shadow: 0 0 20px #a200ff, 0 0 24px #9333ea, 0 0 36px #ec4899;
+
+  @media (max-width: 1440px) {
+    font-size: 40px;
+  }
 `;
 
 const ModeLabel = styled.div`
@@ -599,6 +724,10 @@ const ModeLabel = styled.div`
   letter-spacing: 2px;
   text-transform: uppercase;
   text-shadow: 0 0 10px #00fff7, 0 0 20px #9333ea, 0 0 30px #ec4899;
+
+  @media (max-width: 1440px) {
+    font-size: 20px;
+  }
 `;
 
 const ModeDescription = styled.div`
@@ -609,6 +738,10 @@ const ModeDescription = styled.div`
   text-align: center;
   line-height: 1.4;
   text-shadow: 0 0 6px rgba(0, 255, 247, 0.4), 0 0 12px rgba(147, 51, 234, 0.3);
+
+  @media (max-width: 1440px) {
+    font-size: 16px;
+  }
 `;
 
 function seededRandom(seed: number) {
@@ -754,6 +887,7 @@ const GamePlay: React.FC<{
             onExit();
           }}
           onTryAgain={onTryAgain}
+          gameMode={gameMode}
         />
       )}
 
@@ -785,6 +919,11 @@ export const TypingGame: React.FC = () => {
   const [currentLevel, setCurrentLevel] = useState(1);
   const [totalPlays, setTotalPlays] = useState<number | null>(null);
   const [gameMode, setGameMode] = useState<GameMode>("letter");
+  const [startClicked, setStartClicked] = useState(false);
+  const [clickPosition, setClickPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   const {
     playMusic,
@@ -810,6 +949,14 @@ export const TypingGame: React.FC = () => {
     } else stopMusic();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [musicEnabled, hasStarted]);
+
+  // 🧹 Reset start animation state whenever returning to the main menu
+  useEffect(() => {
+    if (!hasStarted) {
+      setStartClicked(false);
+      setClickPosition(null);
+    }
+  }, [hasStarted]);
 
   const handleStart = () => {
     incrementTotalPlays();
@@ -856,7 +1003,7 @@ export const TypingGame: React.FC = () => {
               $active={gameMode === "letter"}
               onClick={() => setGameMode("letter")}
             >
-              <ModeIcon>⚡</ModeIcon>
+              <ModeIcon>🔤</ModeIcon>
               <ModeLabel>Letter Mode</ModeLabel>
               <ModeDescription>Type individual letters</ModeDescription>
             </ModeButton>
@@ -865,14 +1012,166 @@ export const TypingGame: React.FC = () => {
               $active={gameMode === "word"}
               onClick={() => setGameMode("word")}
             >
-              <ModeIcon>🏹</ModeIcon>
+              <ModeIcon>📜</ModeIcon>
               <ModeLabel>Word Mode</ModeLabel>
               <ModeDescription>Type complete words</ModeDescription>
+            </ModeButton>
+
+            <ModeButton
+              $active={gameMode === "story"}
+              onClick={() => setGameMode("story")}
+            >
+              <ModeIcon>📖</ModeIcon>
+              <ModeLabel>Story Mode</ModeLabel>
+              <ModeDescription>Type through adventures</ModeDescription>
             </ModeButton>
           </ModeSelector>
 
           <Instructions show={!hasStarted} />
-          <StartButton onClick={handleStart}>START</StartButton>
+
+          {!hasStarted && (
+            <>
+              {!startClicked ? (
+                <StartButton
+                  onClick={(e) => {
+                    const x = e.clientX;
+                    const y = e.clientY;
+                    setClickPosition({ x, y });
+                    setStartClicked(true);
+                  }}
+                >
+                  START
+                </StartButton>
+              ) : (
+                <motion.div
+                  key="startAnimation"
+                  initial={{
+                    opacity: 1,
+                    scale: 1,
+                    rotateY: 0,
+                    filter: "brightness(1)",
+                  }}
+                  animate={{
+                    opacity: [1, 1, 0],
+                    scale: [1, 1.5, 3, 0],
+                    rotateY: [0, 360, 1080],
+                    rotateX: [0, 30, 0],
+                    filter: [
+                      "brightness(1)",
+                      "brightness(2) contrast(2)",
+                      "brightness(4) contrast(3)",
+                    ],
+                    boxShadow: [
+                      "0 0 60px #00fff2, 0 0 120px #9333ea",
+                      "0 0 200px #ff00ff, 0 0 400px #22d3ee",
+                      "0 0 800px #00fff2, 0 0 1600px #ec4899",
+                    ],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  onAnimationComplete={handleStart}
+                  style={{ perspective: 2000 }}
+                >
+                  <StartButton>START</StartButton>
+                </motion.div>
+              )}
+
+              {/* ⚡ Warp Burst at click location */}
+              {startClicked && clickPosition && (
+                <>
+                  {/* Outer warp flash */}
+                  <motion.div
+                    key="warpFlashOuter"
+                    initial={{
+                      opacity: 0,
+                      scale: 0,
+                      x: clickPosition.x - window.innerWidth / 2,
+                      y: clickPosition.y - window.innerHeight / 2,
+                    }}
+                    animate={{
+                      opacity: [0, 1, 0],
+                      scale: [0, 2.5, 6],
+                    }}
+                    transition={{ duration: 2, ease: "easeOut" }}
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      height: "100%",
+                      background:
+                        "radial-gradient(circle, #000000 0%, rgba(200, 255, 0, 0.6) 25%, rgba(4, 0, 255, 0.3) 50%, rgba(0, 195, 255, 0.9) 100%)",
+                      zIndex: 9998,
+                      pointerEvents: "none",
+                      borderRadius: "50%",
+                    }}
+                  />
+
+                  {/* Inner core burst */}
+                  <motion.div
+                    key="warpCore"
+                    initial={{
+                      opacity: 0,
+                      scale: 0,
+                      x: clickPosition.x - window.innerWidth / 2,
+                      y: clickPosition.y - window.innerHeight / 2,
+                    }}
+                    animate={{
+                      opacity: [0, 1, 0],
+                      scale: [0, 3, 8],
+                    }}
+                    transition={{ duration: 2, ease: "easeOut" }}
+                    style={{
+                      position: "relative",
+                      width: "400px",
+                      height: "400px",
+                      background:
+                        "radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(0,255,255,0.8) 40%, rgba(0,0,0,0.7) 100%)",
+                      filter: "blur(20px)",
+                      borderRadius: "50%",
+                      zIndex: 9999,
+                      pointerEvents: "none",
+                    }}
+                  />
+
+                  {/* Energy rings expanding from click */}
+                  {[...Array(5)].map((_, i) => (
+                    <motion.div
+                      key={`ring-${i}`}
+                      initial={{
+                        opacity: 0.8,
+                        scale: 0,
+                        x: clickPosition.x - window.innerWidth / 2,
+                        y: clickPosition.y - window.innerHeight / 2,
+                      }}
+                      animate={{
+                        opacity: [0.6, 0.3, 0],
+                        scale: [0, 2 + i, 5 + i],
+                      }}
+                      transition={{
+                        duration: 1,
+                        ease: "easeOut",
+                        delay: i * 0.08,
+                      }}
+                      style={{
+                        position: "relative",
+                        width: 200 + i * 10,
+                        height: 200 + i * 10,
+                        borderRadius: "50%",
+                        border: "2px solid rgba(0,255,255,0.6)",
+                        boxShadow:
+                          "0 0 20px rgba(255, 0, 0, 0.6), 0 0 40px rgba(132, 0, 255, 0.4)",
+                        transform: "translate(-50%, -50%)",
+                        zIndex: 9997,
+                        pointerEvents: "none",
+                      }}
+                    />
+                  ))}
+                </>
+              )}
+            </>
+          )}
+
           <Leaderboard />
           {totalPlays !== null && (
             <TotalPlaysDisplay>

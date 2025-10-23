@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { motion, Variants } from "framer-motion";
 import styled, { keyframes } from "styled-components";
-import { GameStats } from "../../types/game";
+import { GameMode, GameStats } from "../../types/game";
 import { NicknamePrompt } from "./NicknamePrompt";
 import { CreateHighScoreDto } from "../../types/leaderboard";
 
@@ -11,6 +12,7 @@ interface GameOverProps {
   keysPressed: number;
   onRestart: () => void;
   onTryAgain: () => void;
+  gameMode: GameMode;
 }
 
 /* --- Animations --- */
@@ -101,7 +103,7 @@ const Performance = styled.div<{ color: string }>`
 `;
 
 const ScoreBox = styled.div`
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   padding: 24px;
   border: 1px solid rgba(0, 255, 255, 0.3);
   border-radius: 20px;
@@ -124,14 +126,33 @@ const ScoreValue = styled.div`
   text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
 `;
 
-const StatsGrid = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 40px;
-`;
+// ===== Motion variants =====
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.6,
+    },
+  },
+};
 
-const StatItemContainer = styled.div<{ $show: boolean; $delay: number }>`
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20, scale: 0.9 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 140,
+      damping: 14,
+    },
+  },
+};
+
+const StatItemContainer = styled(motion.div)`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -140,12 +161,10 @@ const StatItemContainer = styled.div<{ $show: boolean; $delay: number }>`
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   color: white;
-  opacity: ${(props) => (props.$show ? 1 : 0)};
-  transform: ${(props) => (props.$show ? "translateY(0)" : "translateY(10px)")};
-  transition: all 0.5s ease;
-  transition-delay: ${(props) => props.$delay}ms;
   font-size: 18px;
   letter-spacing: 2px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
 `;
 
 const StatLabel = styled.span`
@@ -214,6 +233,7 @@ const SubmitScoreButton = styled(MainMenuButton)`
   text-transform: uppercase;
   border: none;
   border-radius: 14px;
+  margin-top: 20px;
   padding: 16px 40px;
   font-size: 22px;
   cursor: pointer;
@@ -329,7 +349,37 @@ const TryAgainButton = styled.button`
     background: linear-gradient(90deg, #fbbf24, #f59e0b);
   }
 `;
-/* --- Component --- */
+
+// ===== Component =====
+export const StatsGrid: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => (
+  <motion.div
+    variants={containerVariants}
+    initial="hidden"
+    animate="show"
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "14px",
+      width: "100%",
+    }}
+  >
+    {children}
+  </motion.div>
+);
+
+export const StatItem: React.FC<{ label: string; value: string }> = ({
+  label,
+  value,
+}) => (
+  <StatItemContainer variants={itemVariants}>
+    <StatLabel>{label}</StatLabel>
+    <StatValue>{value}</StatValue>
+  </StatItemContainer>
+);
+
+// ===== Component =====
 export const GameOver: React.FC<GameOverProps> = ({
   gameStats,
   score,
@@ -337,16 +387,14 @@ export const GameOver: React.FC<GameOverProps> = ({
   keysPressed,
   onRestart,
   onTryAgain,
+  gameMode,
 }) => {
-  const [showStats, setShowStats] = useState(false);
   const [animatedScore, setAnimatedScore] = useState(0);
   const [showNicknamePrompt, setShowNicknamePrompt] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowStats(true), 500);
-
     const scoreTimer = setInterval(() => {
       setAnimatedScore((prev) => {
         if (prev >= score) {
@@ -358,7 +406,6 @@ export const GameOver: React.FC<GameOverProps> = ({
     }, 50);
 
     return () => {
-      clearTimeout(timer);
       clearInterval(scoreTimer);
     };
   }, [score]);
@@ -414,17 +461,6 @@ export const GameOver: React.FC<GameOverProps> = ({
     }
   };
 
-  const StatItem: React.FC<{ label: string; value: string; delay: number }> = ({
-    label,
-    value,
-    delay,
-  }) => (
-    <StatItemContainer $show={showStats} $delay={delay}>
-      <StatLabel>{label}</StatLabel>
-      <StatValue>{value}</StatValue>
-    </StatItemContainer>
-  );
-
   return (
     <>
       <Overlay>
@@ -444,22 +480,20 @@ export const GameOver: React.FC<GameOverProps> = ({
               <StatItem
                 label="Time Played"
                 value={`${gameStats.timeInSeconds}s`}
-                delay={100}
               />
               <StatItem
-                label="Correctly typed letters"
+                label={`Correctly typed ${
+                  gameMode === "letter" ? "letters" : "words"
+                }`}
                 value={lettersCorrect.toString()}
-                delay={200}
               />
               <StatItem
                 label="Total Keystrokes"
                 value={keysPressed.toString()}
-                delay={300}
               />
               <StatItem
                 label="Accuracy"
                 value={`${gameStats.successPercentage}%`}
-                delay={400}
               />
             </StatsGrid>
 

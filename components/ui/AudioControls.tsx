@@ -13,7 +13,7 @@ const glow = keyframes`
 const ControlsContainer = styled.div`
   position: fixed;
   bottom: 30px;
-  left: 30px;
+  left: 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;

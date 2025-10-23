@@ -210,7 +210,13 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
             $shieldActive={gameState.shieldState.active}
           >
             <ModeIndicator>
-              {gameState.gameMode === "letter" ? "Letter Mode" : "Word Mode"}
+              {gameState.gameMode === "letter"
+                ? "Letter Mode"
+                : gameState.gameMode === "word"
+                ? "Word Mode"
+                : gameState.gameMode === "story"
+                ? "Story Mode"
+                : ""}
             </ModeIndicator>
 
             <AnimatePresence>

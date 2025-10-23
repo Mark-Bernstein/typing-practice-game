@@ -58,7 +58,7 @@ const InstructionsPanel = styled.div.withConfig({
   padding: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   text-align: center;
-  max-width: 800px;
+  width: 430px;
   margin-bottom: 8px;
   opacity: 0;
 
@@ -286,7 +286,7 @@ const SoundcloudLink = styled.div.withConfig({
   color: #ff00ff;
   text-shadow: 0 0 30px purple;
   bottom: 30px;
-  right: 30px;
+  right: 16px;
   z-index: 15;
   font-size: 28px;
   font-weight: bold;

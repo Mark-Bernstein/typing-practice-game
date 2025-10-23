@@ -5,9 +5,9 @@ import { formatDistanceToNow } from "date-fns";
 
 const LeaderboardContainer = styled.div`
   position: absolute;
-  right: 40px;
+  right: 16px;
   top: 40px;
-  width: 420px;
+  width: 370px;
   max-height: 80vh;
   background: #000000;
   backdrop-filter: blur(16px);
@@ -37,7 +37,7 @@ const LeaderboardContainer = styled.div`
   }
 
   @media screen and (max-width: 1440px) {
-    width: 300px;
+    width: 330px;
   }
 `;
 
@@ -109,7 +109,7 @@ const ScoreItem = styled.div<{ $rank: number }>`
 `;
 
 const Rank = styled.div<{ $rank: number }>`
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 900;
   min-width: 32px;
   text-align: center;
@@ -128,7 +128,7 @@ const ScoreInfo = styled.div`
 `;
 
 const Nickname = styled.div`
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   color: #ffffff;
   white-space: nowrap;

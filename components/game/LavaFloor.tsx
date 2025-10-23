@@ -3,7 +3,7 @@ import styled, { keyframes } from "styled-components";
 
 const lavaBubble = keyframes`
   0%, 100% { transform: scaleY(1); opacity: 0.5; }
-  50% { transform: scaleY(1.2); opacity: 1; }
+  50% { transform: scaleY(2); opacity: 1; }
 `;
 
 const lavaFlow = keyframes`
