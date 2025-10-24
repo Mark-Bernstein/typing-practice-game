@@ -360,12 +360,6 @@ const StartButton = styled.button`
   cursor: pointer;
   z-index: 1;
   overflow: visible;
-  background: radial-gradient(
-    circle at center,
-    #000000 0%,
-    #8400ff 40%,
-    #ff0000 80%
-  );
   box-shadow: 0 0 30px rgba(147, 51, 234, 0.9), 0 0 60px rgba(34, 211, 238, 0.8);
   background-size: 200% 200%;
   transform-style: preserve-3d;
@@ -395,7 +389,6 @@ const StartButton = styled.button`
     }
   }
 
-  /* 🛸 Hover: Ultra Sci-Fi effect */
   &:hover {
     color: #fff;
     letter-spacing: 10px;
@@ -448,12 +441,12 @@ const StartButton = styled.button`
   &::before {
     background: radial-gradient(
       circle,
-      rgba(250, 204, 21, 0.8) 0%,
-      rgba(236, 72, 153, 0.8) 70%,
-      rgba(0, 221, 255, 0.8) 100%
+      rgba(102, 0, 255, 0.8) 0%,
+      rgba(255, 0, 128, 0.8) 70%,
+      rgba(166, 255, 0, 0.8) 100%
     );
-    animation: orbRotate 2s linear infinite;
-    filter: blur(120px);
+    animation: orbRotate 5s linear infinite;
+    filter: blur(80px);
   }
 
   &::after {
@@ -463,13 +456,16 @@ const StartButton = styled.button`
       rgba(34, 211, 238, 0.5) 80%,
       transparent 100%
     );
-    animation: orbPulse 1.5s ease-in-out infinite;
-    filter: blur(180px);
+    animation: orbPulse 2.5s ease-in-out infinite;
+    filter: blur(20px);
   }
 
   @keyframes orbRotate {
     0% {
       transform: rotate(0deg) scale(1);
+    }
+    50% {
+      transform: rotate(180deg) scale(2);
     }
     100% {
       transform: rotate(360deg) scale(1);
@@ -1097,8 +1093,8 @@ export const TypingGame: React.FC = () => {
                     transition={{ duration: 2, ease: "easeOut" }}
                     style={{
                       position: "relative",
-                      width: "100%",
-                      height: "100%",
+                      width: "400%",
+                      height: "400%",
                       background:
                         "radial-gradient(circle, #000000 0%, rgba(200, 255, 0, 0.6) 25%, rgba(4, 0, 255, 0.3) 50%, rgba(0, 195, 255, 0.9) 100%)",
                       zIndex: 9998,
