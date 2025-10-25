@@ -8,7 +8,6 @@ const LeaderboardContainer = styled.div`
   right: 16px;
   top: 40px;
   width: 370px;
-  max-height: 80vh;
   background: #000000;
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -56,9 +55,7 @@ const ScoreList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-height: calc(70vh - 100px);
   overflow-y: auto;
-  padding-right: 8px;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -104,7 +101,7 @@ const ScoreItem = styled.div<{ $rank: number }>`
 
   &:hover {
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(0, 255, 47, 0.3);
   }
 `;
 
@@ -137,7 +134,7 @@ const Nickname = styled.div`
   text-shadow: 0px 0px 2px cyan;
 
   @media screen and (max-width: 1440px) {
-    font-size: 16px;
+    font-size: 18px;
   }
 `;
 

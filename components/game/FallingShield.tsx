@@ -24,13 +24,13 @@ const StyledShield = styled(motion.div)<{ $size: number }>`
 
 const KeyHint = styled.div<{ $size: number }>`
   position: absolute;
-  font-size: 50px !important;
   top: 48%;
   left: 48%;
   transform: translate(-50%, -50%);
-  font-size: ${(props) => props.$size * 0.6}px;
+  font-size: ${(props) => props.$size}px;
   font-weight: bold;
   color: #000000;
+  text-shadow: 0 0 5px #ffffff;
   z-index: 1;
 `;
 

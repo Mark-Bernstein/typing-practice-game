@@ -19,6 +19,37 @@ const fadeOut = keyframes`
   }
 `;
 
+const InstructionTitle = styled.h3`
+  font-size: 28px;
+  font-weight: bold;
+  color: cyan;
+  margin-bottom: 16px;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+  opacity: 0;
+  animation: titleSlideIn 1s ease-in-out 2s forwards;
+
+  @keyframes titleSlideIn {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.95);
+      text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+      letter-spacing: -1px;
+    }
+    50% {
+      opacity: 0.8;
+      transform: translateY(2px) scale(1.05);
+      text-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+      letter-spacing: 0px;
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      text-shadow: 0 0 20px cyan, 0 0 40px #00e5ff;
+      letter-spacing: 2px;
+    }
+  }
+`;
+
 const InstructionsContainer = styled.div`
   position: absolute;
   min-width: 300px;
@@ -27,8 +58,14 @@ const InstructionsContainer = styled.div`
   transform: translateX(-50%);
   z-index: 20;
   transition: left 1.5s ease-in-out;
+  border: none;
+  padding: 16px;
 
   animation: moveToLeft 1s ease-in-out 2s forwards;
+
+  > :first-child {
+    margin-bottom: 16px;
+  }
 
   @keyframes moveToLeft {
     0% {
@@ -39,11 +76,12 @@ const InstructionsContainer = styled.div`
       left: 16px;
       top: 200px;
       transform: none;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
     }
   }
 
   @media screen and (max-width: 1440px) {
-    max-width: 300px;
     top: 130px;
   }
 `;
@@ -312,14 +350,17 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
   return (
     <>
       <InstructionsContainer>
+        <InstructionTitle>Instructions / Tips</InstructionTitle>
         <InstructionsPanel show={show} delay={1}>
           <SubText>Type the letters/words as they fall</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1.2}>
-          <SubText>Incorrect keystrokes = -3 points</SubText>
+          <SubText>Home row keys: +1 point</SubText>
+          <SubText>All others: +2 points</SubText>
+          <SubText>Incorrect keystrokes: -3 points</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1.4}>
-          <SubText>Surviving each level increases difficulty</SubText>
+          <SubText>Survive levels to increase difficulty</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1.6}>
           <SubText>Challenge yourself to beat the high score!</SubText>

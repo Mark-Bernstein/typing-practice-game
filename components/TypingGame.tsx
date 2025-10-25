@@ -368,24 +368,15 @@ const StartButton = styled.button`
 
   /* Run initial animations once */
   animation: ${fadeInFromTop} 2s ease-in-out forwards,
-    moveUp 2s ease-in-out 2s forwards, coinSpin 2s linear 0s 1 both;
+    moveUp 2s ease-in-out 2s forwards, coinSpin 1.5s linear 0s 1 both;
 
   /* 🪙 Coin spin (plays once) */
   @keyframes coinSpin {
-    0% {
-      transform: rotateY(0deg) scale(1);
-    }
-    25% {
-      transform: rotateY(90deg) scale(0.9);
-    }
     50% {
-      transform: rotateY(180deg) scale(1);
-    }
-    75% {
-      transform: rotateY(270deg) scale(0.9);
+      transform: rotateY(45deg) rotateX(-45deg) scale(0.5);
     }
     100% {
-      transform: rotateY(360deg) scale(1);
+      transform: rotate3d(1080deg) scale(1);
     }
   }
 
