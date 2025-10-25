@@ -76,7 +76,7 @@ export const GameCanvas = styled.div<{
             position: absolute;
             inset: 0;
             border-radius: 16px;
-            border: 5px solid rgba(255, 255, 200, 0.5);
+            border: 5px solid rgba(255, 255, 200, 0.8);
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
             opacity: 0.4;
             animation: ${flicker} 1.6s ease-in-out infinite;
