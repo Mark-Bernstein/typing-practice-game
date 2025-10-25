@@ -338,7 +338,7 @@ const fadeInFromTop = keyframes`
     opacity: 0.2;
   }
   75% {
-    opacity: 0.5;
+    opacity: 1;
   }
   100% {
     transform: translateY(0);
@@ -368,15 +368,15 @@ const StartButton = styled.button`
 
   /* Run initial animations once */
   animation: ${fadeInFromTop} 2s ease-in-out forwards,
-    moveUp 2s ease-in-out 2s forwards, coinSpin 1.5s linear 0s 1 both;
+    moveUp ease-in-out 2s forwards, jump 1.5s linear 0s 1 both;
 
   /* 🪙 Coin spin (plays once) */
-  @keyframes coinSpin {
-    50% {
-      transform: rotateY(45deg) rotateX(-45deg) scale(0.5);
+  @keyframes jump {
+    90% {
+      transform: rotateY(360deg) rotateX(45deg) scale(1);
     }
     100% {
-      transform: rotate3d(1080deg) scale(1);
+      transform: scale(1);
     }
   }
 
@@ -456,7 +456,7 @@ const StartButton = styled.button`
       transform: rotate(0deg) scale(1);
     }
     50% {
-      transform: rotate(180deg) scale(2);
+      transform: rotate(180deg) scale(2.5);
     }
     100% {
       transform: rotate(360deg) scale(1);
@@ -477,7 +477,7 @@ const StartButton = styled.button`
 
   @keyframes moveUp {
     from {
-      top: 710px;
+      top: 800px;
     }
     to {
       top: 450px;
@@ -1039,10 +1039,10 @@ export const TypingGame: React.FC = () => {
                     filter: "brightness(1)",
                   }}
                   animate={{
-                    opacity: [1, 1, 0],
-                    scale: [1, 1.5, 3, 0],
-                    rotateY: [0, 360, 1080],
-                    rotateX: [0, 30, 0],
+                    opacity: 0,
+                    scale: 0,
+                    rotateY: 0,
+                    rotateX: 0,
                     filter: [
                       "brightness(1)",
                       "brightness(2) contrast(2)",
@@ -1079,16 +1079,17 @@ export const TypingGame: React.FC = () => {
                     }}
                     animate={{
                       opacity: [0, 1, 0],
-                      scale: [0, 2.5, 6],
+                      scale: [0, 2.5, 5],
                     }}
                     transition={{ duration: 2, ease: "easeOut" }}
                     style={{
                       position: "relative",
-                      width: "400%",
-                      height: "400%",
+                      width: "10%",
+                      height: "10%",
                       background:
                         "radial-gradient(circle, #000000 0%, rgba(200, 255, 0, 0.6) 25%, rgba(4, 0, 255, 0.3) 50%, rgba(0, 195, 255, 0.9) 100%)",
                       zIndex: 9998,
+                      filter: "blur(20px)",
                       pointerEvents: "none",
                       borderRadius: "50%",
                     }}
@@ -1113,7 +1114,7 @@ export const TypingGame: React.FC = () => {
                       width: "400px",
                       height: "400px",
                       background:
-                        "radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(0,255,255,0.8) 40%, rgba(0,0,0,0.7) 100%)",
+                        "radial-gradient(circle, #ff0000 0%, rgba(170, 0, 255, 0.8) 40%, rgba(0,0,0,0.7) 100%)",
                       filter: "blur(20px)",
                       borderRadius: "50%",
                       zIndex: 9999,
@@ -1127,13 +1128,13 @@ export const TypingGame: React.FC = () => {
                       key={`ring-${i}`}
                       initial={{
                         opacity: 0.8,
-                        scale: 0,
+                        scale: 1,
                         x: clickPosition.x - window.innerWidth / 2,
                         y: clickPosition.y - window.innerHeight / 2,
                       }}
                       animate={{
-                        opacity: [0.6, 0.3, 0],
-                        scale: [0, 2 + i, 5 + i],
+                        opacity: [1, 0.5, 0],
+                        scale: [0, 4 + i, 7 + i],
                       }}
                       transition={{
                         duration: 1,
@@ -1142,8 +1143,8 @@ export const TypingGame: React.FC = () => {
                       }}
                       style={{
                         position: "relative",
-                        width: 200 + i * 10,
-                        height: 200 + i * 10,
+                        width: 200 + i * 20,
+                        height: 200 + i * 20,
                         borderRadius: "50%",
                         border: "2px solid rgba(0,255,255,0.6)",
                         boxShadow:

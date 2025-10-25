@@ -19,14 +19,17 @@ const fadeOut = keyframes`
   }
 `;
 
-const InstructionTitle = styled.h3`
+const InstructionTitle = styled.h3<{ $show: boolean }>`
   font-size: 28px;
   font-weight: bold;
   color: cyan;
   margin-bottom: 16px;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
   opacity: 0;
-  animation: titleSlideIn 1s ease-in-out 2s forwards;
+  animation: ${({ $show }) =>
+    $show
+      ? "titleSlideIn 1s ease-in-out 0.5s forwards"
+      : "titleFadeOut 0.5s ease-in-out forwards"};
 
   @keyframes titleSlideIn {
     0% {
@@ -48,36 +51,55 @@ const InstructionTitle = styled.h3`
       letter-spacing: 2px;
     }
   }
+
+  @keyframes titleFadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-400px) scale(0.5);
+    }
+  }
 `;
 
-const InstructionsContainer = styled.div`
+const InstructionsContainer = styled.div<{ $show: boolean }>`
   position: absolute;
   min-width: 300px;
   top: 180px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 16px;
   z-index: 20;
-  transition: left 1.5s ease-in-out;
   border: none;
   padding: 16px;
-
-  animation: moveToLeft 1s ease-in-out 2s forwards;
+  animation: ${({ $show }) =>
+    $show
+      ? "moveToLeft 1s ease-in-out 1s forwards"
+      : "fadeOutContainer 0.8s ease-in-out forwards"};
 
   > :first-child {
     margin-bottom: 16px;
   }
 
   @keyframes moveToLeft {
-    0% {
-      left: 50%;
-      transform: translateX(-50%);
-    }
     100% {
       left: 16px;
       top: 200px;
       transform: none;
       border: 2px solid rgba(255, 255, 255, 0.15);
       border-radius: 16px;
+    }
+  }
+
+  @keyframes fadeOutContainer {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(20px);
+      border: none;
     }
   }
 
@@ -118,6 +140,9 @@ const dropIn = keyframes`
   0% {
     opacity: 0;
     transform: translateY(-1000px);
+  }
+  75% {
+    opacity: 0;
   }
   100% {
     opacity: 1;
@@ -349,23 +374,23 @@ interface InstructionsProps {
 export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
   return (
     <>
-      <InstructionsContainer>
-        <InstructionTitle>Instructions / Tips</InstructionTitle>
-        <InstructionsPanel show={show} delay={1}>
+      <InstructionsContainer $show={show}>
+        <InstructionTitle $show={show}>Instructions / Tips</InstructionTitle>
+        <InstructionsPanel show={show} delay={0.6}>
           <SubText>Type the letters/words as they fall</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={1.2}>
+        <InstructionsPanel show={show} delay={0.8}>
           <SubText>Home row keys: +1 point</SubText>
           <SubText>All others: +2 points</SubText>
           <SubText>Incorrect keystrokes: -3 points</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={1.4}>
+        <InstructionsPanel show={show} delay={1}>
           <SubText>Survive levels to increase difficulty</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={1.6}>
+        <InstructionsPanel show={show} delay={1.2}>
           <SubText>Challenge yourself to beat the high score!</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={1.8}>
+        <InstructionsPanel show={show} delay={1.4}>
           <SubText>Watch for special symbols for power ups!</SubText>
         </InstructionsPanel>
       </InstructionsContainer>
