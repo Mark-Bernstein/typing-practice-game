@@ -6,6 +6,7 @@ import { useTypingGame } from "../hooks/useTypingGame";
 import { calculateGameStats, getLevelMessage } from "../utils/gameUtils";
 import { LEVEL_THRESHOLDS } from "../constants/gameConfig";
 import { GameArea } from "./game/GameArea";
+import { LevelUpVortex } from "./game/LevelUpVortex";
 import { GameOver } from "./ui/GameOver";
 import { Instructions } from "./ui/Instructions";
 import { GameStats } from "./ui/GameStats";
@@ -14,7 +15,7 @@ import { AudioControls } from "./ui/AudioControls";
 import { useAudioContext } from "../app/contexts/AudioContext";
 import { useGameDimensions } from "@/hooks/useGameDimensions";
 import { GameMode } from "../types/game";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const pulse = keyframes`
   0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -304,7 +305,7 @@ const LevelMessage = styled.div`
   font-size: 24px;
   font-weight: bold;
   text-shadow: 0 0 8px rgba(34, 211, 238, 0.7);
-  z-index: 1000;
+  z-index: 9999;
   opacity: 0;
   animation: fadeInOut 3s ease-in-out forwards;
 
@@ -554,7 +555,7 @@ export const ModeSelector = ({ children }: { children: React.ReactNode }) => {
         stiffness: 200,
         damping: 15,
         mass: 1,
-        delay: 3,
+        delay: 2,
       }}
     >
       {children}
@@ -731,6 +732,31 @@ const ModeDescription = styled.div`
   }
 `;
 
+const MaxLevelText = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+
+  font-size: 30px;
+  font-weight: bold;
+  color: cyan;
+  text-shadow: 0 0 20px #000000, 0 0 40px #ff00ff;
+  animation: pulse 1s infinite alternate;
+
+  @keyframes pulse {
+    from {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1.5);
+    }
+  }
+`;
+
 function seededRandom(seed: number) {
   const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
@@ -769,6 +795,8 @@ const GamePlay: React.FC<{
   const [particles] = useState(() => Array.from({ length: 50 }, (_, i) => i));
   const [levelMessage, setLevelMessage] = useState(getLevelMessage(0));
   const prevLevelRef = React.useRef(gameState.level);
+  const [showLevelUpVortex, setShowLevelUpVortex] = useState(false);
+  const [vortexLevel, setVortexLevel] = useState(1);
 
   const gameStats = calculateGameStats(
     gameState.time,
@@ -810,6 +838,8 @@ const GamePlay: React.FC<{
 
     if (gameState.level > prevLevelRef.current) {
       playSFX("level-up");
+      setVortexLevel(gameState.level);
+      setShowLevelUpVortex(true);
     }
     prevLevelRef.current = gameState.level;
 
@@ -890,13 +920,29 @@ const GamePlay: React.FC<{
             <LevelMessage key={levelMessage}>{levelMessage}</LevelMessage>
           )}
           <ProgressWrapper>
-            <ProgressBar $progress={getProgress()}>
-              <div />
-            </ProgressBar>
-            <ProgressText>Progress to next level</ProgressText>
+            {gameState.level >= 10 ? (
+              <MaxLevelText>⚡ MAX LEVEL ⚡</MaxLevelText>
+            ) : (
+              <>
+                {" "}
+                <ProgressBar $progress={getProgress()}>
+                  <div />
+                </ProgressBar>
+                <ProgressText>Progress to next level</ProgressText>
+              </>
+            )}
           </ProgressWrapper>
         </>
       )}
+      <AnimatePresence>
+        {showLevelUpVortex && (
+          <LevelUpVortex
+            key={gameState.level}
+            level={vortexLevel}
+            onComplete={() => setShowLevelUpVortex(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 };

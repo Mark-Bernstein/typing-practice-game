@@ -19,7 +19,7 @@ export const GAME_CONFIG = {
   SHIELD_SPEED_MULTIPLIER: 2,
 
   // Life power-up settings
-  LIFE_SPAWN_INTERVAL: 50,
+  LIFE_SPAWN_INTERVAL: 800,
   LIFE_SPEED_MULTIPLIER: 2,
 } as const;
 
@@ -46,16 +46,28 @@ export const HOME_ROW_LETTERS: ReadonlySet<string> = new Set([
   "L",
 ]);
 
+// export const LEVEL_THRESHOLDS = {
+//   LEVEL_2: 20,
+//   LEVEL_3: 50,
+//   LEVEL_4: 100,
+//   LEVEL_5: 180,
+//   LEVEL_6: 300,
+//   LEVEL_7: 450,
+//   LEVEL_8: 650,
+//   LEVEL_9: 1000,
+//   MAX_LEVEL: 1500,
+// } as const;
+
 export const LEVEL_THRESHOLDS = {
-  LEVEL_2: 20,
-  LEVEL_3: 50,
-  LEVEL_4: 100,
-  LEVEL_5: 180,
-  LEVEL_6: 300,
-  LEVEL_7: 450,
-  LEVEL_8: 650,
-  LEVEL_9: 1000,
-  MAX_LEVEL: 1500,
+  LEVEL_2: 1,
+  LEVEL_3: 2,
+  LEVEL_4: 3,
+  LEVEL_5: 4,
+  LEVEL_6: 5,
+  LEVEL_7: 6,
+  LEVEL_8: 7,
+  LEVEL_9: 8,
+  MAX_LEVEL: 9,
 } as const;
 
 export const WORD_SCORES: Record<number, number> = {
