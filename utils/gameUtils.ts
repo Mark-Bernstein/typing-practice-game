@@ -4,6 +4,7 @@ import {
   ShieldPowerUp,
   GameStats,
   GameDimensions,
+  LifePowerUp,
 } from "../types/game";
 import {
   ALPHABET,
@@ -127,6 +128,20 @@ export const generateShieldPowerUp = (
     x,
     y: 0,
     id: shieldIdCounter,
+  };
+};
+
+export const generateLifePowerUp = (
+  lifeIdCounter: number,
+  dimensions: GameDimensions
+): LifePowerUp => {
+  const lifeSize = dimensions.letterSize * 2;
+  const x = Math.random() * (dimensions.width - lifeSize);
+
+  return {
+    x,
+    y: 0,
+    id: lifeIdCounter,
   };
 };
 

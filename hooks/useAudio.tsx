@@ -5,6 +5,7 @@ export type SoundEffect =
   | "correct-word"
   | "wrong"
   | "life-lost"
+  | "extra-life"
   | "level-up"
   | "game-over"
   | "button-click"
@@ -34,6 +35,7 @@ export const useAudio = () => {
       "correct",
       "wrong",
       "life-lost",
+      "extra-life",
       "level-up",
       "game-over",
       "button-click",
@@ -55,13 +57,15 @@ export const useAudio = () => {
       }
     });
 
+    const sfxMap = sfxRefs.current;
+
     return () => {
       if (musicRef.current) {
         musicRef.current.pause();
         musicRef.current = null;
       }
-      sfxRefs.current.forEach((audio) => audio.pause());
-      sfxRefs.current.clear();
+      sfxMap.forEach((audio) => audio.pause());
+      sfxMap.clear();
     };
   }, []);
 
@@ -113,18 +117,31 @@ export const useAudio = () => {
     }
   };
 
-  // 🔊 Play sound effect (checks ref for live state)
+  // 🔊 Play sound effect (supports overlapping playback)
   const playSFX = useCallback((effect: SoundEffect) => {
     if (!sfxEnabledRef.current) return;
 
-    const audio = sfxRefs.current.get(effect);
-    if (audio) {
-      audio.currentTime = 0;
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.warn(`⚠️ SFX ${effect} playback failed:`, error);
+    const original = sfxRefs.current.get(effect);
+    if (original) {
+      try {
+        // ✅ Clone the audio so sounds can overlap
+        const clone = original.cloneNode(true) as HTMLAudioElement;
+        clone.volume = original.volume;
+
+        // Fire & forget — no need to store
+        const playPromise = clone.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.warn(`⚠️ SFX "${effect}" playback failed:`, error);
+          });
+        }
+
+        // Optionally clean up finished clones after playback
+        clone.addEventListener("ended", () => {
+          clone.remove();
         });
+      } catch (error) {
+        console.warn(`⚠️ Failed to play SFX "${effect}"`, error);
       }
     } else {
       console.warn(`⚠️ SFX not found: ${effect}`);

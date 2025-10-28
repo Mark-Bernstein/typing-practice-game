@@ -17,6 +17,10 @@ export const GAME_CONFIG = {
   SHIELD_CHARGES: 3,
   MAX_SHIELD_STACKS: 3,
   SHIELD_SPEED_MULTIPLIER: 2,
+
+  // Life power-up settings
+  LIFE_SPAWN_INTERVAL: 50,
+  LIFE_SPEED_MULTIPLIER: 2,
 } as const;
 
 export const LETTER_COLORS: readonly string[] = [

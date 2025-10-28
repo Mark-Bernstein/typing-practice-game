@@ -7,6 +7,7 @@ import {
   generateRandomWord,
   generateStoryWord,
   generateShieldPowerUp,
+  generateLifePowerUp,
   getLetterScore,
   getWordScore,
   getLevel,
@@ -28,6 +29,7 @@ export const useTypingGame = (
       letters: [],
       words: [],
       shields: [],
+      lives_powerups: [],
       time: 0,
       lettersCorrect: 0,
       score: 0,
@@ -77,8 +79,10 @@ export const useTypingGame = (
   const letterIdCounter = useRef(0);
   const wordIdCounter = useRef(0);
   const shieldIdCounter = useRef(0);
+  const lifeIdCounter = useRef(0);
   const prevLivesRef = useRef(5);
   const lastShieldSpawnTime = useRef(0);
+  const lastLifeSpawnTime = useRef(0);
 
   useEffect(() => {
     setGameState((prev) => ({ ...prev, dimensions }));
@@ -121,6 +125,32 @@ export const useTypingGame = (
           newState.dimensions.height
       );
 
+      // ===== MOVE LIFE POWER-UPS =====
+      const lifeSpeed = effectiveSpeed * GAME_CONFIG.LIFE_SPEED_MULTIPLIER;
+
+      newState.lives_powerups = newState.lives_powerups.map((life) => ({
+        id: life.id,
+        x: life.x,
+        y: life.y + lifeSpeed,
+      }));
+
+      // Remove life power-ups that reach bottom
+      const livesReachedBottom = newState.lives_powerups.filter(
+        (life) =>
+          life.y + newState.dimensions.letterSize * 2 >=
+          newState.dimensions.height
+      );
+
+      if (livesReachedBottom.length > 0) {
+        playSFX("shield-despawn"); // Reuse shield despawn sound
+      }
+
+      newState.lives_powerups = newState.lives_powerups.filter(
+        (life) =>
+          life.y + newState.dimensions.letterSize * 2 <
+          newState.dimensions.height
+      );
+
       // ===== LETTER MODE =====
       if (prevState.gameMode === "letter") {
         newState.letters = newState.letters.map((letter) => ({
@@ -160,7 +190,7 @@ export const useTypingGame = (
 
         const newLives = newState.lives - livesCost;
 
-        if (livesCost > 0 && newLives < prevLivesRef.current) {
+        if (livesCost > 0 && newLives < prevState.lives) {
           playSFX("life-lost");
           prevLivesRef.current = newLives;
         }
@@ -246,7 +276,7 @@ export const useTypingGame = (
 
         const newLives = newState.lives - livesCost;
 
-        if (livesCost > 0 && newLives < prevLivesRef.current) {
+        if (livesCost > 0 && newLives < prevState.lives) {
           playSFX("life-lost");
           prevLivesRef.current = newLives;
 
@@ -354,6 +384,23 @@ export const useTypingGame = (
         newState.maxLives = prevState.maxLives;
       }
 
+      // ===== LIFE POWER-UP SPAWN =====
+      const timeSinceLastLife = newState.time - lastLifeSpawnTime.current;
+      const shouldSpawnLife =
+        timeSinceLastLife >= GAME_CONFIG.LIFE_SPAWN_INTERVAL &&
+        Math.random() < 0.015 && // ~1.5% chance each frame after interval
+        newState.lives < newState.maxLives; // Only spawn if player is missing lives
+
+      if (shouldSpawnLife) {
+        const newLife = generateLifePowerUp(
+          lifeIdCounter.current++,
+          newState.dimensions
+        );
+
+        newState.lives_powerups = [...newState.lives_powerups, newLife];
+        lastLifeSpawnTime.current = newState.time;
+      }
+
       newState.level = getLevel(newState.lettersCorrect);
       return newState;
     });
@@ -385,6 +432,29 @@ export const useTypingGame = (
           };
 
           playSFX("shield-gain");
+          newState.lastKeyCorrect = true;
+
+          return newState;
+        });
+        return;
+      }
+
+      // ===== LIFE PICKUP ("$" key) =====
+      if (key === "$") {
+        setGameState((prevState) => {
+          if (prevState.gameOver || prevState.lives_powerups.length === 0)
+            return prevState;
+
+          // Only pick up if player is missing lives
+          if (prevState.lives >= prevState.maxLives) {
+            return prevState;
+          }
+
+          const newState = { ...prevState };
+          newState.lives_powerups = [];
+          newState.lives = Math.min(prevState.lives + 1, prevState.maxLives);
+
+          playSFX("extra-life"); // Reuse shield gain sound or add new sound
           newState.lastKeyCorrect = true;
 
           return newState;
@@ -597,8 +667,10 @@ export const useTypingGame = (
     letterIdCounter.current = 0;
     wordIdCounter.current = 0;
     shieldIdCounter.current = 0;
+    lifeIdCounter.current = 0;
     prevLivesRef.current = 5;
     lastShieldSpawnTime.current = 0;
+    lastLifeSpawnTime.current = 0;
   }, [getInitialState]);
 
   useEffect(() => {

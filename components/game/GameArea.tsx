@@ -5,6 +5,7 @@ import { FallingLetter } from "./FallingLetter";
 import { FallingWord } from "./FallingWord";
 import { FallingShield } from "./FallingShield";
 import { Lives } from "../ui/Lives";
+import { FallingLife } from "./FallingLife";
 import { ShieldIndicator } from "../ui/ShieldIndicator";
 import { LetterMissEffect } from "../ui/LetterMissEffect";
 import { AnimatePresence } from "framer-motion";
@@ -224,6 +225,14 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
                 <FallingShield
                   key={`shield-${shield.id}`}
                   shield={shield}
+                  letterSize={gameState.dimensions.letterSize}
+                />
+              ))}
+
+              {gameState.lives_powerups.map((life) => (
+                <FallingLife
+                  key={`life-${life.id}`}
+                  life={life}
                   letterSize={gameState.dimensions.letterSize}
                 />
               ))}
