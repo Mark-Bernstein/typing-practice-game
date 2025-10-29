@@ -491,7 +491,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ refreshTrigger }) => {
       {selectedScore && (
         <ModalOverlay onClick={() => setSelectedScore(null)}>
           <ModalContent onClick={(e) => e.stopPropagation()}>
-            <ModalTitle>{selectedScore.nickname}'s Stats</ModalTitle>
+            <ModalTitle>{selectedScore.nickname}&apos;s Stats</ModalTitle>
             <ModalRow>
               <span>Mode:</span>
               <span>{getModeDisplayName(selectedScore.gameMode)}</span>

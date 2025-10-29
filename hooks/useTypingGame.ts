@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { GameState, GameDimensions, GameMode } from "../types/game";
-import { GAME_CONFIG, ALPHABET } from "../constants/gameConfig";
+import { GAME_CONFIG } from "../constants/gameConfig";
 import { SoundEffect } from "./useAudio";
 import {
   generateRandomLetter,
