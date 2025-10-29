@@ -1,3 +1,5 @@
+export type GameMode = "letter" | "word" | "story";
+
 export interface HighScore {
   id: number;
   nickname: string;
@@ -5,6 +7,7 @@ export interface HighScore {
   lettersCorrect: number;
   accuracy: number;
   timePlayed: number;
+  gameMode: GameMode;
   createdAt: Date;
 }
 
@@ -14,4 +17,5 @@ export interface CreateHighScoreDto {
   lettersCorrect: number;
   accuracy: number;
   timePlayed: number;
+  gameMode: GameMode;
 }

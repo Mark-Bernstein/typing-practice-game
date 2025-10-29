@@ -438,6 +438,7 @@ export const GameOver: React.FC<GameOverProps> = ({
       lettersCorrect,
       accuracy: gameStats.successPercentage,
       timePlayed: gameStats.timeInSeconds,
+      gameMode,
     };
 
     try {

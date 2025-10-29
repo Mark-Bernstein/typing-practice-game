@@ -3,8 +3,16 @@ import { NextResponse } from "next/server";
 
 /* ---------------- High Scores ---------------- */
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const gameMode = searchParams.get("mode") || "letter";
+
+    // Validate game mode
+    if (!["letter", "word", "story"].includes(gameMode)) {
+      return NextResponse.json({ error: "Invalid game mode" }, { status: 400 });
+    }
+
     const { rows } = await sql`
       SELECT 
         id,
@@ -13,8 +21,10 @@ export async function GET() {
         letters_correct as "lettersCorrect",
         accuracy,
         time_played as "timePlayed",
+        game_mode as "gameMode",
         created_at
       FROM high_scores
+      WHERE game_mode = ${gameMode}
       ORDER BY score DESC
       LIMIT 10
     `;
@@ -37,7 +47,8 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { nickname, score, lettersCorrect, accuracy, timePlayed } = body;
+    const { nickname, score, lettersCorrect, accuracy, timePlayed, gameMode } =
+      body;
 
     if (!nickname || nickname.length > 20) {
       return NextResponse.json(
@@ -50,9 +61,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid score" }, { status: 400 });
     }
 
+    if (!["letter", "word", "story"].includes(gameMode)) {
+      return NextResponse.json({ error: "Invalid game mode" }, { status: 400 });
+    }
+
     const { rows } = await sql`
-      INSERT INTO high_scores (nickname, score, letters_correct, accuracy, time_played)
-      VALUES (${nickname}, ${score}, ${lettersCorrect}, ${accuracy}, ${timePlayed})
+      INSERT INTO high_scores (nickname, score, letters_correct, accuracy, time_played, game_mode)
+      VALUES (${nickname}, ${score}, ${lettersCorrect}, ${accuracy}, ${timePlayed}, ${gameMode})
       RETURNING 
         id,
         nickname,
@@ -60,6 +75,7 @@ export async function POST(request: Request) {
         letters_correct as "lettersCorrect",
         accuracy,
         time_played as "timePlayed",
+        game_mode as "gameMode",
         created_at
     `;
 

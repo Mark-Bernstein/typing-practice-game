@@ -1,7 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { HighScore } from "../../types/leaderboard";
 import { formatDistanceToNow } from "date-fns";
+import { GameMode } from "@/types/game";
+
+interface HighScore {
+  id: number;
+  nickname: string;
+  score: number;
+  lettersCorrect: number;
+  accuracy: number;
+  timePlayed: number;
+  gameMode: GameMode;
+  createdAt: string | Date;
+}
 
 const LeaderboardContainer = styled.div`
   position: absolute;
@@ -40,15 +51,127 @@ const LeaderboardContainer = styled.div`
   }
 `;
 
+const TitleRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 12px;
+`;
+
 const Title = styled.h2`
   font-size: 28px;
   font-weight: 900;
-  margin: 0 0 20px 0;
+  margin: 0;
   text-align: center;
   background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  margin-bottom: 8px;
+`;
+
+const ModeWrapper = styled.div<{ $open: boolean }>`
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    transform: translateY(-50%)
+      rotate(${(props) => (props.$open ? "180deg" : "0deg")});
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 9px solid ${(props) => (props.$open ? "#fbbf24" : "#00ffff")};
+    filter: drop-shadow(
+      0 0 ${(props) => (props.$open ? "10px" : "6px")}
+        ${(props) =>
+          props.$open ? "rgba(251,191,36,1)" : "rgba(0,255,255,0.8)"}
+    );
+    transition: all 0.25s ease;
+  }
+`;
+
+const ModeLabel = styled.span`
+  font-family: "Orbitron", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #00ffff;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+`;
+
+const ModeSelect = styled.select`
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.9),
+    rgba(25, 0, 60, 0.95)
+  );
+  border: 2px solid rgba(0, 255, 255, 0.3);
+  border-radius: 12px;
+  color: #00ffff;
+  padding: 12px 48px 12px 16px;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+  font-family: "Orbitron", sans-serif;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.4),
+    inset 0 0 15px rgba(0, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  animation: borderPulse 2.5s infinite alternate;
+
+  @keyframes borderPulse {
+    0% {
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3),
+        inset 0 0 8px rgba(0, 255, 255, 0.1);
+      border-color: rgba(0, 255, 255, 0.3);
+    }
+    100% {
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.8),
+        inset 0 0 15px rgba(0, 255, 255, 0.4);
+      border-color: rgba(0, 255, 255, 0.9);
+    }
+  }
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 40, 80, 0.9),
+      rgba(60, 0, 120, 0.9)
+    );
+    border-color: #00ffff;
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.9),
+      inset 0 0 15px rgba(0, 255, 255, 0.5);
+  }
+
+  &:focus {
+    border-color: #fbbf24;
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.8),
+      inset 0 0 10px rgba(251, 191, 36, 0.4);
+    color: #fff3b0;
+  }
+
+  option {
+    background: #050505;
+    color: #00ffff;
+    font-weight: 700;
+    font-family: "Orbitron", sans-serif;
+    letter-spacing: 1px;
+  }
 `;
 
 const ScoreList = styled.div`
@@ -56,6 +179,7 @@ const ScoreList = styled.div`
   flex-direction: column;
   gap: 12px;
   overflow-y: auto;
+  max-height: 75vh;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -183,7 +307,7 @@ const ModalContent = styled.div`
   max-width: 90%;
   color: #fff;
   box-shadow: 0 0 20px #00fff0, 0 0 40px #ff00ff;
-  font-family: "SF Mono", monospace;
+  font-family: "Orbitron", sans-serif;
 `;
 
 const ModalTitle = styled.h3`
@@ -203,17 +327,69 @@ interface LeaderboardProps {
   refreshTrigger?: number;
 }
 
+type ModeSelectorProps = {
+  selectedMode: GameMode;
+  setSelectedMode: React.Dispatch<React.SetStateAction<GameMode>>;
+};
+
+export const ModeSelector: React.FC<ModeSelectorProps> = ({
+  selectedMode,
+  setSelectedMode,
+}) => {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleMouseDown = () => {
+    setOpen(true);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedMode(e.target.value as GameMode);
+    setOpen(false);
+  };
+
+  return (
+    <ModeWrapper ref={wrapperRef} $open={open}>
+      <ModeLabel>MODE:</ModeLabel>
+      <ModeSelect
+        value={selectedMode}
+        onChange={handleChange}
+        onMouseDown={handleMouseDown}
+      >
+        <option value="letter">Letter</option>
+        <option value="word">Word</option>
+        <option value="story">Story</option>
+      </ModeSelect>
+    </ModeWrapper>
+  );
+};
+
 export const Leaderboard: React.FC<LeaderboardProps> = ({ refreshTrigger }) => {
   const [scores, setScores] = useState<HighScore[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [selectedScore, setSelectedScore] = useState<HighScore | null>(null);
+  const [selectedMode, setSelectedMode] = useState<GameMode>("letter");
 
-  const fetchScores = async () => {
+  const fetchScores = async (mode: GameMode) => {
     try {
       setLoading(true);
       setError(false);
-      const response = await fetch("/api/scores");
+      const response = await fetch(`/api/scores?mode=${mode}`);
       if (!response.ok) throw new Error("Failed to fetch");
       const data = await response.json();
       setScores(data);
@@ -226,8 +402,8 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ refreshTrigger }) => {
   };
 
   useEffect(() => {
-    fetchScores();
-  }, [refreshTrigger]);
+    fetchScores(selectedMode);
+  }, [refreshTrigger, selectedMode]);
 
   const parseDateSafely = (dateStr: string | Date) => {
     const d = new Date(dateStr);
@@ -238,9 +414,28 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ refreshTrigger }) => {
     return d;
   };
 
+  const getModeDisplayName = (mode: string) => {
+    switch (mode) {
+      case "letter":
+        return "Letter Mode";
+      case "word":
+        return "Word Mode";
+      case "story":
+        return "Story Mode";
+      default:
+        return mode;
+    }
+  };
+
   return (
     <LeaderboardContainer>
-      <Title>🏆 High Scores</Title>
+      <TitleRow>
+        <Title>🏆 High Scores</Title>
+        <ModeSelector
+          selectedMode={selectedMode}
+          setSelectedMode={setSelectedMode}
+        />
+      </TitleRow>
 
       {loading && <LoadingState>Loading scores...</LoadingState>}
 
@@ -249,7 +444,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ refreshTrigger }) => {
           Failed to load scores
           <br />
           <button
-            onClick={fetchScores}
+            onClick={() => fetchScores(selectedMode)}
             style={{ marginTop: "10px", cursor: "pointer" }}
           >
             Retry
@@ -259,7 +454,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ refreshTrigger }) => {
 
       {!loading && !error && scores.length === 0 && (
         <EmptyState>
-          No scores yet!
+          No scores yet for {getModeDisplayName(selectedMode)}!
           <br />
           Be the first to play.
         </EmptyState>
@@ -295,8 +490,12 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ refreshTrigger }) => {
 
       {selectedScore && (
         <ModalOverlay onClick={() => setSelectedScore(null)}>
-          <ModalContent>
-            <ModalTitle>{selectedScore.nickname}&apos;s Stats</ModalTitle>
+          <ModalContent onClick={(e) => e.stopPropagation()}>
+            <ModalTitle>{selectedScore.nickname}'s Stats</ModalTitle>
+            <ModalRow>
+              <span>Mode:</span>
+              <span>{getModeDisplayName(selectedScore.gameMode)}</span>
+            </ModalRow>
             <ModalRow>
               <span>Score:</span>
               <span>{selectedScore.score.toLocaleString()} pts</span>
@@ -330,3 +529,5 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ refreshTrigger }) => {
     </LeaderboardContainer>
   );
 };
+
+export default Leaderboard;
