@@ -11,6 +11,7 @@ import { LetterMissEffect } from "../ui/LetterMissEffect";
 import { AnimatePresence } from "framer-motion";
 import { LavaFloor } from "./LavaFloor";
 import { useGameDimensions } from "@/hooks/useGameDimensions";
+import { ChargeIndicator } from "../ui/ChargeIndicator";
 
 const GameContainer = styled.div`
   position: relative;
@@ -203,6 +204,10 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
     <GameContainer>
       <Lives lives={gameState.lives} maxLives={gameState.maxLives} />
       <ShieldIndicator shieldState={gameState.shieldState} />
+      <ChargeIndicator
+        chargeState={gameState.chargeState}
+        gameTime={gameState.time}
+      />
       <LetterMissEffect triggerEffect={triggerMissEffect}>
         <GameCanvasWrapper>
           <GameCanvas

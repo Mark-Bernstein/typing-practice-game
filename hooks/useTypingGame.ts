@@ -54,6 +54,12 @@ export const useTypingGame = (
         multiplier: 1,
         lastCorrectTime: 0,
       },
+      chargeState: {
+        current: 0,
+        max: 100,
+        overchargeActive: false,
+        overchargeEndTime: 0,
+      },
     };
 
     // Initialize story state with single string
@@ -99,6 +105,20 @@ export const useTypingGame = (
         prevState.gameMode === "word" || prevState.gameMode === "story"
           ? prevState.speed * GAME_CONFIG.WORD_SPEED_MULTIPLIER
           : prevState.speed;
+
+      // ===== HANDLE OVERCHARGE EXPIRATION =====
+      if (
+        newState.chargeState.overchargeActive &&
+        newState.time >= newState.chargeState.overchargeEndTime
+      ) {
+        newState.chargeState = {
+          ...newState.chargeState,
+          overchargeActive: false,
+          overchargeEndTime: 0,
+        };
+
+        playSFX("shield-lost");
+      }
 
       // ===== MOVE SHIELDS =====
       const shieldSpeed = effectiveSpeed * GAME_CONFIG.SHIELD_SPEED_MULTIPLIER;
@@ -168,45 +188,51 @@ export const useTypingGame = (
             l.y + newState.dimensions.letterSize < newState.dimensions.height
         );
 
-        let livesCost = lettersReachedBottom.length;
-        let shieldChargesUsed = 0;
+        // Skip life loss during overcharge
+        if (newState.chargeState.overchargeActive) {
+          // Just remove the letters, no life loss
+          newState.letters = remainingLetters;
+        } else {
+          let livesCost = lettersReachedBottom.length;
+          let shieldChargesUsed = 0;
 
-        if (newState.shieldState.active && livesCost > 0) {
-          const chargesAvailable = newState.shieldState.charges;
-          shieldChargesUsed = Math.min(livesCost, chargesAvailable);
+          if (newState.shieldState.active && livesCost > 0) {
+            const chargesAvailable = newState.shieldState.charges;
+            shieldChargesUsed = Math.min(livesCost, chargesAvailable);
 
-          if (shieldChargesUsed > 0) {
-            playSFX("shield-lost");
+            if (shieldChargesUsed > 0) {
+              playSFX("shield-lost");
+            }
+
+            livesCost -= shieldChargesUsed;
+
+            newState.shieldState = {
+              ...newState.shieldState,
+              charges: chargesAvailable - shieldChargesUsed,
+              active: chargesAvailable - shieldChargesUsed > 0,
+            };
           }
 
-          livesCost -= shieldChargesUsed;
+          const newLives = newState.lives - livesCost;
 
-          newState.shieldState = {
-            ...newState.shieldState,
-            charges: chargesAvailable - shieldChargesUsed,
-            active: chargesAvailable - shieldChargesUsed > 0,
-          };
+          if (livesCost > 0 && newLives < prevState.lives) {
+            playSFX("life-lost");
+            prevLivesRef.current = newLives;
+          }
+
+          if (newLives <= 0) {
+            playSFX("game-over");
+            return {
+              ...newState,
+              gameOver: true,
+              lives: 0,
+              letters: remainingLetters,
+            };
+          }
+
+          newState.letters = remainingLetters;
+          newState.lives = newLives;
         }
-
-        const newLives = newState.lives - livesCost;
-
-        if (livesCost > 0 && newLives < prevState.lives) {
-          playSFX("life-lost");
-          prevLivesRef.current = newLives;
-        }
-
-        if (newLives <= 0) {
-          playSFX("game-over");
-          return {
-            ...newState,
-            gameOver: true,
-            lives: 0,
-            letters: remainingLetters,
-          };
-        }
-
-        newState.letters = remainingLetters;
-        newState.lives = newLives;
 
         if (
           newState.letters.length === 0 ||
@@ -256,53 +282,59 @@ export const useTypingGame = (
           newState.currentTypingWordId = null;
         }
 
-        let livesCost = wordsReachedBottom.length;
-        let shieldChargesUsed = 0;
+        // Skip life loss during overcharge
+        if (newState.chargeState.overchargeActive) {
+          // Just remove the words, no life loss
+          newState.words = remainingWords;
+        } else {
+          let livesCost = wordsReachedBottom.length;
+          let shieldChargesUsed = 0;
 
-        if (newState.shieldState.active && livesCost > 0) {
-          const chargesAvailable = newState.shieldState.charges;
-          shieldChargesUsed = Math.min(livesCost, chargesAvailable);
+          if (newState.shieldState.active && livesCost > 0) {
+            const chargesAvailable = newState.shieldState.charges;
+            shieldChargesUsed = Math.min(livesCost, chargesAvailable);
 
-          if (shieldChargesUsed > 0) playSFX("shield-lost");
+            if (shieldChargesUsed > 0) playSFX("shield-lost");
 
-          livesCost -= shieldChargesUsed;
+            livesCost -= shieldChargesUsed;
 
-          newState.shieldState = {
-            ...newState.shieldState,
-            charges: chargesAvailable - shieldChargesUsed,
-            active: chargesAvailable - shieldChargesUsed > 0,
-          };
-        }
+            newState.shieldState = {
+              ...newState.shieldState,
+              charges: chargesAvailable - shieldChargesUsed,
+              active: chargesAvailable - shieldChargesUsed > 0,
+            };
+          }
 
-        const newLives = newState.lives - livesCost;
+          const newLives = newState.lives - livesCost;
 
-        if (livesCost > 0 && newLives < prevState.lives) {
-          playSFX("life-lost");
-          prevLivesRef.current = newLives;
+          if (livesCost > 0 && newLives < prevState.lives) {
+            playSFX("life-lost");
+            prevLivesRef.current = newLives;
 
-          // Cancel typing if the active word hit bottom
-          if (newState.currentTypingWordId !== null) {
-            const hitBottom = wordsReachedBottom.some(
-              (w) => w.id === newState.currentTypingWordId
-            );
-            if (hitBottom) {
-              newState.currentTypingWordId = null;
+            // Cancel typing if the active word hit bottom
+            if (newState.currentTypingWordId !== null) {
+              const hitBottom = wordsReachedBottom.some(
+                (w) => w.id === newState.currentTypingWordId
+              );
+              if (hitBottom) {
+                newState.currentTypingWordId = null;
+              }
             }
           }
-        }
 
-        if (newLives <= 0) {
-          playSFX("game-over");
-          return {
-            ...newState,
-            gameOver: true,
-            lives: 0,
-            words: remainingWords,
-          };
-        }
+          if (newLives <= 0) {
+            playSFX("game-over");
+            return {
+              ...newState,
+              gameOver: true,
+              lives: 0,
+              words: remainingWords,
+            };
+          }
 
-        newState.words = remainingWords;
-        newState.lives = newLives;
+          newState.words = remainingWords;
+          newState.lives = newLives;
+        }
 
         // WORD MODE spawn logic
         if (prevState.gameMode === "word") {
@@ -408,6 +440,41 @@ export const useTypingGame = (
 
   const handleKeyPress = useCallback(
     (key: string) => {
+      // ===== CHARGE METER ACTIVATION (SPACE key) =====
+      if (key === " " || key === "Spacebar") {
+        setGameState((prevState) => {
+          if (prevState.gameOver) return prevState;
+
+          // Check if charge is full
+          if (
+            prevState.chargeState.current >= prevState.chargeState.max &&
+            !prevState.chargeState.overchargeActive
+          ) {
+            playSFX("shield-gain");
+
+            const overchargeDuration = 600;
+
+            return {
+              ...prevState,
+              chargeState: {
+                current: 0,
+                max: 100,
+                overchargeActive: true,
+                overchargeEndTime: prevState.time + overchargeDuration,
+              },
+              shieldState: {
+                active: true,
+                charges: prevState.shieldState.maxCharges,
+                maxCharges: prevState.shieldState.maxCharges,
+              },
+            };
+          }
+
+          return prevState;
+        });
+        return;
+      }
+
       // ===== SHIELD PICKUP ("!" key) =====
       if (key === "!") {
         setGameState((prevState) => {
@@ -454,7 +521,7 @@ export const useTypingGame = (
           newState.lives_powerups = [];
           newState.lives = Math.min(prevState.lives + 1, prevState.maxLives);
 
-          playSFX("extra-life"); // Reuse shield gain sound or add new sound
+          playSFX("extra-life");
           newState.lastKeyCorrect = true;
 
           return newState;
@@ -492,6 +559,15 @@ export const useTypingGame = (
             updatedLetters.splice(index, 1);
             newState.letters = updatedLetters;
             newState.lettersCorrect += 1;
+
+            // Add charge
+            newState.chargeState = {
+              ...newState.chargeState,
+              current: Math.min(
+                newState.chargeState.max,
+                newState.chargeState.current + 1
+              ),
+            };
 
             newState.combo = {
               count: prevState.combo.count + 1,
@@ -545,6 +621,15 @@ export const useTypingGame = (
                 updatedWords.splice(wordIndex, 1);
                 newState.words = updatedWords;
                 newState.lettersCorrect += currentWord.word.length;
+
+                // Add charge
+                newState.chargeState = {
+                  ...newState.chargeState,
+                  current: Math.min(
+                    newState.chargeState.max,
+                    newState.chargeState.current + 1
+                  ),
+                };
 
                 newState.combo = {
                   count: prevState.combo.count + 1,

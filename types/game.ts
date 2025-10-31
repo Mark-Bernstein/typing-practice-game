@@ -47,6 +47,13 @@ export interface ComboState {
   lastCorrectTime: number;
 }
 
+export interface ChargeState {
+  current: number;
+  max: number;
+  overchargeActive: boolean;
+  overchargeEndTime: number;
+}
+
 export interface StoryState {
   currentStoryId: number;
   currentSentenceIndex: number;
@@ -76,6 +83,7 @@ export interface GameState {
   shields: ShieldPowerUp[];
   shieldState: ShieldState;
   combo: ComboState;
+  chargeState: ChargeState;
   storyState?: StoryState;
   lives_powerups: LifePowerUp[];
 }
