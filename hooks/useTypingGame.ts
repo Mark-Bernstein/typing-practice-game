@@ -239,10 +239,7 @@ export const useTypingGame = (
           (newState.time % 60 === 0 &&
             newState.letters.length < GAME_CONFIG.MAX_LETTERS)
         ) {
-          const spawnCount = Math.min(
-            newState.level,
-            12 - newState.letters.length
-          );
+          const spawnCount = newState.level;
 
           for (let i = 0; i < spawnCount; i++) {
             const newLetter = generateRandomLetter(
@@ -580,7 +577,7 @@ export const useTypingGame = (
 
             newState.speed = Math.min(
               GAME_CONFIG.MAX_SPEED,
-              newState.speed * 1.01
+              newState.speed * 1.003
             );
             newState.lastKeyCorrect = true;
           } else {
