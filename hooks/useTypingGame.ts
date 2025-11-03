@@ -101,11 +101,6 @@ export const useTypingGame = (
       const newState = { ...prevState };
       newState.time += 1;
 
-      const effectiveSpeed =
-        prevState.gameMode === "word" || prevState.gameMode === "story"
-          ? prevState.speed * GAME_CONFIG.WORD_SPEED_MULTIPLIER
-          : prevState.speed;
-
       // ===== HANDLE OVERCHARGE EXPIRATION =====
       if (
         newState.chargeState.overchargeActive &&
@@ -117,8 +112,14 @@ export const useTypingGame = (
           overchargeEndTime: 0,
         };
 
+        // Combo is maintained - do not reset
         playSFX("shield-lost");
       }
+
+      const effectiveSpeed =
+        prevState.gameMode === "word" || prevState.gameMode === "story"
+          ? prevState.speed * GAME_CONFIG.WORD_SPEED_MULTIPLIER
+          : prevState.speed;
 
       // ===== MOVE SHIELDS =====
       const shieldSpeed = effectiveSpeed * GAME_CONFIG.SHIELD_SPEED_MULTIPLIER;
@@ -162,7 +163,7 @@ export const useTypingGame = (
       );
 
       if (livesReachedBottom.length > 0) {
-        playSFX("shield-despawn"); // Reuse shield despawn sound
+        playSFX("shield-despawn");
       }
 
       newState.lives_powerups = newState.lives_powerups.filter(
@@ -188,9 +189,8 @@ export const useTypingGame = (
             l.y + newState.dimensions.letterSize < newState.dimensions.height
         );
 
-        // Skip life loss during overcharge
+        // Skip life/shield loss during overcharge
         if (newState.chargeState.overchargeActive) {
-          // Just remove the letters, no life loss
           newState.letters = remainingLetters;
         } else {
           let livesCost = lettersReachedBottom.length;
@@ -279,9 +279,8 @@ export const useTypingGame = (
           newState.currentTypingWordId = null;
         }
 
-        // Skip life loss during overcharge
+        // Skip life/shield loss during overcharge
         if (newState.chargeState.overchargeActive) {
-          // Just remove the words, no life loss
           newState.words = remainingWords;
         } else {
           let livesCost = wordsReachedBottom.length;
@@ -417,8 +416,8 @@ export const useTypingGame = (
       const timeSinceLastLife = newState.time - lastLifeSpawnTime.current;
       const shouldSpawnLife =
         timeSinceLastLife >= GAME_CONFIG.LIFE_SPAWN_INTERVAL &&
-        Math.random() < 0.015 && // ~1.5% chance each frame after interval
-        newState.lives < newState.maxLives; // Only spawn if player is missing lives
+        Math.random() < 0.015 &&
+        newState.lives < newState.maxLives;
 
       if (shouldSpawnLife) {
         const newLife = generateLifePowerUp(
@@ -442,14 +441,21 @@ export const useTypingGame = (
         setGameState((prevState) => {
           if (prevState.gameOver) return prevState;
 
-          // Check if charge is full
+          // Check if charge is full and not already in overcharge
           if (
             prevState.chargeState.current >= prevState.chargeState.max &&
             !prevState.chargeState.overchargeActive
           ) {
             playSFX("shield-gain");
 
-            const overchargeDuration = 600;
+            const overchargeDuration = 600; // 10 seconds at 60 FPS
+
+            // Add +10x to current multiplier by adding 200 to combo count
+            // Formula: multiplier = 1 + floor(count / 10) * 0.5
+            // Adding 200 to count adds exactly +10 to multiplier
+            const comboBoost = 200;
+            const newComboCount = prevState.combo.count + comboBoost;
+            const newMultiplier = getComboMultiplier(newComboCount);
 
             return {
               ...prevState,
@@ -461,8 +467,15 @@ export const useTypingGame = (
               },
               shieldState: {
                 active: true,
-                charges: prevState.shieldState.maxCharges,
-                maxCharges: prevState.shieldState.maxCharges,
+                charges:
+                  GAME_CONFIG.SHIELD_CHARGES * GAME_CONFIG.MAX_SHIELD_STACKS,
+                maxCharges:
+                  GAME_CONFIG.SHIELD_CHARGES * GAME_CONFIG.MAX_SHIELD_STACKS,
+              },
+              combo: {
+                ...prevState.combo,
+                count: newComboCount,
+                multiplier: newMultiplier,
               },
             };
           }
@@ -557,7 +570,7 @@ export const useTypingGame = (
             newState.letters = updatedLetters;
             newState.lettersCorrect += 1;
 
-            // Add charge
+            // Add 5% charge per correct letter
             newState.chargeState = {
               ...newState.chargeState,
               current: Math.min(
@@ -583,11 +596,15 @@ export const useTypingGame = (
           } else {
             playSFX("wrong");
             newState.score = Math.max(0, newState.score - 3);
-            newState.combo = {
-              count: 0,
-              multiplier: 1,
-              lastCorrectTime: 0,
-            };
+
+            // Don't reset combo during overcharge
+            if (!newState.chargeState.overchargeActive) {
+              newState.combo = {
+                count: 0,
+                multiplier: 1,
+                lastCorrectTime: 0,
+              };
+            }
           }
         }
 
@@ -597,11 +614,9 @@ export const useTypingGame = (
           prevState.gameMode === "story"
         ) {
           if (newState.currentTypingWordId === null) {
-            // Find word that starts with the typed key (case-insensitive for letters)
             const wordIndex = newState.words.findIndex((w) => {
               if (w.typedProgress !== 0) return false;
               const firstChar = w.word[0];
-              // For letters, match case-insensitive. For punctuation, match exact
               if (/[A-Za-z]/.test(firstChar)) {
                 return firstChar.toUpperCase() === upperKey;
               } else {
@@ -619,12 +634,12 @@ export const useTypingGame = (
                 newState.words = updatedWords;
                 newState.lettersCorrect += currentWord.word.length;
 
-                // Add charge
+                // Add 5% charge per completed word
                 newState.chargeState = {
                   ...newState.chargeState,
                   current: Math.min(
                     newState.chargeState.max,
-                    newState.chargeState.current + 1
+                    newState.chargeState.current + 5
                   ),
                 };
 
@@ -657,11 +672,15 @@ export const useTypingGame = (
             } else {
               playSFX("wrong");
               newState.score = Math.max(0, newState.score - 3);
-              newState.combo = {
-                count: 0,
-                multiplier: 1,
-                lastCorrectTime: 0,
-              };
+
+              // Don't reset combo during overcharge
+              if (!newState.chargeState.overchargeActive) {
+                newState.combo = {
+                  count: 0,
+                  multiplier: 1,
+                  lastCorrectTime: 0,
+                };
+              }
             }
           } else {
             const wordIndex = newState.words.findIndex(
@@ -673,7 +692,6 @@ export const useTypingGame = (
               const nextLetterIndex = currentWord.typedProgress;
               const expectedChar = currentWord.word[nextLetterIndex];
 
-              // For letters, match case-insensitive. For punctuation, match exact
               let isMatch = false;
               if (/[A-Za-z]/.test(expectedChar)) {
                 isMatch = upperKey === expectedChar.toUpperCase();
@@ -695,6 +713,15 @@ export const useTypingGame = (
                 ) {
                   updatedWords.splice(wordIndex, 1);
                   newState.lettersCorrect += currentWord.word.length;
+
+                  // Add 5% charge per completed word
+                  newState.chargeState = {
+                    ...newState.chargeState,
+                    current: Math.min(
+                      newState.chargeState.max,
+                      newState.chargeState.current + 5
+                    ),
+                  };
 
                   newState.combo = {
                     count: prevState.combo.count + 1,
@@ -728,11 +755,14 @@ export const useTypingGame = (
                 newState.currentTypingWordId = null;
                 newState.score = Math.max(0, newState.score - 5);
 
-                newState.combo = {
-                  count: 0,
-                  multiplier: 1,
-                  lastCorrectTime: 0,
-                };
+                // Don't reset combo during overcharge
+                if (!newState.chargeState.overchargeActive) {
+                  newState.combo = {
+                    count: 0,
+                    multiplier: 1,
+                    lastCorrectTime: 0,
+                  };
+                }
               }
             }
           }
