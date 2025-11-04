@@ -1,13 +1,13 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled, { keyframes, css } from "styled-components";
 import { ChargeState } from "../../types/game";
 
 const pulse = keyframes`
-  0%, 100% { 
+  0%, 100% {
     transform: scale(1);
     filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
   }
-  50% { 
+  50% {
     transform: scale(1.05);
     filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1));
   }
@@ -24,12 +24,12 @@ const shimmer = keyframes`
 `;
 
 const overchargeGlow = keyframes`
-  0%, 100% { 
+  0%, 100% {
     box-shadow: 0 0 30px rgba(255, 215, 0, 0.8),
                 0 0 60px rgba(255, 215, 0, 0.5),
                 inset 0 0 20px rgba(255, 255, 255, 0.3);
   }
-  50% { 
+  50% {
     box-shadow: 0 0 50px rgba(255, 215, 0, 1),
                 0 0 100px rgba(255, 215, 0, 0.8),
                 inset 0 0 30px rgba(255, 255, 255, 0.5);
@@ -62,17 +62,18 @@ const CircularGauge = styled.div<{
   align-items: center;
   justify-content: center;
   border: 3px solid #00f2ff;
-  transition: all 0.3s ease;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
 
-  ${(props) =>
-    props.$full &&
+  ${(p) =>
+    p.$full &&
     css`
       animation: ${pulse} 1.5s ease-in-out infinite;
       border-color: #76691e;
     `}
 
-  ${(props) =>
-    props.$overcharge &&
+  ${(p) =>
+    p.$overcharge &&
     css`
       animation: ${overchargeGlow} 1s ease-in-out infinite;
       border-color: #e100ff;
@@ -83,7 +84,7 @@ const CircularGauge = styled.div<{
       );
     `}
 
-  &::before {
+&::before {
     content: "";
     position: absolute;
     inset: -3px;
@@ -109,8 +110,9 @@ const CircularGauge = styled.div<{
       black calc(50% - 6px),
       black 50%
     );
-    transition: all 0.3s ease;
     filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+    transition: background 0.4s linear; /* 👈 smooth hardware-accelerated change */
+    will-change: background;
   }
 
   ${(props) =>
@@ -146,23 +148,21 @@ const CircularGauge = styled.div<{
 const ChargeValue = styled.div<{ $full: boolean; $overcharge: boolean }>`
   font-size: 28px;
   font-weight: 900;
-  color: ${(props) => (props.$full ? "#ff0000" : "rgba(255, 255, 255, 1)")};
+  color: ${(p) => (p.$full ? "#ff0000" : "rgba(255, 255, 255, 1)")};
   z-index: 1;
   transition: all 0.3s ease;
   font-family: "Orbitron", sans-serif;
 `;
 
 const ChargeLabel = styled.div<{ $full: boolean; $overcharge: boolean }>`
-  color: ${(props) =>
-    props.$full || props.$overcharge ? "#ffd700" : "rgba(255, 255, 255, 0.6)"};
+  color: ${(p) =>
+    p.$full || p.$overcharge ? "#ffd700" : "rgba(255, 255, 255, 0.6)"};
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
-  text-shadow: ${(props) =>
-    props.$full || props.$overcharge
-      ? "0 0 8px rgba(255, 215, 0, 0.8)"
-      : "none"};
+  text-shadow: ${(p) =>
+    p.$full || p.$overcharge ? "0 0 8px rgba(255, 215, 0, 0.8)" : "none"};
   transition: all 0.3s ease;
 `;
 
@@ -173,7 +173,6 @@ const SpacebarHint = styled.div<{ $show: boolean }>`
   text-align: center;
   line-height: 1;
   height: fit-content;
-
   margin-top: 4px;
   padding: 6px 12px;
   background: linear-gradient(
@@ -190,21 +189,22 @@ const SpacebarHint = styled.div<{ $show: boolean }>`
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
-  opacity: ${(props) => (props.$show ? 1 : 0)};
-  transform: translateY(${(props) => (props.$show ? 0 : "10px")});
+  opacity: ${(p) => (p.$show ? 1 : 0)};
+  transform: translateY(${(p) => (p.$show ? 0 : "10px")});
   transition: all 0.3s ease;
   animation: ${shimmer} 2s linear infinite;
   text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
   margin: 0 16px;
 `;
+
 const OverchargeTimer = styled.div`
   position: absolute;
   bottom: -30px;
   left: 50%;
   transform: translateX(-50%);
   color: #ffd700;
-  font-size: 2px;
+  font-size: 20px;
   font-weight: 700;
   text-shadow: 0 0 10px rgba(255, 215, 0, 1);
   white-space: nowrap;
@@ -219,9 +219,35 @@ export const ChargeIndicator: React.FC<ChargeIndicatorProps> = ({
   chargeState,
   gameTime,
 }) => {
-  const percentage = (chargeState.current / chargeState.max) * 100;
+  const percentageTarget = (chargeState.current / chargeState.max) * 100;
+  const [displayPercentage, setDisplayPercentage] = useState(percentageTarget);
   const isFull = chargeState.current >= chargeState.max;
   const isOvercharge = chargeState.overchargeActive;
+  const lastDisplayRef = useRef(displayPercentage);
+
+  // Smooth interpolation of fill animation
+  useEffect(() => {
+    let frame: number;
+    const duration = 200;
+    const start = performance.now();
+    const from = lastDisplayRef.current;
+    const to = percentageTarget;
+
+    const animate = (time: number) => {
+      const progress = Math.min((time - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = from + (to - from) * eased;
+      setDisplayPercentage(current);
+      if (progress < 1) {
+        frame = requestAnimationFrame(animate);
+      } else {
+        lastDisplayRef.current = to;
+      }
+    };
+
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [percentageTarget]);
 
   const remainingTime = isOvercharge
     ? Math.max(0, Math.ceil((chargeState.overchargeEndTime - gameTime) / 60))
@@ -230,12 +256,12 @@ export const ChargeIndicator: React.FC<ChargeIndicatorProps> = ({
   return (
     <ChargeContainer>
       <CircularGauge
-        $percentage={percentage}
+        $percentage={displayPercentage}
         $full={isFull && !isOvercharge}
         $overcharge={isOvercharge}
       >
         <ChargeValue $full={isFull} $overcharge={isOvercharge}>
-          {Math.floor(percentage)}%
+          {Math.floor(displayPercentage)}%
         </ChargeValue>
       </CircularGauge>
 

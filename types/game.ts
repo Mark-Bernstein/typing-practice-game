@@ -35,6 +35,12 @@ export interface LifePowerUp {
   id: number;
 }
 
+export interface MultiplierPowerUp {
+  x: number;
+  y: number;
+  id: number;
+}
+
 export interface ShieldState {
   active: boolean;
   charges: number;
@@ -86,6 +92,7 @@ export interface GameState {
   chargeState: ChargeState;
   storyState?: StoryState;
   lives_powerups: LifePowerUp[];
+  multiplier_powerups: MultiplierPowerUp[];
 }
 
 export interface GameStats {

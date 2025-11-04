@@ -62,6 +62,10 @@ const InstructionTitle = styled.h3<{ $show: boolean }>`
       transform: translateX(-400px) scale(0.5);
     }
   }
+
+  @media screen and (max-width: 1440px) {
+    font-size: 24px;
+  }
 `;
 
 const InstructionsContainer = styled.div<{ $show: boolean }>`
@@ -71,7 +75,7 @@ const InstructionsContainer = styled.div<{ $show: boolean }>`
   left: 16px;
   z-index: 20;
   border: none;
-  padding: 16px;
+  padding: 8px;
   animation: ${({ $show }) =>
     $show
       ? "moveToLeft 1s ease-in-out 1s forwards"
@@ -117,8 +121,7 @@ const InstructionsPanel = styled.div.withConfig({
   border-radius: 16px;
   padding: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  width: 430px;
+  width: 350px;
   margin-bottom: 8px;
   opacity: 0;
 
@@ -133,6 +136,7 @@ const InstructionsPanel = styled.div.withConfig({
 
   @media screen and (max-width: 1440px) {
     padding: 10px;
+    width: 300px;
   }
 `;
 
@@ -279,12 +283,12 @@ const MainText = styled.p<{ $reflected?: boolean }>`
 
 const SubText = styled.p`
   color: rgba(255, 255, 255, 0.8);
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
   line-height: 1.5;
 
   @media screen and (max-width: 1440px) {
-    font-size: 18px;
+    line-height: 1.25;
   }
 `;
 
@@ -376,22 +380,32 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
     <>
       <InstructionsContainer $show={show}>
         <InstructionTitle $show={show}>Instructions / Tips</InstructionTitle>
-        <InstructionsPanel show={show} delay={0.6}>
+        <InstructionsPanel show={show} delay={0.4}>
           <SubText>Type the letters/words as they fall</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={0.8}>
+        <InstructionsPanel show={show} delay={0.6}>
           <SubText>Home row keys: +1 point</SubText>
           <SubText>All others: +2 points</SubText>
           <SubText>Incorrect keystrokes: -3 points</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={1}>
+        <InstructionsPanel show={show} delay={0.8}>
           <SubText>Survive levels to increase difficulty</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={1.2}>
+        <InstructionsPanel show={show} delay={1}>
           <SubText>Challenge yourself to beat the high score!</SubText>
         </InstructionsPanel>
-        <InstructionsPanel show={show} delay={1.4}>
+        <InstructionsPanel show={show} delay={1.2}>
           <SubText>Watch for special symbols for power ups!</SubText>
+          <br></br>
+          <SubText style={{ textAlign: "left" }}>
+            {`🛡️"(!)" ➡️ +3 Shields`}{" "}
+          </SubText>
+          <SubText style={{ textAlign: "left" }}>
+            {`❤️"($)" ➡️ +1 Life`}{" "}
+          </SubText>
+          <SubText style={{ textAlign: "left" }}>
+            {`⚡"(^)" ➡️ +2.5% combo multiplier`}{" "}
+          </SubText>
         </InstructionsPanel>
       </InstructionsContainer>
       <CreatedBy show={show}>

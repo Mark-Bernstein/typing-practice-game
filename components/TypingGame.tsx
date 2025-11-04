@@ -545,17 +545,29 @@ export const ModeSelector = ({ children }: { children: React.ReactNode }) => {
         display: "flex",
         gap: "30px",
         justifyContent: "center",
+        alignItems: "center",
         marginBottom: "80px",
         zIndex: 1001,
+        perspective: 1000,
       }}
-      initial={{ opacity: 0, scale: 0.1, rotate: -45 }}
-      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+      initial={{
+        opacity: 0,
+        scale: 0.3,
+        rotateX: 75,
+        rotateY: -45,
+        filter: "blur(25px)",
+      }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+        rotateX: 0,
+        rotateY: 0,
+        filter: "blur(0px)",
+      }}
       transition={{
-        type: "spring",
-        stiffness: 200,
-        damping: 15,
-        mass: 1,
-        delay: 2,
+        duration: 1.2,
+        ease: [0.25, 0.1, 0.25, 1],
+        delay: 0.6,
       }}
     >
       {children}
@@ -995,7 +1007,6 @@ export const TypingGame: React.FC = () => {
     incrementTotalPlays();
     stopMusic();
     playMusic("gameplay");
-    playSFX("start");
     setHasStarted(true);
   };
 
@@ -1071,6 +1082,7 @@ export const TypingGame: React.FC = () => {
                     const y = e.clientY;
                     setClickPosition({ x, y });
                     setStartClicked(true);
+                    playSFX("start");
                   }}
                 >
                   START
@@ -1180,7 +1192,7 @@ export const TypingGame: React.FC = () => {
                       }}
                       animate={{
                         opacity: [1, 0.5, 0],
-                        scale: [0, 4 + i, 7 + i],
+                        scale: [0, 0.5 + i, 1 + i],
                       }}
                       transition={{
                         duration: 1,

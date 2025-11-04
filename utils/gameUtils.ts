@@ -5,6 +5,7 @@ import {
   GameStats,
   GameDimensions,
   LifePowerUp,
+  MultiplierPowerUp,
 } from "../types/game";
 import {
   ALPHABET,
@@ -142,6 +143,20 @@ export const generateLifePowerUp = (
     x,
     y: 0,
     id: lifeIdCounter,
+  };
+};
+
+export const generateMultiplierPowerUp = (
+  multiplierIdCounter: number,
+  dimensions: GameDimensions
+): MultiplierPowerUp => {
+  const multiplierSize = dimensions.letterSize * 2;
+  const x = Math.random() * (dimensions.width - multiplierSize);
+
+  return {
+    x,
+    y: 0,
+    id: multiplierIdCounter,
   };
 };
 

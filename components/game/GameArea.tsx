@@ -4,14 +4,15 @@ import { GameState } from "../../types/game";
 import { FallingLetter } from "./FallingLetter";
 import { FallingWord } from "./FallingWord";
 import { FallingShield } from "./FallingShield";
-import { Lives } from "../ui/Lives";
 import { FallingLife } from "./FallingLife";
+import { FallingMultiplier } from "./FallingMultiplier";
+import { Lives } from "../ui/Lives";
 import { ShieldIndicator } from "../ui/ShieldIndicator";
+import { ChargeIndicator } from "../ui/ChargeIndicator";
 import { LetterMissEffect } from "../ui/LetterMissEffect";
 import { AnimatePresence } from "framer-motion";
 import { LavaFloor } from "./LavaFloor";
 import { useGameDimensions } from "@/hooks/useGameDimensions";
-import { ChargeIndicator } from "../ui/ChargeIndicator";
 
 const GameContainer = styled.div`
   position: relative;
@@ -170,6 +171,35 @@ const ShieldCatchEffect = styled.div`
   }
 `;
 
+const MultiplierCatchEffect = styled.div`
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle,
+    rgba(153, 0, 255, 0.3) 0%,
+    rgba(26, 255, 0, 0.2) 50%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 100;
+  animation: multiplierPulse 1s ease-out;
+
+  @keyframes multiplierPulse {
+    0% {
+      opacity: 0;
+      transform: scale(0.5) rotate(0deg);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2) rotate(180deg);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.5) rotate(360deg);
+    }
+  }
+`;
+
 interface GameAreaProps {
   gameState: GameState;
 }
@@ -177,6 +207,7 @@ interface GameAreaProps {
 export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
   const [triggerMissEffect, setTriggerMissEffect] = useState(false);
   const [showShieldCatch, setShowShieldCatch] = useState(false);
+  const [showMultiplierCatch, setShowMultiplierCatch] = useState(false);
   const prevLivesRef = useRef(gameState.lives);
   const prevShieldChargesRef = useRef(gameState.shieldState.charges);
   const { width } = useGameDimensions();
@@ -199,6 +230,27 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
     }
     prevShieldChargesRef.current = gameState.shieldState.charges;
   }, [gameState.shieldState.charges]);
+
+  // Multiplier catch effect — trigger only when a multiplier is collected
+  const prevMultiplierCountRef = useRef(gameState.multiplier_powerups.length);
+
+  useEffect(() => {
+    const currentCount = gameState.multiplier_powerups.length;
+    const prevCount = prevMultiplierCountRef.current;
+
+    // ✅ Only trigger if a multiplier was collected (count decreased)
+    if (currentCount < prevCount) {
+      setShowMultiplierCatch(true);
+      const timer = setTimeout(() => setShowMultiplierCatch(false), 600);
+      prevMultiplierCountRef.current = currentCount; // update immediately
+      return () => clearTimeout(timer);
+    }
+
+    // ❌ Do not trigger if a new multiplier spawned (count increased)
+    if (currentCount > prevCount) {
+      prevMultiplierCountRef.current = currentCount;
+    }
+  }, [gameState.multiplier_powerups.length]);
 
   return (
     <GameContainer>
@@ -242,6 +294,14 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
                 />
               ))}
 
+              {gameState.multiplier_powerups.map((multiplier) => (
+                <FallingMultiplier
+                  key={`multiplier-${multiplier.id}`}
+                  multiplier={multiplier}
+                  letterSize={gameState.dimensions.letterSize}
+                />
+              ))}
+
               {/* Render letters OR words based on mode */}
               {gameState.gameMode === "letter"
                 ? gameState.letters.map((letter) => (
@@ -265,6 +325,7 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
             )}
 
             {showShieldCatch && <ShieldCatchEffect />}
+            {showMultiplierCatch && <MultiplierCatchEffect />}
           </GameCanvas>
           <LavaFloor height={30} width={width} />
         </GameCanvasWrapper>

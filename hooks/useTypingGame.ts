@@ -8,6 +8,7 @@ import {
   generateStoryWord,
   generateShieldPowerUp,
   generateLifePowerUp,
+  generateMultiplierPowerUp,
   getLetterScore,
   getWordScore,
   getLevel,
@@ -30,6 +31,7 @@ export const useTypingGame = (
       words: [],
       shields: [],
       lives_powerups: [],
+      multiplier_powerups: [],
       time: 0,
       lettersCorrect: 0,
       score: 0,
@@ -86,9 +88,11 @@ export const useTypingGame = (
   const wordIdCounter = useRef(0);
   const shieldIdCounter = useRef(0);
   const lifeIdCounter = useRef(0);
+  const multiplierIdCounter = useRef(0);
   const prevLivesRef = useRef(5);
   const lastShieldSpawnTime = useRef(0);
   const lastLifeSpawnTime = useRef(0);
+  const lastMultiplierSpawnTime = useRef(0);
 
   useEffect(() => {
     setGameState((prev) => ({ ...prev, dimensions }));
@@ -169,6 +173,34 @@ export const useTypingGame = (
       newState.lives_powerups = newState.lives_powerups.filter(
         (life) =>
           life.y + newState.dimensions.letterSize * 2 <
+          newState.dimensions.height
+      );
+
+      // ===== MOVE MULTIPLIER POWER-UPS =====
+      const multiplierSpeed =
+        effectiveSpeed * GAME_CONFIG.MULTIPLIER_SPEED_MULTIPLIER;
+
+      newState.multiplier_powerups = newState.multiplier_powerups.map(
+        (mult) => ({
+          id: mult.id,
+          x: mult.x,
+          y: mult.y + multiplierSpeed,
+        })
+      );
+
+      const multipliersReachedBottom = newState.multiplier_powerups.filter(
+        (mult) =>
+          mult.y + newState.dimensions.letterSize * 2 >=
+          newState.dimensions.height
+      );
+
+      if (multipliersReachedBottom.length > 0) {
+        playSFX("shield-despawn");
+      }
+
+      newState.multiplier_powerups = newState.multiplier_powerups.filter(
+        (mult) =>
+          mult.y + newState.dimensions.letterSize * 2 <
           newState.dimensions.height
       );
 
@@ -352,13 +384,10 @@ export const useTypingGame = (
         if (prevState.gameMode === "story" && newState.storyState) {
           const { currentSentence, sentenceWordIndex } = newState.storyState;
 
-          // Check if we've reached the end of the story
           if (sentenceWordIndex >= currentSentence.length) {
-            // Story complete - prevent further spawning
             return newState;
           }
 
-          // Spawn next word from story
           if (
             newState.words.length === 0 ||
             (newState.time % 90 === 0 &&
@@ -429,6 +458,33 @@ export const useTypingGame = (
         lastLifeSpawnTime.current = newState.time;
       }
 
+      // ===== MULTIPLIER POWER-UP SPAWN =====
+      // Only spawn if player has full HP AND full shields
+      const hasFullHP = newState.lives >= newState.maxLives;
+      const hasFullShields =
+        newState.shieldState.charges >= newState.shieldState.maxCharges &&
+        newState.shieldState.active;
+      const timeSinceLastMultiplier =
+        newState.time - lastMultiplierSpawnTime.current;
+      const shouldSpawnMultiplier =
+        hasFullHP &&
+        hasFullShields &&
+        timeSinceLastMultiplier >= GAME_CONFIG.MULTIPLIER_SPAWN_INTERVAL &&
+        Math.random() < 0.01; // 1% chance per frame after interval
+
+      if (shouldSpawnMultiplier) {
+        const newMultiplier = generateMultiplierPowerUp(
+          multiplierIdCounter.current++,
+          newState.dimensions
+        );
+
+        newState.multiplier_powerups = [
+          ...newState.multiplier_powerups,
+          newMultiplier,
+        ];
+        lastMultiplierSpawnTime.current = newState.time;
+      }
+
       newState.level = getLevel(newState.lettersCorrect);
       return newState;
     });
@@ -448,7 +504,7 @@ export const useTypingGame = (
           ) {
             playSFX("shield-gain");
 
-            const overchargeDuration = 600; // 10 seconds at 60 FPS
+            const overchargeDuration = 600;
 
             // Add +10x to current multiplier by adding 200 to combo count
             // Formula: multiplier = 1 + floor(count / 10) * 0.5
@@ -481,6 +537,37 @@ export const useTypingGame = (
           }
 
           return prevState;
+        });
+        return;
+      }
+
+      // ===== MULTIPLIER PICKUP ("^" key) =====
+      if (key === "^") {
+        // ^ requires shift+6, so accept both
+        setGameState((prevState) => {
+          if (prevState.gameOver || prevState.multiplier_powerups.length === 0)
+            return prevState;
+
+          const newState = { ...prevState };
+          newState.multiplier_powerups = [];
+
+          // Add +2.5x to current multiplier by adding 50 to combo count
+          // Formula: multiplier = 1 + floor(count / 10) * 0.5
+          // Adding 50 to count adds exactly +2.5 to multiplier
+          const comboBoost = 50;
+          const newComboCount = prevState.combo.count + comboBoost;
+          const newMultiplier = getComboMultiplier(newComboCount);
+
+          newState.combo = {
+            ...prevState.combo,
+            count: newComboCount,
+            multiplier: newMultiplier,
+          };
+
+          playSFX("extra-life");
+          newState.lastKeyCorrect = true;
+
+          return newState;
         });
         return;
       }
@@ -575,7 +662,7 @@ export const useTypingGame = (
               ...newState.chargeState,
               current: Math.min(
                 newState.chargeState.max,
-                newState.chargeState.current + 1
+                newState.chargeState.current + 5
               ),
             };
 
@@ -704,7 +791,7 @@ export const useTypingGame = (
                 const updatedWords = [...newState.words];
                 updatedWords[wordIndex] = {
                   ...updatedWords[wordIndex],
-                  typedProgress: nextLetterIndex + 1,
+                  typedProgress: nextLetterIndex + 5,
                 };
 
                 if (
@@ -780,9 +867,11 @@ export const useTypingGame = (
     wordIdCounter.current = 0;
     shieldIdCounter.current = 0;
     lifeIdCounter.current = 0;
+    multiplierIdCounter.current = 0;
     prevLivesRef.current = 5;
     lastShieldSpawnTime.current = 0;
     lastLifeSpawnTime.current = 0;
+    lastMultiplierSpawnTime.current = 0;
   }, [getInitialState]);
 
   useEffect(() => {
