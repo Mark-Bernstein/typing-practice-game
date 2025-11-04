@@ -233,7 +233,6 @@ const SubmitScoreButton = styled(MainMenuButton)`
   text-transform: uppercase;
   border: none;
   border-radius: 14px;
-  margin-top: 20px;
   padding: 16px 40px;
   font-size: 22px;
   cursor: pointer;
@@ -363,6 +362,7 @@ export const StatsGrid: React.FC<{ children: React.ReactNode }> = ({
       flexDirection: "column",
       gap: "14px",
       width: "100%",
+      marginBottom: "20px",
     }}
   >
     {children}
