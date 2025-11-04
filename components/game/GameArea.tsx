@@ -10,6 +10,7 @@ import { Lives } from "../ui/Lives";
 import { ShieldIndicator } from "../ui/ShieldIndicator";
 import { ChargeIndicator } from "../ui/ChargeIndicator";
 import { LetterMissEffect } from "../ui/LetterMissEffect";
+import { PointsGainEffect } from "../ui/PointsGainEffect";
 import { AnimatePresence } from "framer-motion";
 import { LavaFloor } from "./LavaFloor";
 import { useGameDimensions } from "@/hooks/useGameDimensions";
@@ -211,6 +212,21 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
   const prevLivesRef = useRef(gameState.lives);
   const prevShieldChargesRef = useRef(gameState.shieldState.charges);
   const { width } = useGameDimensions();
+  const [pointsEarned, setPointsEarned] = useState<number | null>(null);
+  const prevScoreRef = useRef(gameState.score);
+
+  // Points gain effect
+  useEffect(() => {
+    const prevScore = prevScoreRef.current;
+    if (gameState.score > prevScore) {
+      const gain = gameState.score - prevScore;
+      setPointsEarned(gain);
+      const timer = setTimeout(() => setPointsEarned(null), 1000);
+      prevScoreRef.current = gameState.score;
+      return () => clearTimeout(timer);
+    }
+    prevScoreRef.current = gameState.score;
+  }, [gameState.score]);
 
   useEffect(() => {
     if (gameState.lives < prevLivesRef.current) {
@@ -326,6 +342,7 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
 
             {showShieldCatch && <ShieldCatchEffect />}
             {showMultiplierCatch && <MultiplierCatchEffect />}
+            {pointsEarned && <PointsGainEffect points={pointsEarned} />}
           </GameCanvas>
           <LavaFloor height={30} width={width} />
         </GameCanvasWrapper>
