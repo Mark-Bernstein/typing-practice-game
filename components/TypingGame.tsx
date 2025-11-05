@@ -552,7 +552,7 @@ export const ModeSelector = ({ children }: { children: React.ReactNode }) => {
       }}
       initial={{
         opacity: 0,
-        scale: 0.3,
+        scale: 0.1,
         rotateX: 75,
         rotateY: -45,
         filter: "blur(25px)",
@@ -876,8 +876,15 @@ const GamePlay: React.FC<{
       </ParticleLayer>
 
       <GridBackground />
-      <GlowingOrb $size={128} $color="#06b6d4" $top="40px" $left="40px" />
       <GlowingOrb
+        key="orb-1"
+        $size={128}
+        $color="#06b6d4"
+        $top="40px"
+        $left="40px"
+      />
+      <GlowingOrb
+        key="orb-2"
         $size={96}
         $color="#9333ea"
         $bottom="40px"
@@ -885,6 +892,7 @@ const GamePlay: React.FC<{
         $delay="1s"
       />
       <GlowingOrb
+        key="orb-3"
         $size={64}
         $color="#ec4899"
         $top="50%"

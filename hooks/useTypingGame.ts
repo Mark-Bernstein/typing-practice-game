@@ -652,6 +652,10 @@ export const useTypingGame = (
 
           if (index !== -1) {
             playSFX("correct");
+            newState.lastTypedPosition = {
+              x: newState.letters[index].x,
+              y: newState.letters[index].y,
+            };
             const updatedLetters = [...newState.letters];
             updatedLetters.splice(index, 1);
             newState.letters = updatedLetters;
@@ -791,7 +795,7 @@ export const useTypingGame = (
                 const updatedWords = [...newState.words];
                 updatedWords[wordIndex] = {
                   ...updatedWords[wordIndex],
-                  typedProgress: nextLetterIndex + 5,
+                  typedProgress: nextLetterIndex + 1,
                 };
 
                 if (

@@ -93,6 +93,10 @@ export interface GameState {
   storyState?: StoryState;
   lives_powerups: LifePowerUp[];
   multiplier_powerups: MultiplierPowerUp[];
+  lastTypedPosition?: {
+    x: number;
+    y: number;
+  };
 }
 
 export interface GameStats {

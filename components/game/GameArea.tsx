@@ -212,21 +212,64 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
   const prevLivesRef = useRef(gameState.lives);
   const prevShieldChargesRef = useRef(gameState.shieldState.charges);
   const { width } = useGameDimensions();
-  const [pointsEarned, setPointsEarned] = useState<number | null>(null);
+  const [pointsEffect, setPointsEffect] = useState<{
+    x: number;
+    y: number;
+    points: number;
+  } | null>(null);
   const prevScoreRef = useRef(gameState.score);
 
-  // Points gain effect
   useEffect(() => {
     const prevScore = prevScoreRef.current;
-    if (gameState.score > prevScore) {
+
+    // only trigger when score increases and a correct key was pressed
+    if (gameState.score > prevScore && gameState.lastKeyCorrect) {
       const gain = gameState.score - prevScore;
-      setPointsEarned(gain);
-      const timer = setTimeout(() => setPointsEarned(null), 1000);
+
+      // ✅ Prefer exact saved position (captured before removal)
+      if (gameState.lastTypedPosition) {
+        setPointsEffect({
+          x: gameState.lastTypedPosition.x,
+          y: gameState.lastTypedPosition.y,
+          points: gain,
+        });
+      } else {
+        // fallback to approximate logic
+        let x = gameState.dimensions.width / 2;
+        let y = gameState.dimensions.height / 2;
+
+        if (gameState.gameMode === "letter") {
+          const nearestToBottom = [...gameState.letters].sort(
+            (a, b) => b.y - a.y
+          )[0];
+          if (nearestToBottom) {
+            x = nearestToBottom.x;
+            y = nearestToBottom.y;
+          }
+        } else if (gameState.gameMode === "word") {
+          const activeWord = gameState.words.find(
+            (w) => w.id === gameState.currentTypingWordId
+          );
+          if (activeWord) {
+            x =
+              activeWord.x +
+              (activeWord.word.length * gameState.dimensions.letterSize) / 2;
+            y = activeWord.y - gameState.dimensions.letterSize / 2;
+          }
+        }
+
+        setPointsEffect({ x, y, points: gain });
+      }
+
+      // clear after animation ends
+      const timer = setTimeout(() => setPointsEffect(null), 1000);
       prevScoreRef.current = gameState.score;
       return () => clearTimeout(timer);
     }
+
     prevScoreRef.current = gameState.score;
-  }, [gameState.score]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState.score, gameState.lastKeyCorrect, gameState.lastTypedPosition]);
 
   useEffect(() => {
     if (gameState.lives < prevLivesRef.current) {
@@ -310,9 +353,9 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
                 />
               ))}
 
-              {gameState.multiplier_powerups.map((multiplier) => (
+              {gameState.multiplier_powerups.map((multiplier, index) => (
                 <FallingMultiplier
-                  key={`multiplier-${multiplier.id}`}
+                  key={`multiplier-${multiplier.id}-${index}`}
                   multiplier={multiplier}
                   letterSize={gameState.dimensions.letterSize}
                 />
@@ -342,7 +385,13 @@ export const GameArea: React.FC<GameAreaProps> = ({ gameState }) => {
 
             {showShieldCatch && <ShieldCatchEffect />}
             {showMultiplierCatch && <MultiplierCatchEffect />}
-            {pointsEarned && <PointsGainEffect points={pointsEarned} />}
+            {pointsEffect && (
+              <PointsGainEffect
+                x={pointsEffect.x}
+                y={pointsEffect.y}
+                points={pointsEffect.points}
+              />
+            )}
           </GameCanvas>
           <LavaFloor height={30} width={width} />
         </GameCanvasWrapper>
