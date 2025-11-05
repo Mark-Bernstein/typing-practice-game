@@ -19,7 +19,7 @@ export const GAME_CONFIG = {
   SHIELD_SPEED_MULTIPLIER: 2,
 
   // Life power-up settings
-  LIFE_SPAWN_INTERVAL: 600,
+  LIFE_SPAWN_INTERVAL: 300,
   LIFE_SPEED_MULTIPLIER: 2,
 
   // Multiplier power-up settings
