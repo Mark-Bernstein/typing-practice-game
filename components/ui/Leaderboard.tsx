@@ -17,7 +17,7 @@ interface HighScore {
 const LeaderboardContainer = styled.div`
   position: absolute;
   right: 16px;
-  top: 40px;
+  top: 16px;
   width: 370px;
   background: #000000;
   backdrop-filter: blur(16px);
@@ -364,7 +364,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
 
   return (
     <ModeWrapper ref={wrapperRef} $open={open}>
-      <ModeLabel>MODE:</ModeLabel>
+      <ModeLabel>MODE: </ModeLabel>
       <ModeSelect
         value={selectedMode}
         onChange={handleChange}

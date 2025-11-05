@@ -12,7 +12,7 @@ const glow = keyframes`
 
 const ControlsContainer = styled.div`
   position: fixed;
-  bottom: 30px;
+  bottom: 16px;
   left: 16px;
   display: flex;
   flex-direction: column;
@@ -36,7 +36,7 @@ const ToggleButton = styled.button<{ $active: boolean }>`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 28px 40px;
+  padding: 20px 32px;
   background: ${(props) =>
     props.$active
       ? "linear-gradient(135deg, rgba(34, 211, 238, 0.3) 0%, rgba(147, 51, 234, 0.3) 100%)"

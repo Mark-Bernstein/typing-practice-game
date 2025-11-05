@@ -490,7 +490,7 @@ const TotalPlaysDisplay = styled.div`
   position: absolute;
   font-size: 28px;
   left: 16px;
-  top: 40px;
+  top: 16px;
   width: 420px;
   max-height: 70vh;
   background: #000000;
@@ -523,7 +523,6 @@ const TotalPlaysDisplay = styled.div`
   @media screen and (max-width: 1440px) {
     font-size: 20px;
     width: 300px;
-    top: 30px;
     padding: 16px;
     border-radius: 16px;
     box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);

@@ -75,7 +75,7 @@ const InstructionsContainer = styled.div<{ $show: boolean }>`
   left: 16px;
   z-index: 20;
   border: none;
-  padding: 8px;
+  padding: 8px 8px 0;
   animation: ${({ $show }) =>
     $show
       ? "moveToLeft 1s ease-in-out 1s forwards"
@@ -381,15 +381,15 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
       <InstructionsContainer $show={show}>
         <InstructionTitle $show={show}>Instructions / Tips</InstructionTitle>
         <InstructionsPanel show={show} delay={0.4}>
-          <SubText>Type the letters/words as they fall</SubText>
+          <SubText>Type the letters/words before they hit the bottom</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={0.6}>
           <SubText>Home row keys: +1 point</SubText>
           <SubText>All others: +2 points</SubText>
-          <SubText>Incorrect keystrokes: -3 points</SubText>
+          <SubText>Wrong keystrokes: -3 points</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={0.8}>
-          <SubText>Survive levels to increase difficulty</SubText>
+          <SubText>Difficulty increases nonstop</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1}>
           <SubText>Challenge yourself to beat the high score!</SubText>
@@ -398,17 +398,16 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
           <SubText>Watch for special symbols for power ups!</SubText>
           <br></br>
           <SubText style={{ textAlign: "left" }}>
-            {`🛡️"(!)" ➡️ +3 Shields`}{" "}
+            {`🛡️"!" ➡️ +3 Shields`}{" "}
           </SubText>
+          <SubText style={{ textAlign: "left" }}>{`❤️"$" ➡️ +1 Life`} </SubText>
           <SubText style={{ textAlign: "left" }}>
-            {`❤️"($)" ➡️ +1 Life`}{" "}
-          </SubText>
-          <SubText style={{ textAlign: "left" }}>
-            {`⚡"(^)" ➡️ +2.5% combo multiplier`}{" "}
+            {`⚡"^" ➡️ +2.5% pts multiplier`}{" "}
           </SubText>
           <br></br>
+          <SubText style={{ textAlign: "left" }}>100% charged meter:</SubText>
           <SubText style={{ textAlign: "left" }}>
-            {`100% charged meter? Press Spacebar! ➡️ 10 second invincibility, full shields, & +10% multiplier`}{" "}
+            {`Press Spacebar! ➡️ 10 second invincibility, full shields, & +10% multiplier`}{" "}
           </SubText>
         </InstructionsPanel>
       </InstructionsContainer>
