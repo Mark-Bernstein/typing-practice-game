@@ -1,45 +1,25 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, memo } from "react";
 import styled, { keyframes, css } from "styled-components";
 import { ChargeState } from "../../types/game";
 
+/* === LIGHTWEIGHT ANIMATIONS === */
 const pulse = keyframes`
-  0%, 100% {
-    transform: scale(1);
-    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
-  }
-  50% {
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1));
-  }
+  0%,100% { transform: scale(1); box-shadow: 0 0 8px #ffd700; }
+  50% { transform: scale(1.05); box-shadow: 0 0 16px #ffd700; }
 `;
-
-const rotate = keyframes`
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-`;
-
+const rotate = keyframes`from{transform:rotate(0deg);}to{transform:rotate(360deg);}`;
 const shimmer = keyframes`
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0%{background-position:-200% 0;}100%{background-position:200% 0;}
 `;
-
 const overchargeGlow = keyframes`
-  0%, 100% {
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8),
-                0 0 60px rgba(255, 215, 0, 0.5),
-                inset 0 0 20px rgba(255, 255, 255, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 50px rgba(255, 215, 0, 1),
-                0 0 100px rgba(255, 215, 0, 0.8),
-                inset 0 0 30px rgba(255, 255, 255, 0.5);
-  }
+  0%,100%{box-shadow:0 0 20px #ffd700,inset 0 0 15px rgba(255,255,255,.4);}
+  50%{box-shadow:0 0 35px #ffd700,inset 0 0 25px rgba(255,255,255,.6);}
 `;
 
 const ChargeContainer = styled.div`
   position: absolute;
   width: 190px;
-  right: 0px;
+  right: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -57,90 +37,48 @@ const CircularGauge = styled.div<{
   height: 150px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
   border: 3px solid #00f2ff;
   overflow: hidden;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, background 0.3s ease;
 
   ${(p) =>
     p.$full &&
     css`
-      animation: ${pulse} 1.5s ease-in-out infinite;
-      border-color: #76691e;
+      animation: ${pulse} 2s ease-in-out infinite;
+      border-color: #ffd700;
     `}
-
   ${(p) =>
     p.$overcharge &&
     css`
-      animation: ${overchargeGlow} 1s ease-in-out infinite;
+      animation: ${overchargeGlow} 1.5s ease-in-out infinite;
       border-color: #e100ff;
-      background: linear-gradient(
-        135deg,
-        rgba(255, 215, 0, 0.3),
-        rgba(255, 255, 255, 0.2)
-      );
+      background: radial-gradient(circle, rgba(255, 215, 0, 0.15), transparent);
     `}
-
-&::before {
+  &::before {
     content: "";
     position: absolute;
-    inset: -3px;
+    inset: 0;
     border-radius: 50%;
     background: conic-gradient(
-      from 0deg,
-      #ffd700 0%,
       #ffd700 ${(props) => props.$percentage}%,
-      transparent ${(props) => props.$percentage}%,
-      transparent 100%
+      rgba(255, 255, 255, 0.1) ${(props) => props.$percentage}% 100%
     );
-    mask: radial-gradient(
-      circle,
-      transparent 0%,
-      transparent calc(50% - 6px),
-      black calc(50% - 6px),
-      black 50%
-    );
-    -webkit-mask: radial-gradient(
-      circle,
-      transparent 0%,
-      transparent calc(50% - 6px),
-      black calc(50% - 6px),
-      black 50%
-    );
-    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
-    transition: background 0.4s linear; /* 👈 smooth hardware-accelerated change */
-    will-change: background;
+    mask: radial-gradient(circle, transparent 60%, black 61%);
+    transition: background 0.2s linear;
   }
-
-  ${(props) =>
-    props.$full &&
-    css`
-      &::before {
-        filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1));
-      }
-    `}
-
   ${(props) =>
     props.$overcharge &&
     css`
       &::after {
         content: "";
         position: absolute;
-        inset: -1px;
+        inset: 0;
         border-radius: 50%;
-        background: conic-gradient(
-          from 0deg,
-          transparent,
-          #84ff00,
-          transparent,
-          #ffe600,
-          transparent
-        );
-        animation: ${rotate} 0.5s linear infinite;
-        opacity: 1;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        animation: ${rotate} 1s linear infinite;
       }
     `}
 `;
@@ -148,66 +86,53 @@ const CircularGauge = styled.div<{
 const ChargeValue = styled.div<{ $full: boolean; $overcharge: boolean }>`
   font-size: 28px;
   font-weight: 900;
-  color: ${(p) => (p.$full ? "#ff0000" : "rgba(255, 255, 255, 1)")};
-  z-index: 1;
-  transition: all 0.3s ease;
+  color: ${(p) => (p.$overcharge ? "#ff00ff" : p.$full ? "#ffd700" : "#fff")};
   font-family: "Orbitron", sans-serif;
+  z-index: 1;
+  transition: color 0.3s ease;
 `;
 
 const ChargeLabel = styled.div<{ $full: boolean; $overcharge: boolean }>`
   color: ${(p) =>
-    p.$full || p.$overcharge ? "#ffd700" : "rgba(255, 255, 255, 0.6)"};
+    p.$overcharge ? "#ff00ff" : p.$full ? "#ffd700" : "rgba(255,255,255,0.7)"};
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
   text-shadow: ${(p) =>
-    p.$full || p.$overcharge ? "0 0 8px rgba(255, 215, 0, 0.8)" : "none"};
+    p.$full || p.$overcharge ? "0 0 8px rgba(255,215,0,0.7)" : "none"};
   transition: all 0.3s ease;
 `;
 
 const SpacebarHint = styled.div<{ $show: boolean }>`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  line-height: 1;
-  height: fit-content;
-  margin-top: 4px;
-  padding: 6px 12px;
+  opacity: ${(p) => (p.$show ? 1 : 0)};
+  transform: translateY(${(p) => (p.$show ? 0 : "8px")});
   background: linear-gradient(
     90deg,
     rgba(255, 215, 0, 0.2),
     rgba(255, 255, 255, 0.2),
     rgba(255, 215, 0, 0.2)
   );
-  background-size: 200% 100%;
-  border: 1px solid rgba(255, 215, 0, 0.5);
+  border: 1px solid rgba(255, 215, 0, 0.4);
   border-radius: 8px;
   color: #ffd700;
-  font-size: 14px;
+  padding: 6px 10px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 1px;
   text-transform: uppercase;
-  opacity: ${(p) => (p.$show ? 1 : 0)};
-  transform: translateY(${(p) => (p.$show ? 0 : "10px")});
-  transition: all 0.3s ease;
-  animation: ${shimmer} 2s linear infinite;
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-  margin: 0 16px;
+  animation: ${shimmer} 3s linear infinite;
+  transition: opacity 0.4s ease, transform 0.4s ease;
 `;
 
 const OverchargeTimer = styled.div`
   position: absolute;
-  bottom: -30px;
+  bottom: 0px;
   left: 50%;
   transform: translateX(-50%);
   color: #ffd700;
-  font-size: 20px;
+  font-size: 32px;
   font-weight: 700;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 1);
-  white-space: nowrap;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
 `;
 
 interface ChargeIndicatorProps {
@@ -215,33 +140,38 @@ interface ChargeIndicatorProps {
   gameTime: number;
 }
 
-export const ChargeIndicator: React.FC<ChargeIndicatorProps> = ({
+const ChargeIndicatorBase: React.FC<ChargeIndicatorProps> = ({
   chargeState,
   gameTime,
 }) => {
-  const percentageTarget = (chargeState.current / chargeState.max) * 100;
+  const rawTarget = (chargeState.current / chargeState.max) * 100;
+  const percentageTarget = Math.min(100, Math.max(0, rawTarget)); // clamp 0–100
   const [displayPercentage, setDisplayPercentage] = useState(percentageTarget);
   const isFull = chargeState.current >= chargeState.max;
   const isOvercharge = chargeState.overchargeActive;
   const lastDisplayRef = useRef(displayPercentage);
 
-  // Smooth interpolation of fill animation
+  /* === Smooth, bounded interpolation === */
   useEffect(() => {
+    if (Math.abs(lastDisplayRef.current - percentageTarget) < 0.1) {
+      setDisplayPercentage(percentageTarget);
+      return;
+    }
     let frame: number;
-    const duration = 200;
     const start = performance.now();
     const from = lastDisplayRef.current;
     const to = percentageTarget;
+    const duration = 180;
 
     const animate = (time: number) => {
       const progress = Math.min((time - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const eased = progress * (2 - progress);
       const current = from + (to - from) * eased;
       setDisplayPercentage(current);
-      if (progress < 1) {
-        frame = requestAnimationFrame(animate);
-      } else {
+      if (progress < 1) frame = requestAnimationFrame(animate);
+      else {
         lastDisplayRef.current = to;
+        setDisplayPercentage(to);
       }
     };
 
@@ -253,6 +183,8 @@ export const ChargeIndicator: React.FC<ChargeIndicatorProps> = ({
     ? Math.max(0, Math.ceil((chargeState.overchargeEndTime - gameTime) / 60))
     : 0;
 
+  const shownValue = Math.round(displayPercentage);
+
   return (
     <ChargeContainer>
       <CircularGauge
@@ -261,7 +193,7 @@ export const ChargeIndicator: React.FC<ChargeIndicatorProps> = ({
         $overcharge={isOvercharge}
       >
         <ChargeValue $full={isFull} $overcharge={isOvercharge}>
-          {Math.floor(displayPercentage)}%
+          {shownValue}%
         </ChargeValue>
       </CircularGauge>
 
@@ -272,10 +204,11 @@ export const ChargeIndicator: React.FC<ChargeIndicatorProps> = ({
       <SpacebarHint $show={isFull && !isOvercharge}>
         Press SPACE to activate!
       </SpacebarHint>
-
       {isOvercharge && remainingTime > 0 && (
-        <OverchargeTimer>{remainingTime}s remaining</OverchargeTimer>
+        <OverchargeTimer>{remainingTime}s</OverchargeTimer>
       )}
     </ChargeContainer>
   );
 };
+
+export const ChargeIndicator = memo(ChargeIndicatorBase);

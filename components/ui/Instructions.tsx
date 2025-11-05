@@ -406,6 +406,10 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
           <SubText style={{ textAlign: "left" }}>
             {`⚡"(^)" ➡️ +2.5% combo multiplier`}{" "}
           </SubText>
+          <br></br>
+          <SubText style={{ textAlign: "left" }}>
+            {`100% charged meter? Press Spacebar! ➡️ 10 second invincibility, full shields, & +10% multiplier`}{" "}
+          </SubText>
         </InstructionsPanel>
       </InstructionsContainer>
       <CreatedBy show={show}>
