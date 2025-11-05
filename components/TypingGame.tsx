@@ -350,8 +350,8 @@ const fadeInFromTop = keyframes`
 const StartButton = styled.button`
   position: absolute;
   top: 710px;
-  padding: 100px 25px;
-  font-size: 48px;
+  padding: 140px 45px;
+  font-size: 64px;
   font-weight: bold;
   font-family: "Orbitron", sans-serif;
   letter-spacing: 3px;
@@ -383,7 +383,7 @@ const StartButton = styled.button`
 
   &:hover {
     color: #fff;
-    letter-spacing: 10px;
+    letter-spacing: 20px;
     background: linear-gradient(135deg, #22d3ee, #9333ea, #ff007f, #00fff2);
     background-size: 300% 300%;
     box-shadow: 0 0 30px rgba(0, 255, 255, 0.9),
@@ -391,7 +391,6 @@ const StartButton = styled.button`
       inset 0 0 30px rgba(255, 255, 255, 0.6);
     text-shadow: 0 0 25px #22d3ee, 0 0 45px #9333ea, 0 0 65px #ec4899,
       0 0 85px #00fff2;
-    transform: scale(1.1);
   }
 
   @keyframes hoverWarp {

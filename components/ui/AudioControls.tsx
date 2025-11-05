@@ -36,7 +36,7 @@ const ToggleButton = styled.button<{ $active: boolean }>`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 20px 32px;
+  padding: 16px 24px 16px 12px;
   background: ${(props) =>
     props.$active
       ? "linear-gradient(135deg, rgba(34, 211, 238, 0.3) 0%, rgba(147, 51, 234, 0.3) 100%)"
@@ -94,7 +94,7 @@ const ToggleButton = styled.button<{ $active: boolean }>`
 `;
 
 const IconWrapper = styled.div<{ $active: boolean }>`
-  font-size: 24px;
+  font-size: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -107,12 +107,16 @@ const IconWrapper = styled.div<{ $active: boolean }>`
     color: #22d3ee;
     transform: scale(1.1);
   }
+
+  @media screen and (max-width: 1440px) {
+    font-size: 26px;
+  }
 `;
 
 const Label = styled.span<{ $active: boolean }>`
   color: ${(props) => (props.$active ? "#ffffff" : "rgba(255, 255, 255, 0.7)")};
   font-weight: 700;
-  font-size: 14px;
+  font-size: 18px;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-family: "Orbitron", monospace;
@@ -123,13 +127,17 @@ const Label = styled.span<{ $active: boolean }>`
   ${ToggleButton}:hover & {
     color: #ffffff;
   }
+
+  @media screen and (max-width: 1440px) {
+    font-size: 14px;
+  }
 `;
 
 const StatusIndicator = styled.div<{ $active: boolean }>`
-  width: 8px;
-  height: 8px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  background: ${(props) => (props.$active ? "#00ff88" : "#ff4444")};
+  background: ${(props) => (props.$active ? "#00ff88" : "#ff0000")};
   box-shadow: ${(props) =>
     props.$active ? "0 0 10px #00ff88" : "0 0 10px #ff4444"};
   position: relative;

@@ -397,16 +397,27 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
         <InstructionsPanel show={show} delay={1.2}>
           <SubText>Watch for special symbols for power ups!</SubText>
           <br></br>
-          <SubText style={{ textAlign: "left" }}>
+          <SubText style={{ textAlign: "left", color: "cyan" }}>
             {`🛡️"!" ➡️ +3 Shields`}{" "}
           </SubText>
-          <SubText style={{ textAlign: "left" }}>{`❤️"$" ➡️ +1 Life`} </SubText>
-          <SubText style={{ textAlign: "left" }}>
+          <SubText style={{ textAlign: "left", color: "cyan" }}>
+            {`❤️"$" ➡️ +1 Life`}{" "}
+          </SubText>
+          <SubText style={{ textAlign: "left", color: "cyan" }}>
             {`⚡"^" ➡️ +2.5% pts multiplier`}{" "}
           </SubText>
           <br></br>
-          <SubText style={{ textAlign: "left" }}>100% charged meter:</SubText>
-          <SubText style={{ textAlign: "left" }}>
+          <SubText
+            style={{
+              textAlign: "left",
+              color: "#c32bff",
+              fontWeight: 800,
+              textTransform: "uppercase",
+            }}
+          >
+            100% charged meter:
+          </SubText>
+          <SubText style={{ textAlign: "left", color: "cyan" }}>
             {`Press Spacebar! ➡️ 10 second invincibility, full shields, & +10% multiplier`}{" "}
           </SubText>
         </InstructionsPanel>
