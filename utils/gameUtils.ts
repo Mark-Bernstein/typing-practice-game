@@ -171,24 +171,23 @@ export const getWordScore = (word: string): number => {
 
 export const getLevelMessage = (lettersCorrect: number): string => {
   if (lettersCorrect >= LEVEL_THRESHOLDS.MAX_LEVEL)
-    return "Level 10: GOD MODE!";
+    return "FINAL LEVEL: GOD MODE";
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_9)
-    return "Level 9: Lightning Fingers!";
+    return "Level 9: Digital Deity";
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_8)
-    return "Level 8: Master of Speed!";
+    return "Level 8: Cyber Samurai";
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_7)
-    return "Level 7: Precision Expert!";
+    return "Level 7: Lightning Typist";
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_6)
-    return "Level 6: Typing Virtuoso!";
+    return "Level 6: Keystorm Commander";
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_5)
-    return "Level 5: Word Warrior!";
-  if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_4)
-    return "Level 4: Master Typist!";
+    return "Level 5: Rapid Reactor";
+  if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_4) return "Level 4: Word Slicer";
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_3)
-    return "Level 3: Expert Mode!";
+    return "Level 3: Rising Challenger";
   if (lettersCorrect >= LEVEL_THRESHOLDS.LEVEL_2)
-    return "Level 2: Getting Better!";
-  if (lettersCorrect >= 0) return "Level 1: Beginner Mode!";
+    return "Level 2: Typing Trainee";
+  if (lettersCorrect >= 0) return "Level 1: Initiate";
   return "";
 };
 

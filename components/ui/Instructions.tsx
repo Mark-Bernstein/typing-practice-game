@@ -384,8 +384,6 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
           <SubText>Type the letters/words before they hit the bottom</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={0.6}>
-          <SubText>Home row keys: +1 point</SubText>
-          <SubText>All others: +2 points</SubText>
           <SubText>Wrong keystrokes: -3 points</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={0.8}>
