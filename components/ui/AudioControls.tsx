@@ -53,6 +53,7 @@ const ToggleButton = styled.button<{ $active: boolean }>`
       : "0 4px 12px rgba(0, 0, 0, 0.3)"};
   position: relative;
   overflow: hidden;
+  min-width: 250px;
 
   &:hover {
     transform: translateX(5px);
@@ -89,7 +90,7 @@ const ToggleButton = styled.button<{ $active: boolean }>`
 
   @media screen and (max-width: 1440px) {
     padding: 12px;
-    max-width: 200px;
+    min-width: 200px;
   }
 `;
 
