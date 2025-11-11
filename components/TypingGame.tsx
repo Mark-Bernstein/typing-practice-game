@@ -16,16 +16,7 @@ import { useAudioContext } from "../app/contexts/AudioContext";
 import { useGameDimensions } from "@/hooks/useGameDimensions";
 import { GameMode } from "../types/game";
 import { motion, AnimatePresence } from "framer-motion";
-
-const pulse = keyframes`
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.2); }
-`;
-
-const gridMove = keyframes`
-  0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(50px, 50px, 0); }
-`;
+import { BackgroundParticles } from "./ui/BackgroundParticles";
 
 const GameWrapper = styled.div<{ $level: number }>`
   position: relative;
@@ -50,64 +41,6 @@ const GameWrapper = styled.div<{ $level: number }>`
     const clampedLevel = Math.min(Math.max($level, 1), 10);
     return `background: ${gradients[clampedLevel]};`;
   }}
-`;
-
-const ParticleDot = styled.div<{ $left: number; $top: number; $delay: number }>`
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: white;
-  opacity: 0.3;
-  left: ${({ $left }) => `${$left}%`};
-  top: ${({ $top }) => `${$top}%`};
-  animation-name: ${pulse};
-  animation-iteration-count: infinite;
-  animation-timing-function: linear;
-  animation-delay: ${({ $delay }) => `${$delay}s`};
-`;
-
-const ParticleLayer = styled.div`
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-`;
-
-const GridBackground = styled.div`
-  position: absolute;
-  inset: 0;
-  opacity: 0.05;
-  background-image: linear-gradient(
-      rgba(255, 255, 255, 0.1) 1px,
-      transparent 1px
-    ),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  background-size: 50px 50px;
-  animation: ${gridMove} 20s linear infinite;
-`;
-
-const GlowingOrb = styled.div<{
-  $size: number;
-  $color: string;
-  $top?: string;
-  $left?: string;
-  $bottom?: string;
-  $right?: string;
-  $delay?: string;
-}>`
-  position: absolute;
-  width: ${({ $size }) => $size}px;
-  height: ${({ $size }) => $size}px;
-  border-radius: 50%;
-  background: ${({ $color }) => $color};
-  opacity: 0.2;
-  filter: blur(30px);
-  animation: ${pulse} 4s infinite;
-  top: ${({ $top }) => $top || "auto"};
-  left: ${({ $left }) => $left || "auto"};
-  bottom: ${({ $bottom }) => $bottom || "auto"};
-  right: ${({ $right }) => $right || "auto"};
-  animation-delay: ${({ $delay }) => $delay || "0s"};
 `;
 
 const GameContainer = styled.div`
@@ -349,8 +282,8 @@ const fadeInFromTop = keyframes`
 
 const StartButton = styled.button`
   position: absolute;
-  top: 710px;
-  padding: 140px 45px;
+  top: 720px;
+  padding: 120px 25px;
   font-size: 64px;
   font-weight: bold;
   font-family: "Orbitron", sans-serif;
@@ -437,14 +370,14 @@ const StartButton = styled.button`
       rgba(166, 255, 0, 0.8) 100%
     );
     animation: orbRotate 5s linear infinite;
-    filter: blur(80px);
+    filter: blur(40px);
   }
 
   &::after {
     background: radial-gradient(
       circle,
       rgba(147, 51, 234, 0.6) 60%,
-      rgba(34, 211, 238, 0.5) 80%,
+      rgba(0, 255, 238, 0.5) 80%,
       transparent 100%
     );
     animation: orbPulse 2.5s ease-in-out infinite;
@@ -493,25 +426,25 @@ const TotalPlaysDisplay = styled.div`
   width: 420px;
   max-height: 70vh;
   background: #000000;
-  backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   padding: 20px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
   overflow: hidden;
-  animation: slideInRight 2s ease-in-out;
+  backdrop-filter: blur(12px);
+  animation: slideInLeft 2s ease-in-out;
 
-  @keyframes slideInRight {
+  @keyframes slideInLeft {
     0% {
-      transform: translateX(500px);
+      transform: translateX(-500px);
       opacity: 0;
     }
     60% {
-      transform: translateX(-20px);
+      transform: translateX(20px);
       opacity: 1;
     }
     80% {
-      transform: translateX(10px);
+      transform: translateX(-10px);
     }
     100% {
       transform: translateX(0);
@@ -553,14 +486,12 @@ export const ModeSelector = ({ children }: { children: React.ReactNode }) => {
         scale: 0.1,
         rotateX: 75,
         rotateY: -45,
-        filter: "blur(25px)",
       }}
       animate={{
         opacity: 1,
         scale: 1,
         rotateX: 0,
         rotateY: 0,
-        filter: "blur(0px)",
       }}
       transition={{
         duration: 1.2,
@@ -767,32 +698,6 @@ const MaxLevelText = styled.div`
   }
 `;
 
-function seededRandom(seed: number) {
-  const x = Math.sin(seed) * 10000;
-  return x - Math.floor(x);
-}
-
-interface ParticleProps {
-  index: number;
-  delay: number;
-  lettersCorrect: number;
-}
-
-const Particle: React.FC<ParticleProps> = React.memo(
-  ({ index, delay }) => {
-    const left = +(seededRandom(index * 2) * 100).toFixed(3);
-    const top = +(seededRandom(index * 3) * 100).toFixed(3);
-
-    return <ParticleDot $left={left} $top={top} $delay={delay} />;
-  },
-  (prevProps, nextProps) =>
-    prevProps.lettersCorrect === nextProps.lettersCorrect &&
-    prevProps.index === nextProps.index &&
-    prevProps.delay === nextProps.delay
-);
-
-Particle.displayName = "Particle";
-
 const GamePlay: React.FC<{
   onExit: () => void;
   onLevelChange?: (level: number) => void;
@@ -801,8 +706,6 @@ const GamePlay: React.FC<{
   const dimensions = useGameDimensions();
   const { playSFX } = useAudioContext();
   const { gameState, resetGame } = useTypingGame(playSFX, dimensions, gameMode);
-
-  const [particles] = useState(() => Array.from({ length: 50 }, (_, i) => i));
   const [levelMessage, setLevelMessage] = useState(getLevelMessage(0));
   const prevLevelRef = React.useRef(gameState.level);
   const [showLevelUpVortex, setShowLevelUpVortex] = useState(false);
@@ -862,42 +765,6 @@ const GamePlay: React.FC<{
 
   return (
     <>
-      <ParticleLayer>
-        {particles.map((i) => (
-          <Particle
-            key={i}
-            index={i}
-            delay={i * 0.1}
-            lettersCorrect={gameState.lettersCorrect}
-          />
-        ))}
-      </ParticleLayer>
-
-      <GridBackground />
-      <GlowingOrb
-        key="orb-1"
-        $size={128}
-        $color="#06b6d4"
-        $top="40px"
-        $left="40px"
-      />
-      <GlowingOrb
-        key="orb-2"
-        $size={96}
-        $color="#9333ea"
-        $bottom="40px"
-        $right="40px"
-        $delay="1s"
-      />
-      <GlowingOrb
-        key="orb-3"
-        $size={64}
-        $color="#ec4899"
-        $top="50%"
-        $left="25%"
-        $delay="2s"
-      />
-
       <GameContainer>
         <GameStats
           time={gameState.time}
@@ -1037,6 +904,8 @@ export const TypingGame: React.FC = () => {
 
   return (
     <GameWrapper $level={currentLevel}>
+      {/* // TODO - try to make this background only for outside of the GameArea */}
+      {/* <BackgroundParticles isActive={!hasStarted} /> */}
       <AudioControls
         musicEnabled={musicEnabled}
         sfxEnabled={sfxEnabled}
@@ -1046,6 +915,7 @@ export const TypingGame: React.FC = () => {
 
       {!hasStarted && (
         <StartScreen>
+          <BackgroundParticles isActive={!hasStarted} />
           <TitleMainMenu>Typing Challenge</TitleMainMenu>
 
           <ModeSelector>

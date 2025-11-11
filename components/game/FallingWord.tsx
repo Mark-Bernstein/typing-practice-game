@@ -21,9 +21,9 @@ const Letter = styled.span<{ $color: string; $size: number; $typed: boolean }>`
   line-height: 0.6;
   font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
   color: ${(props) => (props.$typed ? "#00ff88" : props.$color)};
-  -webkit-text-stroke: 0.5px #d0ff00; /* cyan outline */
+  -webkit-text-stroke: 0.7px #d0ff00;
   transition: all 0.2s ease;
-  transform: ${(props) => (props.$typed ? "scale(1.1)" : "scale(1)")};
+  transform: ${(props) => (props.$typed ? "scale(1.2)" : "scale(1)")};
 `;
 
 interface FallingWordProps {

@@ -39,13 +39,13 @@ const Overlay = styled.div`
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(20px);
   z-index: 100;
 `;
 
 const Container = styled.div`
   position: relative;
-  max-width: 600px;
+  max-width: 530px;
   width: 100%;
   margin: 0 16px;
 `;
@@ -57,11 +57,11 @@ const Panel = styled.div`
     rgba(255, 255, 255, 0.08),
     rgba(255, 255, 255, 0.03)
   );
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(217, 0, 255, 1);
   border-radius: 24px;
-  padding: 48px 32px;
+  padding: 32px 16px;
   text-align: center;
-  box-shadow: 0 8px 40px rgba(0, 255, 255, 0.15);
+  box-shadow: 0 8px 40px rgba(0, 255, 255, 0.8);
 
   &::before {
     content: "";

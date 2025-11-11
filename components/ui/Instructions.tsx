@@ -70,6 +70,7 @@ const InstructionTitle = styled.h3<{ $show: boolean }>`
 
 const InstructionsContainer = styled.div<{ $show: boolean }>`
   position: absolute;
+  backdrop-filter: blur(12px);
   min-width: 300px;
   top: 180px;
   left: 16px;
@@ -198,6 +199,7 @@ export const CreatedBy = styled.div.withConfig({
   overflow: visible;
   z-index: 20;
   font-size: 32px;
+  backdrop-filter: blur(5px);
 
   /* Start off-screen and hidden */
   transform: translateY(-1000px);
@@ -360,6 +362,7 @@ const SoundcloudLink = styled.div.withConfig({
   text-align: right;
   transform: translateY(-2000px);
   opacity: 0;
+  backdrop-filter: blur(12px);
 
   ${({ show }) =>
     show

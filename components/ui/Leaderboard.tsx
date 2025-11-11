@@ -19,8 +19,7 @@ const LeaderboardContainer = styled.div`
   right: 16px;
   top: 16px;
   width: 370px;
-  background: #000000;
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   padding: 20px;
