@@ -26,6 +26,7 @@ const LeaderboardContainer = styled.div`
   box-shadow: 0 0 40px rgba(183, 0, 255, 0.5);
   overflow: hidden;
   animation: slideInRight 2s ease-in-out;
+  z-index: 1000;
 
   @keyframes slideInRight {
     0% {

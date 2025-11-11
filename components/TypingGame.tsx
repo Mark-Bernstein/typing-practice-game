@@ -27,7 +27,7 @@ const GameWrapper = styled.div<{ $level: number }>`
 
   ${({ $level }) => {
     const gradients: Record<number, string> = {
-      1: "linear-gradient(to bottom right, #312e81, #581c87, #9d174d)", // deep violet
+      1: "linear-gradient(to bottom right, #000000, #000000, #000000)", // deep black
       2: "linear-gradient(to bottom right, #581c87, #1e3a8a, #3730a3)", // indigo blend
       3: "linear-gradient(to bottom right, #1e3a8a, #164e63, #115e59)", // blue-green oceanic
       4: "linear-gradient(to bottom right, #164e63, #065f46, #166534)", // emerald depth
@@ -45,13 +45,14 @@ const GameWrapper = styled.div<{ $level: number }>`
 
 const GameContainer = styled.div`
   position: relative;
-  z-index: 10;
   width: 100%;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.01);
+  backdrop-filter: blur(10px);
+  pointer-events: auto;
 `;
 
 const LevelIndicator = styled.div`
@@ -283,7 +284,7 @@ const fadeInFromTop = keyframes`
 const StartButton = styled.button`
   position: absolute;
   top: 720px;
-  padding: 120px 25px;
+  padding: 120px 35px;
   font-size: 64px;
   font-weight: bold;
   font-family: "Orbitron", sans-serif;
@@ -418,6 +419,12 @@ const StartButton = styled.button`
   }
 `;
 
+const StartButtonModeText = styled.span`
+  display: block;
+  font-size: 24px;
+  color: #00fffb;
+`;
+
 const TotalPlaysDisplay = styled.div`
   position: absolute;
   font-size: 28px;
@@ -432,6 +439,7 @@ const TotalPlaysDisplay = styled.div`
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   backdrop-filter: blur(12px);
+  z-index: 1000;
   animation: slideInLeft 2s ease-in-out;
 
   @keyframes slideInLeft {
@@ -517,14 +525,14 @@ const ModeButton = styled.button<{ $active: boolean }>`
   border: 1px solid rgba(0, 0, 0, 0.2);
   cursor: pointer;
   overflow: hidden;
-  background: rgba(0, 225, 255, 0.3);
+  background: #7b7b7b;
   backdrop-filter: blur(20px);
   transition: all 0.5s ease;
   transform: ${(props) =>
     props.$active ? "translateY(-4px) scale(1.05)" : "scale(1)"};
   box-shadow: ${(props) =>
     props.$active
-      ? "0 0 30px rgba(34,211,238,1), 0 0 60px rgba(147,51,234,1)"
+      ? "0 0 30px rgba(34,211,238,1), 0 0 60px #3a0070"
       : "0 0 10px rgba(255,255,255,0.1)"};
 
   @media (max-width: 1440px) {
@@ -545,7 +553,14 @@ const ModeButton = styled.button<{ $active: boolean }>`
     position: absolute;
     inset: -2px;
     border-radius: 26px;
-    background: linear-gradient(60deg, #22d3ee, #9333ea, #ff0000, #22d3ee);
+    background: linear-gradient(
+      60deg,
+      #22d3ee,
+      #9400e3,
+      #000000,
+      #0600b0,
+      #22d3ee
+    );
     background-size: 400% 400%;
     opacity: ${(props) => (props.$active ? 1 : 0)};
     animation: ${(props) =>
@@ -561,7 +576,7 @@ const ModeButton = styled.button<{ $active: boolean }>`
     width: 100%;
     height: 18px;
     bottom: 0;
-    background: linear-gradient(180deg, #00fff2, #9000f0, #ff0000);
+    background: linear-gradient(180deg, #00fff2, #9900ff, #ff0000);
     background-size: 200% 200%;
     opacity: ${(props) => (props.$active ? 1 : 0)};
     filter: blur(4px);
@@ -905,7 +920,7 @@ export const TypingGame: React.FC = () => {
   return (
     <GameWrapper $level={currentLevel}>
       {/* // TODO - try to make this background only for outside of the GameArea */}
-      {/* <BackgroundParticles isActive={!hasStarted} /> */}
+      <BackgroundParticles isActive={!hasStarted} />
       <AudioControls
         musicEnabled={musicEnabled}
         sfxEnabled={sfxEnabled}
@@ -962,6 +977,7 @@ export const TypingGame: React.FC = () => {
                   }}
                 >
                   START
+                  <StartButtonModeText>{gameMode} mode</StartButtonModeText>
                 </StartButton>
               ) : (
                 <motion.div

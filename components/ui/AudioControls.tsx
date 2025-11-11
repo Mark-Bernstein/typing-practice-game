@@ -6,7 +6,7 @@ const glow = keyframes`
     box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
   }
   50% {
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.6), 0 0 30px rgba(34, 211, 238, 0.3);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.6), 0 0 30px rgba(34, 211, 238, 1);
   }
 `;
 
@@ -18,11 +18,11 @@ const ControlsContainer = styled.div`
   flex-direction: column;
   gap: 16px;
   z-index: 10000;
-  animation: slideInLeft 0.6s ease-out;
+  animation: slideInLeft 0.5s ease-out;
 
   @keyframes slideInLeft {
     from {
-      transform: translateX(-100px);
+      transform: translateX(-250px);
       opacity: 0;
     }
     to {

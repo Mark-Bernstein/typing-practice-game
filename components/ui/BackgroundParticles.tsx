@@ -79,8 +79,8 @@ export const BackgroundParticles: React.FC<BackgroundParticlesProps> = ({
           const dy = p.y - mouse.current.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 100) {
-            p.vx += dx / 400;
-            p.vy += dy / 400;
+            p.vx += dx / 300;
+            p.vy += dy / 300;
           }
         }
 
@@ -127,8 +127,10 @@ export const BackgroundParticles: React.FC<BackgroundParticlesProps> = ({
         inset: 0,
         width: "100%",
         height: "100%",
-        background: "radial-gradient(circle at 50% 50%, #0a0a0a, #000)",
-        zIndex: 0,
+        background: "transparent",
+        zIndex: 1,
+        pointerEvents: "none",
+        filter: "blur(8px)",
       }}
     />
   );

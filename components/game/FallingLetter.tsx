@@ -11,7 +11,7 @@ const StyledLetter = styled(motion.div)<{ $color: string; $size: number }>`
   color: ${(props) => props.$color};
   user-select: none;
   cursor: default;
-  z-index: 10;
+  z-index: 1000;
   text-shadow: 0 0 10px ${(props) => props.$color}CC,
     0 0 20px ${(props) => props.$color}80, 2px 2px 4px rgba(0, 0, 0, 0.8);
   will-change: transform, opacity, filter;
