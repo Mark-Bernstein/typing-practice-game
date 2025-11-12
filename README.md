@@ -22,6 +22,7 @@ Includes **music**, **sound effects**, **shields**, and **visual power-ups** for
 ### ⚡ Power-Ups & Bonuses
 
 - **🛡️ Shield Pickups (`!`)** – Absorb missed letters or words before losing lives
+- **❤️ Life Pickups (`$`)** – Regain back a missing life
 - **💥 Combo Multipliers** – Increases score by maintaining accuracy.
 - **🛡️🛡️🛡️ Charge Meter** – Gives 10 seconds of invincibility, full shields, and +10% multiplier
 
@@ -94,8 +95,6 @@ Includes **music**, **sound effects**, **shields**, and **visual power-ups** for
    ```
 
 ## 🧩 Upcoming Features
-
-- 🌀 Double Points Mode – temporary point multiplier
 
 - 💣 Letter Bomb Power-Up – clears nearby falling text
 
