@@ -13,18 +13,17 @@ Includes **music**, **sound effects**, **shields**, and **visual power-ups** for
 - **Three Game Modes**
   - 🟢 **Letter Mode** – Type single letters as they fall
   - 🟣 **Word Mode** – Complete full words for higher points
-  - 🟠 **Story Mode** – Type through evolving adventure stories _(punctuation rendered but ignored for smoother flow)_
+  - 🟠 **Story Mode** – Type through evolving adventure stories _(punctuation included!)_
 - **Progressive Difficulty** – Game speed and spawn rate increase as you improve
-- **Smart Scoring System** – Word length and combo streaks multiply your points
-- **Combo Multiplier System** – Maintain accuracy for double, triple, and beyond scoring
+- **Combo Multiplier System** – Maintain accuracy for bonus points
 
 ---
 
 ### ⚡ Power-Ups & Bonuses
 
 - **🛡️ Shield Pickups (`!`)** – Absorb missed letters or words before losing lives
-- **💥 Double Points (coming soon)** – Temporary scoring surge
-- **💣 Letter Bomb (coming soon)** – Clears nearby letters in an energy burst
+- **💥 Combo Multipliers** – Increases score by maintaining accuracy.
+- **🛡️🛡️🛡️ Charge Meter** – Gives 10 seconds of invincibility, full shields, and +10% multiplier
 
 ---
 
@@ -41,15 +40,15 @@ Includes **music**, **sound effects**, **shields**, and **visual power-ups** for
 
 ### 🎧 Audio & Feedback
 
-- **Dynamic Sound Effects** – Correct typing, shields, power-ups, and game over cues
+- **Dynamic Sound Effects** – Correct typing, shields, power-ups, game over cues, etc.
 - **Music System** – Menu and gameplay music handled by a custom audio context
-- **Real-Time Stats HUD** – Score, time, accuracy, combo multiplier, and level indicator
+- **Real-Time Stats HUD** – Time, Score, Total Correct Words/Letters, Speed %, Combo multiplier, Current mode, and level indicator, Shields, Charge Meter %, Music and SFX toggle.
 
 ---
 
 ### 💾 Leaderboard & Progress
 
-- **Online Leaderboard** – Submit your final score and see global results
+- **Online Leaderboard** – Submit your final score and see global results. (All 3 modes have their own leaderboard)
 - **Total Plays Counter** – Tracks number of games played worldwide
 - **Smooth Game Over Screen** – Animated score reveal, per-stat fade-in, and nickname prompt
 
