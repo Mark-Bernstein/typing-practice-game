@@ -1976,7 +1976,7 @@ export const ADVENTURE_STORIES: Story[] = [
   {
     id: 1,
     title: "The Shattered Realms",
-    story: `"Emberfall," she says. "The Dragon's Lair." You awaken on a misty shore beneath a crimson sunrise. The waves crash softly against jagged black volcanic rocks as the salt air fills your lungs. A tattered journal lies beside you, half soaked in seawater, its pages fluttering like broken wings. The words are faded, but one line stands clear and sharp through the blur: 
+    story: `You awaken on a misty shore beneath a crimson sunrise. The waves crash softly against jagged black volcanic rocks as the salt air fills your lungs. A tattered journal lies beside you, half soaked in seawater, its pages fluttering like broken wings. The words are faded, but one line stands clear and sharp through the blur: 
 Find the Heart of the World.
 
 You push yourself up, sand clinging to your palms. The horizon glows with dawn's first light, and ahead, the shadow of a dense jungle rises from the mist. Something heavy shifts in your pocket, a golden compass, its surface etched with runes. The needle spins wildly, then stops dead, pointing north. You feel a strange pull in your chest, as if the air itself has chosen a path for you.
