@@ -305,7 +305,6 @@ const StartButton = styled.button`
   animation: ${fadeInFromTop} 2s ease-in-out forwards,
     moveUp ease-in-out 2s forwards, jump 1.5s linear 0s 1 both;
 
-  /* 🪙 Coin spin (plays once) */
   @keyframes jump {
     90% {
       transform: rotateY(360deg) rotateX(45deg) scale(1);
@@ -367,11 +366,11 @@ const StartButton = styled.button`
     background: radial-gradient(
       circle,
       rgba(102, 0, 255, 0.8) 0%,
-      rgba(255, 0, 128, 0.8) 70%,
-      rgba(166, 255, 0, 0.8) 100%
+      rgba(200, 255, 0, 0.8) 80%,
+      rgba(255, 0, 0, 0.8) 100%
     );
-    animation: orbRotate 5s linear infinite;
-    filter: blur(40px);
+    animation: orbRotate 7s linear infinite;
+    filter: blur(50px);
   }
 
   &::after {

@@ -390,7 +390,7 @@ export const Instructions: React.FC<InstructionsProps> = ({ show }) => {
           <SubText>Wrong keystrokes: -3 points</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={0.8}>
-          <SubText>Difficulty increases nonstop</SubText>
+          <SubText>Difficulty increases as you play</SubText>
         </InstructionsPanel>
         <InstructionsPanel show={show} delay={1}>
           <SubText>Challenge yourself to beat the high score!</SubText>
