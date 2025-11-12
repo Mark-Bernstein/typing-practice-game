@@ -1,4 +1,4 @@
-# ⚡ Typing Practice Game
+# ⚡ Typing Practice Game ⚡
 
 ## Overview
 
