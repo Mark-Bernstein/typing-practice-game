@@ -53,8 +53,8 @@ const VortexCore = styled.div<{ $level: number }>`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 400px;
-  height: 400px;
+  width: 600px;
+  height: 600px;
   border-radius: 50%;
   background: ${({ $level }) => {
     const colors: Record<number, string> = {
@@ -176,7 +176,7 @@ export const LevelUpVortex: React.FC<LevelUpVortexProps> = ({
   return (
     <LevelUpContainer
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      animate={{ opacity: 0.7 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >

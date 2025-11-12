@@ -28,13 +28,13 @@ const GameWrapper = styled.div<{ $level: number }>`
   ${({ $level }) => {
     const gradients: Record<number, string> = {
       1: "linear-gradient(to bottom right, #000000, #000000, #000000)", // deep black
-      2: "linear-gradient(to bottom right, #581c87, #1e3a8a, #3730a3)", // indigo blend
-      3: "linear-gradient(to bottom right, #1e3a8a, #164e63, #115e59)", // blue-green oceanic
-      4: "linear-gradient(to bottom right, #164e63, #065f46, #166534)", // emerald depth
-      5: "linear-gradient(to bottom right, #7c2d12, #991b1b, #9d174d)", // crimson energy
-      6: "linear-gradient(to bottom right, #9d174d, #b91c1c, #c2410c)", // fiery red-orange
-      7: "linear-gradient(to bottom right, #c2410c, #ca8a04, #a16207)", // molten gold
-      8: "linear-gradient(to bottom right, #a16207, #3f6212, #15803d)", // forest vitality
+      2: "linear-gradient(to bottom right, #380062, #001b66, #3730a3)", // indigo blend
+      3: "linear-gradient(to bottom right, #0039d6, #0093c8, #115e59)", // blue-green oceanic
+      4: "linear-gradient(to bottom right, #00729b, #00bc87, #166534)", // emerald depth
+      5: "linear-gradient(to bottom right, #481200, #680000, #ff00ae)", // crimson energy
+      6: "linear-gradient(to bottom right, #ff00c8, #00eaff, #aeaeae)", // fiery red-orange
+      7: "linear-gradient(to bottom right, #c2410c, #ca8a04, #3f2500)", // molten gold
+      8: "linear-gradient(to bottom right, #a16207, #3f6212, #8b8b8b)", // forest vitality
       9: "linear-gradient(to bottom right, #15803d, #065f46, #0e7490)", // deep aqua-teal
       10: "linear-gradient(to bottom right, #0e7490, #2563eb, #7e22ce)", // radiant blue-violet finale
     };
@@ -129,7 +129,7 @@ const TitleMainMenu = styled.span`
   display: inline-block;
   font-size: 40px;
   font-weight: bold;
-  margin-bottom: 100px;
+  margin-bottom: 60px;
   text-shadow: 0 0 20px cyan;
   color: #e0ffff;
   opacity: 0;
@@ -235,10 +235,10 @@ const LevelMessage = styled.div`
   top: 50vh;
   left: 50%;
   transform: translateX(-50%);
-  color: #22d3ee;
-  font-size: 24px;
+  color: cyan;
+  font-size: 32px;
   font-weight: bold;
-  text-shadow: 0 0 8px rgba(34, 211, 238, 0.7);
+  text-shadow: 0 0 8px #000000;
   z-index: 9999;
   opacity: 0;
   animation: fadeInOut 3s ease-in-out forwards;
@@ -283,7 +283,7 @@ const fadeInFromTop = keyframes`
 
 const StartButton = styled.button`
   position: absolute;
-  top: 720px;
+  top: 750px;
   padding: 120px 35px;
   font-size: 64px;
   font-weight: bold;
@@ -413,7 +413,7 @@ const StartButton = styled.button`
       top: 800px;
     }
     to {
-      top: 450px;
+      top: 500px;
     }
   }
 `;
@@ -426,11 +426,10 @@ const StartButtonModeText = styled.span`
 
 const TotalPlaysDisplay = styled.div`
   position: absolute;
-  font-size: 28px;
+  font-size: 24px;
   left: 16px;
   top: 16px;
-  width: 420px;
-  max-height: 70vh;
+  width: 370px;
   background: #000000;
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
@@ -460,8 +459,8 @@ const TotalPlaysDisplay = styled.div`
   }
 
   @media screen and (max-width: 1440px) {
-    font-size: 20px;
-    width: 300px;
+    font-size: 18px;
+    width: 320px;
     padding: 16px;
     border-radius: 16px;
     box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
@@ -473,14 +472,44 @@ const HighlightedNumberOfPlays = styled.div`
   color: cyan;
   background-color: rgba(0, 4, 255, 0.3);
   border-radius: 10px;
-  margin-top: 20px;
+  margin-top: 8px;
+`;
+
+const ModeSelectorTitle = styled.h2`
+  font-family: "Orbitron", sans-serif;
+  display: block;
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 3px;
+  margin-bottom: 16px;
+  background: linear-gradient(90deg, #ffffff, #ffff00, #9e88ff, #00ffff);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 6s linear infinite;
+
+  @keyframes shimmer {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 300% 50%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    letter-spacing: 1.5px;
+    margin-bottom: 30px;
+  }
 `;
 
 export const ModeSelector = ({ children }: { children: React.ReactNode }) => {
   return (
     <motion.div
       style={{
-        display: "flex",
+        display: "block",
         gap: "30px",
         justifyContent: "center",
         alignItems: "center",
@@ -506,7 +535,17 @@ export const ModeSelector = ({ children }: { children: React.ReactNode }) => {
         delay: 0.6,
       }}
     >
-      {children}
+      <ModeSelectorTitle>Select a Mode</ModeSelectorTitle>
+      <div
+        style={{
+          display: "flex",
+          gap: "30px",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {children}
+      </div>
     </motion.div>
   );
 };
@@ -931,7 +970,6 @@ export const TypingGame: React.FC = () => {
         <StartScreen>
           <BackgroundParticles isActive={!hasStarted} />
           <TitleMainMenu>Typing Challenge</TitleMainMenu>
-
           <ModeSelector>
             <ModeButton
               $active={gameMode === "letter"}
