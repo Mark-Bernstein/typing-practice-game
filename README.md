@@ -1,8 +1,14 @@
 # ⚡ Typing Practice Game
 
-A **sci-fi/retro-themed interactive typing experience** built with **Next.js**, **TypeScript**, and **Styled Components**.  
-Test your reflexes, typing accuracy, and focus as glowing letters, words, and full sentences descend through a futuristic cosmos.  
-Includes **music**, **sound effects**, **shields**, and **visual power-ups** for an immersive experience.
+## Overview
+
+A **sci-fi / retro-themed interactive typing experience** built with **Next.js**, **TypeScript**, and **Styled Components**.  
+Test your reflexes, typing accuracy, and focus as glowing letters, words, and full sentences descend through a futuristic cosmos.
+
+Featuring **music**, **dynamic sound effects**, **reactive particle animations**, and **visual power-ups**, it delivers a deeply immersive and responsive gameplay experience.
+
+The backend is powered by **PostgreSQL** via **@vercel/postgres**, enabling a **live online leaderboard**, **persistent player stats**, and **server-validated scoring**.  
+Additional features include **level progression**, **shield mechanics**, **audio feedback**, and **adaptive difficulty scaling** designed for both casual and competitive players.
 
 ---
 
