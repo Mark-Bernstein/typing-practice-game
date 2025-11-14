@@ -22,8 +22,47 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Typing Practice Game",
-  description: "By: Mark Bernstein",
+  metadataBase: new URL("https://typing-prodigy.vercel.app"),
+
+  title: "Typing Prodigy – Futuristic Typing Challenge",
+  description:
+    "A neon sci-fi typing game built by Mark Bernstein. Features letters, words, story adventures, power-ups, animations, music, SFX, and a live leaderboard.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/app_icon_16.png", sizes: "16x16", type: "image/png" },
+      { url: "/app_icon_32.png", sizes: "32x32", type: "image/png" },
+      { url: "/app_icon_64.png", sizes: "64x64", type: "image/png" },
+      { url: "/app_icon_128.png", sizes: "128x128", type: "image/png" },
+      { url: "/app_icon_256.png", sizes: "256x256", type: "image/png" },
+      { url: "/app_icon_512.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: ["/app_icon-64.png"],
+    apple: [{ url: "/app_icon-128.png" }, { url: "/app_icon-256.png" }],
+  },
+  openGraph: {
+    title: "Typing Prodigy – Neon Sci-Fi Typing Game",
+    description:
+      "A futuristic typing adventure built by Mark Bernstein with interactive animations, power-ups, music, SFX, and leaderboard support.",
+    url: "https://typing-prodigy.vercel.app",
+    siteName: "Typing Prodigy",
+    images: [
+      {
+        url: "/Typing_Prodigy_Image.png",
+        width: 1200,
+        height: 630,
+        alt: "Typing Prodigy – Neon Sci-Fi Typing Game",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Typing Prodigy – Neon Sci-Fi Typing Game",
+    description:
+      "A neon-themed typing game by Mark Bernstein featuring glowing animations, story mode, and a live leaderboard.",
+    images: ["/Typing_Prodigy_Image.png"],
+  },
 };
 
 export default function RootLayout({
@@ -33,7 +72,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head></head>
+      <head>
+        <meta name="theme-color" content="#00eaff" />
+        <meta name="msapplication-TileColor" content="#00eaff" />
+
+        <meta
+          name="theme-color"
+          media="(prefers-color-scheme: dark)"
+          content="#0a0f1f"
+        />
+        <meta
+          name="theme-color"
+          media="(prefers-color-scheme: light)"
+          content="#22d3ee"
+        />
+      </head>
+
       <body
         className={`${orbitron.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >

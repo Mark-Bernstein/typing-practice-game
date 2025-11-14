@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://typing-prodigy.vercel.app/sitemap.xml
