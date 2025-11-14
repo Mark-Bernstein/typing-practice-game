@@ -55,6 +55,120 @@ const GameContainer = styled.div`
   pointer-events: auto;
 `;
 
+const QuitButton = styled.button`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 10px 22px;
+  background: rgba(255, 255, 255, 0.1);
+  color: cyan;
+  font-family: "Orbitron", sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  transition: all 0.25s ease;
+
+  &:hover {
+    background: rgba(0, 255, 255, 0.3);
+    color: #ffffff;
+    box-shadow: 0 0 25px red;
+    transform: scale(1.05);
+  }
+`;
+
+const QuitModalBackground = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5000;
+`;
+
+const QuitModalBox = styled.div`
+  width: 420px;
+  padding: 30px;
+  border-radius: 20px;
+  background: rgba(30, 30, 30, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+  color: white;
+  text-align: center;
+  font-family: "Orbitron", sans-serif;
+`;
+
+const QuitModalButtons = styled.div`
+  display: flex;
+  gap: 20px;
+  margin-top: 25px;
+  justify-content: center;
+`;
+
+const QuitOptionButton = styled.button<{ $variant?: "quit" }>`
+  position: relative;
+  overflow: hidden;
+  height: 100px;
+  width: 200px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-family: "Orbitron", sans-serif;
+  letter-spacing: 2px;
+  font-size: 24px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+
+  /* Default (Continue) style */
+  background: linear-gradient(90deg, #00d0ff, #9333ea);
+  color: #fbff00;
+  box-shadow: 0 0 12px black;
+
+  /* Quit Button Variant */
+  ${({ $variant }) =>
+    $variant === "quit" &&
+    `
+      background: linear-gradient(90deg, #ff0000, #68001c);
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+      font-size: 28px;
+    `}
+
+  &:hover {
+    transform: translateX(5px) scale(1.06);
+
+    ${({ $variant }) =>
+      $variant === "quit"
+        ? `box-shadow: 0 0 30px #ffffff;`
+        : `box-shadow: 0 0 30px cyan;`}
+  }
+
+  /* Shimmer sweep */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      transparent 10%,
+      rgba(255, 255, 255, 0.5) 50%,
+      transparent 50%
+    );
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+
+  &:hover::before {
+    transform: translateX(100%);
+  }
+`;
+
 const LevelIndicator = styled.div`
   position: absolute;
   top: 0.5vh;
@@ -758,11 +872,32 @@ const GamePlay: React.FC<{
 }> = ({ onExit, onLevelChange, gameMode }) => {
   const dimensions = useGameDimensions();
   const { playSFX } = useAudioContext();
-  const { gameState, resetGame } = useTypingGame(playSFX, dimensions, gameMode);
+  const [isPaused, setIsPaused] = useState(false);
+  const { gameState, resetGame } = useTypingGame(
+    playSFX,
+    dimensions,
+    gameMode,
+    isPaused
+  );
+
   const [levelMessage, setLevelMessage] = useState(getLevelMessage(0));
   const prevLevelRef = React.useRef(gameState.level);
   const [showLevelUpVortex, setShowLevelUpVortex] = useState(false);
   const [vortexLevel, setVortexLevel] = useState(1);
+  const [showQuitModal, setShowQuitModal] = useState(false);
+
+  // ESC key opens quit modal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowQuitModal(true);
+        setIsPaused(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
 
   const gameStats = calculateGameStats(
     gameState.time,
@@ -850,6 +985,14 @@ const GamePlay: React.FC<{
 
       {!gameState.gameOver && (
         <>
+          <QuitButton
+            onClick={() => {
+              setShowQuitModal(true);
+              setIsPaused(true);
+            }}
+          >
+            Quit
+          </QuitButton>
           <LevelIndicator>
             <span>Level {gameState.level}</span>
           </LevelIndicator>
@@ -872,6 +1015,38 @@ const GamePlay: React.FC<{
           </ProgressWrapper>
         </>
       )}
+
+      {showQuitModal && (
+        <QuitModalBackground>
+          <QuitModalBox>
+            <h2>- Quit Game -</h2>
+            <br></br>
+            <p>Are you sure you want to return to the main menu?</p>
+
+            <QuitModalButtons>
+              <QuitOptionButton
+                onClick={() => {
+                  setShowQuitModal(false);
+                  setIsPaused(false);
+                }}
+              >
+                Continue Playing
+              </QuitOptionButton>
+
+              <QuitOptionButton
+                $variant="quit"
+                onClick={() => {
+                  resetGame();
+                  onExit();
+                }}
+              >
+                Quit
+              </QuitOptionButton>
+            </QuitModalButtons>
+          </QuitModalBox>
+        </QuitModalBackground>
+      )}
+
       <AnimatePresence>
         {showLevelUpVortex && (
           <LevelUpVortex

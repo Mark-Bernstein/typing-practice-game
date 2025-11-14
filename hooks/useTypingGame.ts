@@ -23,7 +23,8 @@ const getComboMultiplier = (comboCount: number): number => {
 export const useTypingGame = (
   playSFX: (effect: SoundEffect) => void,
   dimensions: GameDimensions,
-  initialGameMode: GameMode = "letter"
+  initialGameMode: GameMode = "letter",
+  isPaused: boolean
 ) => {
   const getInitialState = useCallback((): GameState => {
     const baseState: GameState = {
@@ -101,6 +102,9 @@ export const useTypingGame = (
   const gameLoop = useCallback(() => {
     setGameState((prevState) => {
       if (prevState.gameOver) return prevState;
+
+      // ⬇️ Paused: do nothing, keep state as is
+      if (isPaused) return prevState;
 
       const newState = { ...prevState };
       newState.time += 1;
@@ -488,10 +492,13 @@ export const useTypingGame = (
       newState.level = getLevel(newState.lettersCorrect);
       return newState;
     });
-  }, [playSFX]);
+  }, [playSFX, isPaused]);
 
   const handleKeyPress = useCallback(
     (key: string) => {
+      // If paused, ignore all gameplay input
+      if (isPaused) return;
+
       // ===== CHARGE METER ACTIVATION (SPACE key) =====
       if (key === " " || key === "Spacebar") {
         setGameState((prevState) => {
@@ -862,7 +869,7 @@ export const useTypingGame = (
         return newState;
       });
     },
-    [playSFX]
+    [isPaused, playSFX]
   );
 
   const resetGame = useCallback(() => {
