@@ -172,7 +172,16 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
 }) => {
   return (
     <ControlsContainer>
-      <ToggleButton $active={musicEnabled} onClick={onToggleMusic}>
+      <ToggleButton
+        $active={musicEnabled}
+        onClick={(e) => {
+          onToggleMusic();
+          e.currentTarget.blur();
+        }}
+        onKeyDown={(e) => {
+          if (e.code === "Space") e.preventDefault();
+        }}
+      >
         <IconWrapper $active={musicEnabled}>
           {musicEnabled ? "🔊" : "🔇"}
         </IconWrapper>
@@ -182,7 +191,16 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
         </Label>
         <StatusIndicator $active={musicEnabled} />
       </ToggleButton>
-      <ToggleButton $active={sfxEnabled} onClick={onToggleSFX}>
+      <ToggleButton
+        $active={sfxEnabled}
+        onClick={(e) => {
+          onToggleSFX();
+          e.currentTarget.blur(); // ← prevents spacebar reactivating it
+        }}
+        onKeyDown={(e) => {
+          if (e.code === "Space") e.preventDefault();
+        }}
+      >
         <IconWrapper $active={sfxEnabled}>
           {sfxEnabled ? "🔊" : "🔇"}
         </IconWrapper>
