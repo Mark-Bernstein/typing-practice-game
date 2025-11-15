@@ -407,7 +407,7 @@ const StartButton = styled.button`
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  z-index: 1;
+  z-index: 10000;
   overflow: visible;
   box-shadow: 0 0 30px rgba(147, 51, 234, 0.9), 0 0 60px rgba(34, 211, 238, 0.8);
   background-size: 200% 200%;
