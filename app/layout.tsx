@@ -27,6 +27,7 @@ export const metadata: Metadata = {
   title: "Typing Prodigy – Futuristic Typing Challenge",
   description:
     "A neon sci-fi typing game built by Mark Bernstein. Features letters, words, story adventures, power-ups, animations, music, SFX, and a live leaderboard.",
+
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -37,9 +38,15 @@ export const metadata: Metadata = {
       { url: "/app_icon_256.png", sizes: "256x256", type: "image/png" },
       { url: "/app_icon_512.png", sizes: "512x512", type: "image/png" },
     ],
-    shortcut: ["/app_icon-64.png"],
-    apple: [{ url: "/app_icon-128.png" }, { url: "/app_icon-256.png" }],
+
+    shortcut: ["/app_icon_64.png"],
+
+    apple: [
+      { url: "/app_icon_128.png", sizes: "128x128" },
+      { url: "/app_icon_256.png", sizes: "256x256" },
+    ],
   },
+
   openGraph: {
     title: "Typing Prodigy – Neon Sci-Fi Typing Game",
     description:
@@ -56,6 +63,7 @@ export const metadata: Metadata = {
     ],
     type: "website",
   },
+
   twitter: {
     card: "summary_large_image",
     title: "Typing Prodigy – Neon Sci-Fi Typing Game",
@@ -72,22 +80,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <meta name="theme-color" content="#00eaff" />
-        <meta name="msapplication-TileColor" content="#00eaff" />
-
-        <meta
-          name="theme-color"
-          media="(prefers-color-scheme: dark)"
-          content="#0a0f1f"
-        />
-        <meta
-          name="theme-color"
-          media="(prefers-color-scheme: light)"
-          content="#22d3ee"
-        />
-      </head>
-
       <body
         className={`${orbitron.className} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
