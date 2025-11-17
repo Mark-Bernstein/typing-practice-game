@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { formatDistanceToNow } from "date-fns";
 import { GameMode } from "@/types/game";
 
@@ -300,9 +300,10 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContent = styled.div`
+  position: relative;
   background: #111;
   border-radius: 16px;
-  padding: 30px;
+  padding: 24px;
   width: 400px;
   max-width: 90%;
   color: #fff;
@@ -310,8 +311,61 @@ const ModalContent = styled.div`
   font-family: "Orbitron", sans-serif;
 `;
 
+const shimmer = keyframes`
+  0% { transform: translateX(-150%); opacity: 0; }
+  50% { opacity: 0.7; }
+  100% { transform: translateX(150%); opacity: 0; }
+`;
+
+export const CloseButton = styled.button`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: rgb(255, 255, 255);
+  transition: all 0.25s ease;
+  box-shadow: 0 0 6px rgba(170, 0, 255, 0.4);
+  overflow: hidden;
+
+  &:hover {
+    transform: scale(1.12);
+    color: #22d3ee;
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.7),
+      0 0 28px rgba(147, 51, 234, 0.7);
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.35) 50%,
+      transparent 100%
+    );
+    transform: translateX(-150%);
+  }
+
+  &:hover::before {
+    animation: ${shimmer} 0.6s ease forwards;
+  }
+`;
+
 const ModalTitle = styled.h3`
   margin: 0 0 20px 0;
+  padding-right: 24px;
   font-size: 22px;
   color: #0ff;
   text-align: center;
@@ -427,6 +481,10 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ refreshTrigger }) => {
     }
   };
 
+  const handleCloseModal = () => {
+    setSelectedScore(null);
+  };
+
   return (
     <LeaderboardContainer>
       <TitleRow>
@@ -489,8 +547,11 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ refreshTrigger }) => {
       )}
 
       {selectedScore && (
-        <ModalOverlay onClick={() => setSelectedScore(null)}>
+        <ModalOverlay onClick={handleCloseModal}>
           <ModalContent onClick={(e) => e.stopPropagation()}>
+            <CloseButton onClick={handleCloseModal} aria-label="Close">
+              ✕
+            </CloseButton>
             <ModalTitle>{selectedScore.nickname}&apos;s Stats</ModalTitle>
             <ModalRow>
               <span>Mode:</span>
