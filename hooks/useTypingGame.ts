@@ -210,20 +210,23 @@ export const useTypingGame = (
 
       // ===== LETTER MODE =====
       if (prevState.gameMode === "letter") {
-        newState.letters = newState.letters.map((letter) => ({
-          ...letter,
-          y: letter.y + effectiveSpeed,
-        }));
+        const bottomLimit = newState.dimensions.height;
 
-        const lettersReachedBottom = newState.letters.filter(
-          (l) =>
-            l.y + newState.dimensions.letterSize >= newState.dimensions.height
-        );
+        const updatedLetters = newState.letters.map((letter) => {
+          const nextY = letter.y + effectiveSpeed;
+          return {
+            ...letter,
+            y: Math.min(nextY, bottomLimit),
+            __hitBottom: nextY >= bottomLimit,
+          };
+        });
 
-        const remainingLetters = newState.letters.filter(
-          (l) =>
-            l.y + newState.dimensions.letterSize < newState.dimensions.height
+        const lettersReachedBottom = updatedLetters.filter(
+          (l) => l.__hitBottom
         );
+        const remainingLetters = updatedLetters.filter((l) => !l.__hitBottom);
+
+        newState.letters = remainingLetters;
 
         // Skip life/shield loss during overcharge
         if (newState.chargeState.overchargeActive) {
@@ -293,20 +296,21 @@ export const useTypingGame = (
         prevState.gameMode === "word" ||
         prevState.gameMode === "story"
       ) {
-        newState.words = newState.words.map((word) => ({
-          ...word,
-          y: word.y + effectiveSpeed,
-        }));
+        const bottomLimit = newState.dimensions.height;
 
-        const wordsReachedBottom = newState.words.filter(
-          (w) =>
-            w.y + newState.dimensions.letterSize >= newState.dimensions.height
-        );
+        const updatedWords = newState.words.map((word) => {
+          const nextY = word.y + effectiveSpeed;
+          return {
+            ...word,
+            y: Math.min(nextY, bottomLimit),
+            __hitBottom: nextY >= bottomLimit,
+          };
+        });
 
-        const remainingWords = newState.words.filter(
-          (w) =>
-            w.y + newState.dimensions.letterSize < newState.dimensions.height
-        );
+        const wordsReachedBottom = updatedWords.filter((w) => w.__hitBottom);
+        const remainingWords = updatedWords.filter((w) => !w.__hitBottom);
+
+        newState.words = remainingWords;
 
         if (
           newState.currentTypingWordId &&
