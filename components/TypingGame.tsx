@@ -591,33 +591,25 @@ const HighlightedNumberOfPlays = styled.div`
 
 const ModeSelectorTitle = styled.h2`
   font-family: "Orbitron", sans-serif;
-  display: inline-block;
+  display: block;
   font-size: clamp(24px, 3vw, 32px);
   font-weight: 800;
   text-align: center;
   letter-spacing: 3px;
   margin-bottom: 16px;
-  position: relative;
-  color: transparent;
 
-  &::before {
-    content: attr(data-text);
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, #ffffff, #ffff00, #9e88ff, #00ffff);
-    background-size: 300% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shimmer 6s linear infinite;
-  }
+  background: linear-gradient(90deg, #ffffff, cyan, #3cff42, #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: hueShift 6s linear infinite;
 
-  @keyframes shimmer {
+  @keyframes hueShift {
     0% {
-      background-position: 0% 50%;
+      filter: hue-rotate(0deg);
     }
     100% {
-      background-position: 300% 50%;
+      filter: hue-rotate(360deg);
     }
   }
 
@@ -657,9 +649,7 @@ export const ModeSelector = ({ children }: { children: React.ReactNode }) => {
         delay: 0.6,
       }}
     >
-      <ModeSelectorTitle data-text="Select a Mode">
-        Select a Mode
-      </ModeSelectorTitle>
+      <ModeSelectorTitle>Select a Mode</ModeSelectorTitle>
       <div
         style={{
           display: "flex",
